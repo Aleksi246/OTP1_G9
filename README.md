@@ -1,2 +1,4 @@
 # OTP1_G9
-ohjelmisto tuotanto projekti 1 repo
+ohjelmistotuotanto projekti 1 repo
+
+sprint2: https://trello.com/b/2XyOSUYe/sprint2
