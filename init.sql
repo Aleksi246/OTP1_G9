@@ -55,9 +55,7 @@ CREATE TABLE IF NOT EXISTS reviews (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
---
---MOCK DATA
---
+-- MOCK DATA
 
 INSERT INTO users (username, password_hash, user_type, access_token)
 VALUES 
