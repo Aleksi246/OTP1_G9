@@ -1,1 +1,4 @@
 com/example/App.class
+com/example/otp/dao/UserDao.class
+com/example/otp/model/User.class
+com/example/otp/db/Database.class
