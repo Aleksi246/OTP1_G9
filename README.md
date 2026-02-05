@@ -4,3 +4,5 @@ ohjelmistotuotanto projekti 1 repo
 sprint2: https://trello.com/b/2XyOSUYe/sprint2
 Use case diagram:
 ![img.png](img.png)
+
+Use "mvn clean javafx:run" in terminal to run the application.
