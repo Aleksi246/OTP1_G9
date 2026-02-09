@@ -4,21 +4,23 @@ package com.example.otp.dao;
 import com.example.otp.db.Database;
 import com.example.otp.model.User;
 import com.example.otp.model.Course;
-import org.junit.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ParticipantDaoTest {
     private static ParticipantDao dao;
     private static UserDao userDao;
     private static CourseDao courseDao;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         try (Connection c = Database.getConnection();
              Statement s = c.createStatement()) {
@@ -53,7 +55,7 @@ public class ParticipantDaoTest {
         assertNotNull(createdClass.getClassId());
 
         // add participant
-        assertTrue("addParticipant should return true", dao.addParticipant(createdUser.getUserId(), createdClass.getClassId()));
+        assertTrue(dao.addParticipant(createdUser.getUserId(), createdClass.getClassId()), "addParticipant should return true");
 
         // find users by class
         List<Integer> usersInClass = dao.findUsersByClass(createdClass.getClassId());
@@ -64,7 +66,7 @@ public class ParticipantDaoTest {
         assertTrue(classesForUser.contains(createdClass.getClassId()));
 
         // remove participant
-        assertTrue("removeParticipant should return true", dao.removeParticipant(createdUser.getUserId(), createdClass.getClassId()));
+        assertTrue(dao.removeParticipant(createdUser.getUserId(), createdClass.getClassId()), "removeParticipant should return true");
 
         // verify removal
         usersInClass = dao.findUsersByClass(createdClass.getClassId());
@@ -73,7 +75,7 @@ public class ParticipantDaoTest {
         assertFalse(classesForUser.contains(createdClass.getClassId()));
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() throws SQLException {
         try (Connection c = Database.getConnection();
              Statement s = c.createStatement()) {

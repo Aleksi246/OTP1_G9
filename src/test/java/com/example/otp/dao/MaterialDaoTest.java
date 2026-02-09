@@ -5,21 +5,23 @@ import com.example.otp.db.Database;
 import com.example.otp.model.User;
 import com.example.otp.model.Course;
 import com.example.otp.model.Material;
-import org.junit.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MaterialDaoTest {
     private static MaterialDao dao;
     private static UserDao userDao;
     private static CourseDao courseDao;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         try (Connection c = Database.getConnection();
              Statement s = c.createStatement()) {
@@ -73,12 +75,12 @@ public class MaterialDaoTest {
         // findByClassId
         List<Material> byClass = dao.findByClassId(createdClass.getClassId());
         boolean contains = byClass.stream().anyMatch(x -> x.getFileId().equals(created.getFileId()));
-        assertTrue("findByClassId should contain created material", contains);
+        assertTrue(contains, "findByClassId should contain created material");
 
         // update
         created.setOriginalFilename("file_updated.txt");
         created.setMaterialType("TEXT");
-        assertTrue("update should return true", dao.update(created));
+        assertTrue(dao.update(created), "update should return true");
 
         Material updated = dao.findById(created.getFileId());
         assertNotNull(updated);
@@ -86,11 +88,11 @@ public class MaterialDaoTest {
         assertEquals("TEXT", updated.getMaterialType());
 
         // delete
-        assertTrue("delete should return true", dao.delete(created.getFileId()));
-        assertNull("deleted material should not be found", dao.findById(created.getFileId()));
+        assertTrue(dao.delete(created.getFileId()), "delete should return true");
+        assertNull(dao.findById(created.getFileId()), "deleted material should not be found");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() throws SQLException {
         try (Connection c = Database.getConnection();
              Statement s = c.createStatement()) {

@@ -6,14 +6,16 @@ import com.example.otp.model.User;
 import com.example.otp.model.Course;
 import com.example.otp.model.Material;
 import com.example.otp.model.Review;
-import org.junit.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ReviewDaoTest {
     private static ReviewDao dao;
@@ -21,7 +23,7 @@ public class ReviewDaoTest {
     private static CourseDao courseDao;
     private static MaterialDao materialDao;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         try (Connection c = Database.getConnection();
              Statement s = c.createStatement()) {
@@ -84,32 +86,34 @@ public class ReviewDaoTest {
         // findByFileId
         List<Review> byFile = dao.findByFileId(createdMaterial.getFileId());
         boolean contains = byFile.stream().anyMatch(x -> x.getReviewId().equals(created.getReviewId()));
-        assertTrue("findByFileId should contain created review", contains);
+        assertTrue(contains, "findByFileId should contain created review");
 
         // update
         created.setReview("Updated review");
         created.setRating(5);
-        assertTrue("update should return true", dao.update(created));
+        assertTrue(dao.update(created), "update should return true");
         Review updated = dao.findById(created.getReviewId());
         assertNotNull(updated);
         assertEquals((Integer)5, updated.getRating());
         assertEquals("Updated review", updated.getReview());
 
         // delete
-        assertTrue("delete should return true", dao.delete(created.getReviewId()));
-        assertNull("deleted review should not be found", dao.findById(created.getReviewId()));
+        assertTrue(dao.delete(created.getReviewId()), "delete should return true");
+        assertNull(dao.findById(created.getReviewId()), "deleted review should not be found");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testInvalidRatingRejected() throws SQLException {
-        Review r = new Review();
-        r.setReview("Bad rating");
-        r.setRating(999); // invalid
-        // should throw IllegalArgumentException from DAO validation
-        dao.create(r);
+        assertThrows(IllegalArgumentException.class, () -> {
+            Review r = new Review();
+            r.setReview("Bad rating");
+            r.setRating(999); // invalid
+            // should throw IllegalArgumentException from DAO validation
+            dao.create(r);
+        });
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() throws SQLException {
         try (Connection c = Database.getConnection();
              Statement s = c.createStatement()) {

@@ -3,19 +3,21 @@ package com.example.otp.dao;
 
 import com.example.otp.db.Database;
 import com.example.otp.model.Course;
-import org.junit.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CourseDaoTest {
     private static CourseDao dao;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         // Ensure a clean DB state for tests. Order matters because of FK constraints.
         try (Connection c = Database.getConnection();
@@ -38,7 +40,7 @@ public class CourseDaoTest {
         c.setTopic("Testing");
 
         Course created = dao.create(c);
-        assertNotNull("created class id should be set", created.getClassId());
+        assertNotNull(created.getClassId(), "created class id should be set");
 
         // findById
         Course found = dao.findById(created.getClassId());
@@ -49,12 +51,12 @@ public class CourseDaoTest {
         // findAll contains the new class
         List<Course> all = dao.findAll();
         boolean contains = all.stream().anyMatch(x -> x.getClassId().equals(created.getClassId()));
-        assertTrue("findAll should contain created class", contains);
+        assertTrue(contains, "findAll should contain created class");
 
         // update
         created.setClassName(base + "_upd");
         created.setTopic("UpdatedTopic");
-        assertTrue("update should return true", dao.update(created));
+        assertTrue(dao.update(created), "update should return true");
 
         Course updated = dao.findById(created.getClassId());
         assertNotNull(updated);
@@ -62,11 +64,11 @@ public class CourseDaoTest {
         assertEquals("UpdatedTopic", updated.getTopic());
 
         // delete
-        assertTrue("delete should return true", dao.delete(created.getClassId()));
-        assertNull("deleted class should not be found", dao.findById(created.getClassId()));
+        assertTrue(dao.delete(created.getClassId()), "delete should return true");
+        assertNull(dao.findById(created.getClassId()), "deleted class should not be found");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() throws SQLException {
         // clean up created rows (defensive)
         try (Connection c = Database.getConnection();
