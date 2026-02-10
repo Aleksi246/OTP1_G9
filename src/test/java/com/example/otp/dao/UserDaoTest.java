@@ -3,20 +3,22 @@ package com.example.otp.dao;
 
 import com.example.otp.db.Database;
 import com.example.otp.model.User;
-import org.junit.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserDaoTest {
 
     private static UserDao dao;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         // Ensure a clean DB state for tests. Order matters because of FK constraints.
         try (Connection c = Database.getConnection();
@@ -41,7 +43,7 @@ public class UserDaoTest {
         u.setAccessToken(null);
 
         User created = dao.create(u);
-        assertNotNull("created user id should be set", created.getUserId());
+        assertNotNull(created.getUserId(), "created user id should be set");
 
         // findById
         User found = dao.findById(created.getUserId());
@@ -52,14 +54,14 @@ public class UserDaoTest {
         // findAll contains the new user
         List<User> all = dao.findAll();
         boolean contains = all.stream().anyMatch(x -> x.getUserId().equals(created.getUserId()));
-        assertTrue("findAll should contain created user", contains);
+        assertTrue(contains, "findAll should contain created user");
 
         // update
         created.setUsername(base + "_upd");
         created.setPasswordHash("newhash");
         created.setUserType("teacher");
         created.setAccessToken("tok");
-        assertTrue("update should return true", dao.update(created));
+        assertTrue(dao.update(created), "update should return true");
 
         User updated = dao.findById(created.getUserId());
         assertNotNull(updated);
@@ -68,11 +70,11 @@ public class UserDaoTest {
         assertEquals("tok", updated.getAccessToken());
 
         // delete
-        assertTrue("delete should return true", dao.delete(created.getUserId()));
-        assertNull("deleted user should not be found", dao.findById(created.getUserId()));
+        assertTrue(dao.delete(created.getUserId()), "delete should return true");
+        assertNull(dao.findById(created.getUserId()), "deleted user should not be found");
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() throws SQLException {
         // clean up created rows (defensive)
         try (Connection c = Database.getConnection();

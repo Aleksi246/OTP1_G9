@@ -1,9 +1,9 @@
-com/example/otp/dao/MaterialDao.class
 com/example/App.class
+com/example/otp/dao/MaterialDao.class
 com/example/otp/dao/UserDao.class
 com/example/otp/dao/ReviewDao.class
-com/example/app/Main.class
 com/example/otp/model/Review.class
+com/example/app/Main.class
 com/example/otp/dao/CourseDao.class
 com/example/otp/dao/ParticipantDao.class
 com/example/otp/model/User.class
