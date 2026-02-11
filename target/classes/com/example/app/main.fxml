@@ -1,17 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.app.MainController"
-      spacing="10" alignment="CENTER">
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #DDDDF1;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
     <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>
 
-    <TextField fx:id="inputField" promptText="Enter your name"/>
-    <Button fx:id="clickButton" text="Greet"/>
-    <Label fx:id="messageLabel" text="Enter name and click Greet"/>
+    <left>
+        <VBox prefHeight="540.0" prefWidth="200.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
+            <children>
+                <Label text="Profile">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                    <VBox.margin>
+                        <Insets bottom="50.0" left="40.0" top="40.0" />
+                    </VBox.margin>
+                </Label>
+                <VBox spacing="25.0">
+                    <children>
+                        <Label text="Dashboard" />
+                        <Label text="Notifications" />
+                        <Label text="My Course" />
+                    </children>
+                    <padding>
+                        <Insets left="40.0" />
+                    </padding>
+                </VBox>
+                <VBox alignment="BOTTOM_LEFT" spacing="15.0" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Label text="Settings" />
+                        <Label text="Language" />
+                    </children>
+                    <padding>
+                        <Insets bottom="40.0" left="40.0" />
+                    </padding>
+                </VBox>
+            </children>
+        </VBox>
+    </left>
 
-</VBox>
+    <center>
+        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+            <children>
+                <HBox alignment="CENTER" prefHeight="120.0" prefWidth="710.0" spacing="200.0" style="-fx-background-color: white;">
+                    <VBox.margin>
+                        <Insets left="30.0" />
+                    </VBox.margin>
+                    <children>
+                        <Label text="Attendance" />
+                        <Label text="Grades" />
+                    </children>
+                </HBox>
+
+                <AnchorPane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Label text="Assignment" AnchorPane.leftAnchor="100.0" AnchorPane.topAnchor="80.0" />
+                        <Label text="Calendar" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="80.0" />
+                    </children>
+                </AnchorPane>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

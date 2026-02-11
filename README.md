@@ -8,4 +8,4 @@ published jacoco report: https://users.metropolia.fi/~aleklap/Aleksi246%20OTP1_G
 Use case diagram:
 ![img.png](img.png)
 
-Use "mvn clean javafx:run" in terminal to run the application.
+Use "mvn clean javafx:run" or "mvn -DskipTests javafx:run" in terminal to run the application.
