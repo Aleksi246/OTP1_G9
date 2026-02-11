@@ -1,5 +1,5 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-otp,com.example.app,Main,30,0,0,0,9,0,3,0,3,0
+otp,com.example.app,Main,63,0,2,0,18,0,4,0,3,0
 otp,com.example.app,MainController,13,0,0,0,5,0,3,0,3,0
 otp,com.example.otp.dao,MaterialDao,20,282,13,17,0,60,13,9,0,7
 otp,com.example.otp.dao,ParticipantDao,2,115,2,6,0,29,2,7,0,5
