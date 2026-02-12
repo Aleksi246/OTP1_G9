@@ -1,5 +1,6 @@
 ### Sprint 3 Planning Report – CI/CD Integration & Feature Extension
 
+
 #Sprint 3: 12.2.2026 - 05.3.2026
 
 **Sprint Goal:**
