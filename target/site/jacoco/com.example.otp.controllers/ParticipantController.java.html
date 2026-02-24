@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ParticipantController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">otp</a> &gt; <a href="index.source.html" class="el_package">com.example.otp.controllers</a> &gt; <span class="el_source">ParticipantController.java</span></div><h1>ParticipantController.java</h1><pre class="source lang-java linenums">package com.example.otp.controllers;
+
+import com.example.otp.dao.ParticipantDao;
+import com.example.otp.dao.UserDao;
+import com.example.otp.model.User;
+import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.util.List;
+
+<span class="fc" id="L13">public class ParticipantController {</span>
+<span class="fc" id="L14">    private ParticipantDao participantDao = new ParticipantDao();</span>
+<span class="fc" id="L15">    private UserDao userDao = new UserDao();</span>
+
+    public void enrollUser(Context ctx) {
+        try {
+<span class="fc" id="L19">            String username = ctx.attribute(&quot;username&quot;);</span>
+<span class="fc" id="L20">            User enrollingUser = userDao.findByUsername(username);</span>
+<span class="pc bpc" id="L21" title="1 of 4 branches missed.">            if (enrollingUser == null || !&quot;teacher&quot;.equals(enrollingUser.getUserType())) {</span>
+<span class="fc" id="L22">                ctx.status(HttpStatus.FORBIDDEN).json(&quot;Only teachers can enroll students&quot;);</span>
+<span class="fc" id="L23">                return;</span>
+            }
+
+<span class="fc" id="L26">            JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();</span>
+<span class="fc" id="L27">            int userId = body.get(&quot;userId&quot;).getAsInt();</span>
+<span class="fc" id="L28">            int classId = body.get(&quot;classId&quot;).getAsInt();</span>
+
+<span class="fc" id="L30">            User userToEnroll = userDao.findById(userId);</span>
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">            if (userToEnroll == null) {</span>
+<span class="nc" id="L32">                ctx.status(HttpStatus.BAD_REQUEST).json(&quot;User to enroll does not exist&quot;);</span>
+<span class="nc" id="L33">                return;</span>
+            }
+<span class="pc bpc" id="L35" title="1 of 2 branches missed.">            if (&quot;admin&quot;.equals(userToEnroll.getUserType())) {</span>
+<span class="nc" id="L36">                ctx.status(HttpStatus.BAD_REQUEST).json(&quot;Cannot enroll admin users&quot;);</span>
+<span class="nc" id="L37">                return;</span>
+            }
+
+<span class="fc" id="L40">            boolean success = participantDao.addParticipant(userId, classId);</span>
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">            if (success) {</span>
+<span class="fc" id="L42">                JsonObject response = new JsonObject();</span>
+<span class="fc" id="L43">                response.addProperty(&quot;message&quot;, &quot;User enrolled&quot;);</span>
+<span class="fc" id="L44">                response.addProperty(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L45">                response.addProperty(&quot;classId&quot;, classId);</span>
+<span class="fc" id="L46">                ctx.status(HttpStatus.CREATED).json(response.toString());</span>
+<span class="fc" id="L47">            } else {</span>
+<span class="nc" id="L48">                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Failed to enroll user&quot;);</span>
+            }
+<span class="nc" id="L50">        } catch (Exception e) {</span>
+<span class="nc" id="L51">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L52">        }</span>
+<span class="fc" id="L53">    }</span>
+
+    public void unenrollUser(Context ctx) {
+        try {
+<span class="fc" id="L57">            String username = ctx.attribute(&quot;username&quot;);</span>
+<span class="fc" id="L58">            User unenrollingUser = userDao.findByUsername(username);</span>
+<span class="pc bpc" id="L59" title="2 of 4 branches missed.">            if (unenrollingUser == null || !&quot;teacher&quot;.equals(unenrollingUser.getUserType())) {</span>
+<span class="nc" id="L60">                ctx.status(HttpStatus.FORBIDDEN).json(&quot;Only teachers can unenroll users&quot;);</span>
+<span class="nc" id="L61">                return;</span>
+            }
+
+<span class="fc" id="L64">            JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();</span>
+<span class="fc" id="L65">            int userId = body.get(&quot;userId&quot;).getAsInt();</span>
+<span class="fc" id="L66">            int classId = body.get(&quot;classId&quot;).getAsInt();</span>
+
+<span class="fc" id="L68">            boolean success = participantDao.removeParticipant(userId, classId);</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">            if (success) {</span>
+<span class="fc" id="L70">                JsonObject response = new JsonObject();</span>
+<span class="fc" id="L71">                response.addProperty(&quot;message&quot;, &quot;User unenrolled&quot;);</span>
+<span class="fc" id="L72">                response.addProperty(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L73">                response.addProperty(&quot;classId&quot;, classId);</span>
+<span class="fc" id="L74">                ctx.json(response.toString());</span>
+<span class="fc" id="L75">            } else {</span>
+<span class="nc" id="L76">                ctx.status(HttpStatus.NOT_FOUND).json(&quot;Enrollment not found&quot;);</span>
+            }
+<span class="nc" id="L78">        } catch (Exception e) {</span>
+<span class="nc" id="L79">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L80">        }</span>
+<span class="fc" id="L81">    }</span>
+
+    public void getUsersByClass(Context ctx) {
+        try {
+<span class="fc" id="L85">            int classId = Integer.parseInt(ctx.pathParam(&quot;classId&quot;));</span>
+<span class="fc" id="L86">            List&lt;Integer&gt; userIds = participantDao.findUsersByClass(classId);</span>
+<span class="fc" id="L87">            ctx.json(userIds);</span>
+<span class="nc" id="L88">        } catch (Exception e) {</span>
+<span class="nc" id="L89">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L90">        }</span>
+<span class="fc" id="L91">    }</span>
+
+    public void getClassesByUser(Context ctx) {
+        try {
+<span class="fc" id="L95">            int userId = Integer.parseInt(ctx.pathParam(&quot;userId&quot;));</span>
+<span class="fc" id="L96">            List&lt;Integer&gt; classIds = participantDao.findClassesByUser(userId);</span>
+<span class="fc" id="L97">            ctx.json(classIds);</span>
+<span class="nc" id="L98">        } catch (Exception e) {</span>
+<span class="nc" id="L99">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L100">        }</span>
+<span class="fc" id="L101">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

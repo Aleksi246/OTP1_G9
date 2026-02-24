@@ -36,6 +36,20 @@ public class UserDao {
         }
         return null;
     }
+    
+    public User findByUsername(String username) throws SQLException {
+        String sql = "SELECT user_id, username, password_hash, user_type, access_token, created_at FROM users WHERE username = ?";
+        try (Connection c = Database.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        }
+        return null;
+    }
 
     public List<User> findAll() throws SQLException {
         String sql = "SELECT user_id, username, password_hash, user_type, access_token, created_at FROM users";

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">otp</a> &gt; <a href="index.source.html" class="el_package">com.example.app</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">// src/main/java/com/example/app/Main.java
+package com.example.app;
+
+import com.example.otp.controllers.*;
+import com.example.otp.util.JWTUtil;
+import io.javalin.Javalin;
+import io.javalin.http.HttpStatus;
+import io.javalin.http.UnauthorizedResponse;
+
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+<span class="nc" id="L15">public class Main extends Application {</span>
+    @Override
+    public void start(Stage stage) throws Exception {
+<span class="nc" id="L18">        SceneManager.setPrimaryStage(stage);</span>
+<span class="nc" id="L19">        SceneManager.loadLogin();</span>
+<span class="nc" id="L20">    }</span>
+
+    public static void main(String[] args) {
+        // Start Javalin server in another thread to avoid blocking JavaFX application
+<span class="nc" id="L24">        new Thread(() -&gt; {</span>
+
+            // Initialize controllers
+<span class="nc" id="L27">            UserController userController = new UserController();</span>
+<span class="nc" id="L28">            CourseController courseController = new CourseController();</span>
+<span class="nc" id="L29">            MaterialController materialController = new MaterialController();</span>
+<span class="nc" id="L30">            ReviewController reviewController = new ReviewController();</span>
+<span class="nc" id="L31">            ParticipantController participantController = new ParticipantController();</span>
+
+            // Start Javalin server
+<span class="nc" id="L34">            Javalin app = Javalin.create(config -&gt; {</span>
+<span class="nc" id="L35">                config.plugins.enableCors(cors -&gt; {</span>
+<span class="nc" id="L36">                    cors.add(it -&gt; {</span>
+<span class="nc" id="L37">                        it.anyHost();</span>
+<span class="nc" id="L38">                    });</span>
+<span class="nc" id="L39">                });</span>
+<span class="nc" id="L40">            }).start(7700);</span>
+
+            // Authentication middleware - only for protected routes
+<span class="nc" id="L43">            app.before(&quot;/api/users&quot;, ctx -&gt; checkAuth(ctx));</span>
+<span class="nc" id="L44">            app.before(&quot;/api/users/{id}&quot;, ctx -&gt; checkAuth(ctx));</span>
+<span class="nc" id="L45">            app.before(&quot;/api/courses&quot;, ctx -&gt; checkAuth(ctx));</span>
+<span class="nc" id="L46">            app.before(&quot;/api/courses/{id}&quot;, ctx -&gt; checkAuth(ctx));</span>
+<span class="nc" id="L47">            app.before(&quot;/api/materials&quot;, ctx -&gt; checkAuth(ctx));</span>
+<span class="nc" id="L48">            app.before(&quot;/api/materials/{id}&quot;, ctx -&gt; checkAuth(ctx));</span>
+<span class="nc" id="L49">            app.before(&quot;/api/materials/{id}/download&quot;, ctx -&gt; checkAuth(ctx));</span>
+<span class="nc" id="L50">            app.before(&quot;/api/participants&quot;, ctx -&gt; checkAuth(ctx));</span>
+<span class="nc" id="L51">            app.before(&quot;/api/participants/enroll&quot;, ctx -&gt; checkAuth(ctx));</span>
+<span class="nc" id="L52">            app.before(&quot;/api/participants/unenroll&quot;, ctx -&gt; checkAuth(ctx));</span>
+<span class="nc" id="L53">            app.before(&quot;/api/participants/class/{classId}&quot;, ctx -&gt; checkAuth(ctx));</span>
+<span class="nc" id="L54">            app.before(&quot;/api/participants/user/{userId}&quot;, ctx -&gt; checkAuth(ctx));</span>
+<span class="nc" id="L55">            app.before(&quot;/api/admin/create-teacher&quot;, ctx -&gt; checkAuth(ctx));</span>
+
+<span class="nc" id="L57">            app.post(&quot;/api/auth/register&quot;, userController::register);</span>
+<span class="nc" id="L58">            app.post(&quot;/api/auth/login&quot;, userController::login);</span>
+
+            // Admin routes
+<span class="nc" id="L61">            app.post(&quot;/api/admin/create-teacher&quot;, userController::createTeacher);</span>
+
+            // User routes
+<span class="nc" id="L64">            app.get(&quot;/api/users&quot;, userController::getAllUsers);</span>
+<span class="nc" id="L65">            app.get(&quot;/api/users/{id}&quot;, userController::getUserById);</span>
+
+            // Course routes
+<span class="nc" id="L68">            app.get(&quot;/api/courses&quot;, courseController::getAllCourses);</span>
+<span class="nc" id="L69">            app.get(&quot;/api/courses/{id}&quot;, courseController::getCourseById);</span>
+<span class="nc" id="L70">            app.post(&quot;/api/courses&quot;, courseController::createCourse);</span>
+<span class="nc" id="L71">            app.put(&quot;/api/courses/{id}&quot;, courseController::updateCourse);</span>
+<span class="nc" id="L72">            app.delete(&quot;/api/courses/{id}&quot;, courseController::deleteCourse);</span>
+
+            // Material routes
+<span class="nc" id="L75">            app.get(&quot;/api/materials/course/{classId}&quot;, materialController::getMaterialsByCourse);</span>
+<span class="nc" id="L76">            app.get(&quot;/api/materials/{id}&quot;, materialController::getMaterialById);</span>
+<span class="nc" id="L77">            app.post(&quot;/api/materials&quot;, materialController::uploadMaterial);</span>
+<span class="nc" id="L78">            app.put(&quot;/api/materials/{id}&quot;, materialController::updateMaterial);</span>
+<span class="nc" id="L79">            app.delete(&quot;/api/materials/{id}&quot;, materialController::deleteMaterial);</span>
+
+            // Review routes
+<span class="nc" id="L82">            app.get(&quot;/api/reviews/material/{fileId}&quot;, reviewController::getReviewsByMaterial);</span>
+<span class="nc" id="L83">            app.get(&quot;/api/reviews/{id}&quot;, reviewController::getReviewById);</span>
+<span class="nc" id="L84">            app.post(&quot;/api/reviews&quot;, reviewController::createReview);</span>
+<span class="nc" id="L85">            app.put(&quot;/api/reviews/{id}&quot;, reviewController::updateReview);</span>
+<span class="nc" id="L86">            app.delete(&quot;/api/reviews/{id}&quot;, reviewController::deleteReview);</span>
+
+            // Participant routes
+<span class="nc" id="L89">            app.post(&quot;/api/participants/enroll&quot;, participantController::enrollUser);</span>
+<span class="nc" id="L90">            app.delete(&quot;/api/participants/unenroll&quot;, participantController::unenrollUser);</span>
+<span class="nc" id="L91">            app.get(&quot;/api/participants/class/{classId}&quot;, participantController::getUsersByClass);</span>
+<span class="nc" id="L92">            app.get(&quot;/api/participants/user/{userId}&quot;, participantController::getClassesByUser);</span>
+
+<span class="nc" id="L94">            System.out.println(&quot;Server started on port 7700&quot;);</span>
+<span class="nc" id="L95">        }).start();</span>
+
+<span class="nc" id="L97">        launch(args);</span>
+<span class="nc" id="L98">    }</span>
+
+    private static void checkAuth(io.javalin.http.Context ctx) {
+<span class="nc" id="L101">        String authHeader = ctx.header(&quot;Authorization&quot;);</span>
+<span class="nc bnc" id="L102" title="All 4 branches missed.">        if (authHeader == null || !authHeader.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="nc" id="L103">            throw new UnauthorizedResponse(&quot;Missing or invalid token&quot;);</span>
+        }
+<span class="nc" id="L105">        String token = authHeader.substring(7);</span>
+<span class="nc" id="L106">        String username = JWTUtil.validateToken(token);</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">        if (username == null) {</span>
+<span class="nc" id="L108">            throw new UnauthorizedResponse(&quot;Invalid token&quot;);</span>
+        }
+<span class="nc" id="L110">        ctx.attribute(&quot;username&quot;, username);</span>
+<span class="nc" id="L111">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,7 @@
+com/example/otp/dao/ParticipantDaoTest.class
+com/example/otp/controllers/ApiEndpointsIntegrationTest.class
+com/example/otp/dao/ReviewDaoTest.class
+com/example/AppTest.class
+com/example/otp/dao/MaterialDaoTest.class
+com/example/otp/dao/UserDaoTest.class
+com/example/otp/dao/CourseDaoTest.class

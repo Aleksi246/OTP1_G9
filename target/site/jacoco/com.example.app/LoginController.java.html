@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoginController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">otp</a> &gt; <a href="index.source.html" class="el_package">com.example.app</a> &gt; <span class="el_source">LoginController.java</span></div><h1>LoginController.java</h1><pre class="source lang-java linenums">package com.example.app;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+<span class="nc" id="L13">public class LoginController {</span>
+
+    @FXML private TextField usernameField;
+    @FXML private TextField passwordField;
+    @FXML private Label errorLabel;
+
+    private static final String API_URL = &quot;http://localhost:7700&quot;;
+<span class="nc" id="L20">    private final HttpClient httpClient = HttpClient.newHttpClient();</span>
+
+    @FXML
+    public void handleLogin() {
+<span class="nc" id="L24">        String username = usernameField.getText().trim();</span>
+<span class="nc" id="L25">        String password = passwordField.getText().trim();</span>
+
+<span class="nc bnc" id="L27" title="All 4 branches missed.">        if (username.isEmpty() || password.isEmpty()) {</span>
+<span class="nc" id="L28">            showError(&quot;Username and password required&quot;);</span>
+<span class="nc" id="L29">            return;</span>
+        }
+
+<span class="nc" id="L32">        doLogin(username, password);</span>
+<span class="nc" id="L33">    }</span>
+
+    @FXML
+    public void handleRegister() {
+<span class="nc" id="L37">        String username = usernameField.getText().trim();</span>
+<span class="nc" id="L38">        String password = passwordField.getText().trim();</span>
+
+<span class="nc bnc" id="L40" title="All 4 branches missed.">        if (username.isEmpty() || password.isEmpty()) {</span>
+<span class="nc" id="L41">            showError(&quot;Username and password required&quot;);</span>
+<span class="nc" id="L42">            return;</span>
+        }
+
+<span class="nc" id="L45">        doRegister(username, password);</span>
+<span class="nc" id="L46">    }</span>
+
+    private void doLogin(String username, String password) {
+        try {
+<span class="nc" id="L50">            String json = &quot;{\&quot;username\&quot;:\&quot;&quot; + escapeJson(username) + &quot;\&quot;,\&quot;password\&quot;:\&quot;&quot; + escapeJson(password) + &quot;\&quot;}&quot;;</span>
+<span class="nc" id="L51">            HttpRequest request = HttpRequest.newBuilder()</span>
+<span class="nc" id="L52">                    .uri(URI.create(API_URL + &quot;/api/auth/login&quot;))</span>
+<span class="nc" id="L53">                    .header(&quot;Content-Type&quot;, &quot;application/json&quot;)</span>
+<span class="nc" id="L54">                    .POST(HttpRequest.BodyPublishers.ofString(json))</span>
+<span class="nc" id="L55">                    .build();</span>
+
+<span class="nc" id="L57">            HttpResponse&lt;String&gt; response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());</span>
+
+<span class="nc bnc" id="L59" title="All 2 branches missed.">            if (response.statusCode() == 200) {</span>
+<span class="nc" id="L60">                String token = extractToken(response.body());</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">                if (token != null) {</span>
+<span class="nc" id="L62">                    errorLabel.setText(&quot;Login successful!&quot;);</span>
+<span class="nc" id="L63">                    new Thread(() -&gt; {</span>
+                        try {
+<span class="nc" id="L65">                            Thread.sleep(500);</span>
+<span class="nc" id="L66">                            String userType = JWTHelper.getUserTypeFromToken(token);</span>
+<span class="nc" id="L67">                            SceneManager.loadDashboard(userType, token, username);</span>
+<span class="nc" id="L68">                        } catch (InterruptedException e) {</span>
+<span class="nc" id="L69">                            Thread.currentThread().interrupt();</span>
+<span class="nc" id="L70">                        }</span>
+<span class="nc" id="L71">                    }).start();</span>
+                } else {
+<span class="nc" id="L73">                    showError(&quot;Failed to extract token from response&quot;);</span>
+                }
+<span class="nc" id="L75">            } else {</span>
+<span class="nc" id="L76">                showError(&quot;Login failed: &quot; + response.statusCode());</span>
+            }
+<span class="nc" id="L78">        } catch (IOException | InterruptedException ex) {</span>
+<span class="nc" id="L79">            showError(&quot;Connection error: &quot; + ex.getMessage());</span>
+<span class="nc" id="L80">        }</span>
+<span class="nc" id="L81">    }</span>
+
+    private void doRegister(String username, String password) {
+        try {
+<span class="nc" id="L85">            String json = &quot;{\&quot;username\&quot;:\&quot;&quot; + escapeJson(username) + &quot;\&quot;,\&quot;password\&quot;:\&quot;&quot; + escapeJson(password) + &quot;\&quot;}&quot;;</span>
+<span class="nc" id="L86">            HttpRequest request = HttpRequest.newBuilder()</span>
+<span class="nc" id="L87">                    .uri(URI.create(API_URL + &quot;/api/auth/register&quot;))</span>
+<span class="nc" id="L88">                    .header(&quot;Content-Type&quot;, &quot;application/json&quot;)</span>
+<span class="nc" id="L89">                    .POST(HttpRequest.BodyPublishers.ofString(json))</span>
+<span class="nc" id="L90">                    .build();</span>
+
+<span class="nc" id="L92">            HttpResponse&lt;String&gt; response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());</span>
+
+<span class="nc bnc" id="L94" title="All 2 branches missed.">            if (response.statusCode() == 201) {</span>
+<span class="nc" id="L95">                usernameField.setText(&quot;&quot;);</span>
+<span class="nc" id="L96">                passwordField.setText(&quot;&quot;);</span>
+<span class="nc" id="L97">                errorLabel.setText(&quot;Registration successful! Please log in.&quot;);</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">            } else if (response.statusCode() == 409) {</span>
+<span class="nc" id="L99">                showError(&quot;Username already exists&quot;);</span>
+            } else {
+<span class="nc" id="L101">                showError(&quot;Registration failed: &quot; + response.statusCode());</span>
+            }
+<span class="nc" id="L103">        } catch (IOException | InterruptedException ex) {</span>
+<span class="nc" id="L104">            showError(&quot;Connection error: &quot; + ex.getMessage());</span>
+<span class="nc" id="L105">        }</span>
+<span class="nc" id="L106">    }</span>
+
+    private void showError(String message) {
+<span class="nc" id="L109">        errorLabel.setText(message);</span>
+<span class="nc" id="L110">    }</span>
+
+    private String extractToken(String response) {
+<span class="nc" id="L113">        int start = response.indexOf(&quot;\&quot;token\&quot;:\&quot;&quot;);</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        if (start == -1) return null;</span>
+<span class="nc" id="L115">        start += 9;</span>
+<span class="nc" id="L116">        int end = response.indexOf(&quot;\&quot;&quot;, start);</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        return end &gt; start ? response.substring(start, end) : null;</span>
+    }
+
+    private String escapeJson(String str) {
+<span class="nc" id="L121">        return str.replace(&quot;\\&quot;, &quot;\\\\&quot;).replace(&quot;\&quot;&quot;, &quot;\\\&quot;&quot;).replace(&quot;\n&quot;, &quot;\\n&quot;).replace(&quot;\r&quot;, &quot;\\r&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

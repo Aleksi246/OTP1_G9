@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">otp</a> &gt; <a href="index.source.html" class="el_package">com.example.otp.controllers</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.example.otp.controllers;
+
+import com.example.otp.dao.UserDao;
+import com.example.otp.model.User;
+import com.example.otp.util.BCryptUtil;
+import com.example.otp.util.JWTUtil;
+import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.util.List;
+
+<span class="fc" id="L14">public class UserController {</span>
+<span class="fc" id="L15">    private UserDao userDao = new UserDao();</span>
+
+    public void register(Context ctx) {
+        try {
+<span class="fc" id="L19">            JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();</span>
+<span class="pc bpc" id="L20" title="1 of 2 branches missed.">            String username = body.has(&quot;username&quot;) ? body.get(&quot;username&quot;).getAsString() : null;</span>
+<span class="pc bpc" id="L21" title="1 of 2 branches missed.">            String password = body.has(&quot;password&quot;) ? body.get(&quot;password&quot;).getAsString() : null;</span>
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">            String userType = body.has(&quot;userType&quot;) ? body.get(&quot;userType&quot;).getAsString() : null;</span>
+
+<span class="pc bpc" id="L24" title="2 of 4 branches missed.">            if (username == null || password == null) {</span>
+<span class="nc" id="L25">                ctx.status(HttpStatus.BAD_REQUEST).json(&quot;Missing parameters&quot;);</span>
+<span class="nc" id="L26">                return;</span>
+            }
+
+<span class="fc" id="L29">            User existing = userDao.findByUsername(username);</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">            if (existing != null) {</span>
+<span class="nc" id="L31">                ctx.status(HttpStatus.CONFLICT).json(&quot;Username already exists&quot;);</span>
+<span class="nc" id="L32">                return;</span>
+            }
+
+<span class="pc bpc" id="L35" title="1 of 2 branches missed.">            if (&quot;admin&quot;.equals(userType)) {</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">                String adminKey = body.has(&quot;adminKey&quot;) ? body.get(&quot;adminKey&quot;).getAsString() : null;</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">                if (!&quot;supersecretkey&quot;.equals(adminKey)) {</span>
+<span class="nc" id="L38">                    ctx.status(HttpStatus.FORBIDDEN).json(&quot;Invalid admin key&quot;);</span>
+<span class="nc" id="L39">                    return;</span>
+                }
+<span class="nc" id="L41">            } else {</span>
+<span class="fc" id="L42">                userType = &quot;student&quot;;</span>
+            }
+
+<span class="fc" id="L45">            String hashedPassword = BCryptUtil.hashPassword(password);</span>
+<span class="fc" id="L46">            User user = new User();</span>
+<span class="fc" id="L47">            user.setUsername(username);</span>
+<span class="fc" id="L48">            user.setPasswordHash(hashedPassword);</span>
+<span class="fc" id="L49">            user.setUserType(userType);</span>
+
+<span class="fc" id="L51">            User created = userDao.create(user);</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">            if (created.getUserId() != null) {</span>
+<span class="fc" id="L53">                created.setPasswordHash(null);</span>
+<span class="fc" id="L54">                ctx.status(HttpStatus.CREATED).json(created);</span>
+            } else {
+<span class="nc" id="L56">                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Failed to register user&quot;);</span>
+            }
+<span class="nc" id="L58">        } catch (Exception e) {</span>
+<span class="nc" id="L59">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L60">        }</span>
+<span class="fc" id="L61">    }</span>
+
+    public void login(Context ctx) {
+        try {
+<span class="fc" id="L65">            JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">            String username = body.has(&quot;username&quot;) ? body.get(&quot;username&quot;).getAsString() : null;</span>
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">            String password = body.has(&quot;password&quot;) ? body.get(&quot;password&quot;).getAsString() : null;</span>
+
+<span class="pc bpc" id="L69" title="2 of 4 branches missed.">            if (username == null || password == null) {</span>
+<span class="nc" id="L70">                ctx.status(HttpStatus.BAD_REQUEST).json(&quot;Missing parameters&quot;);</span>
+<span class="nc" id="L71">                return;</span>
+            }
+
+<span class="fc" id="L74">            User user = userDao.findByUsername(username);</span>
+<span class="pc bpc" id="L75" title="2 of 4 branches missed.">            if (user != null &amp;&amp; BCryptUtil.verifyPassword(password, user.getPasswordHash())) {</span>
+<span class="fc" id="L76">                String token = JWTUtil.generateToken(username);</span>
+<span class="fc" id="L77">                ctx.json(&quot;{\&quot;token\&quot;:\&quot;&quot; + token + &quot;\&quot;}&quot;);</span>
+<span class="fc" id="L78">            } else {</span>
+<span class="nc" id="L79">                ctx.status(HttpStatus.UNAUTHORIZED).json(&quot;Invalid credentials&quot;);</span>
+            }
+<span class="nc" id="L81">        } catch (Exception e) {</span>
+<span class="nc" id="L82">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L83">        }</span>
+<span class="fc" id="L84">    }</span>
+
+    public void getAllUsers(Context ctx) {
+        try {
+<span class="fc" id="L88">            List&lt;User&gt; users = userDao.findAll();</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">            for (User user : users) {</span>
+<span class="fc" id="L90">                user.setPasswordHash(null);</span>
+<span class="fc" id="L91">            }</span>
+<span class="fc" id="L92">            ctx.json(users);</span>
+<span class="nc" id="L93">        } catch (Exception e) {</span>
+<span class="nc" id="L94">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L95">        }</span>
+<span class="fc" id="L96">    }</span>
+
+    public void getUserById(Context ctx) {
+        try {
+<span class="fc" id="L100">            int id = Integer.parseInt(ctx.pathParam(&quot;id&quot;));</span>
+<span class="fc" id="L101">            User user = userDao.findById(id);</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">            if (user != null) {</span>
+<span class="fc" id="L103">                user.setPasswordHash(null);</span>
+<span class="fc" id="L104">                ctx.json(user);</span>
+            } else {
+<span class="nc" id="L106">                ctx.status(HttpStatus.NOT_FOUND).json(&quot;User not found&quot;);</span>
+            }
+<span class="nc" id="L108">        } catch (Exception e) {</span>
+<span class="nc" id="L109">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L110">        }</span>
+<span class="fc" id="L111">    }</span>
+
+    public void createTeacher(Context ctx) {
+        try {
+<span class="fc" id="L115">            String username = ctx.attribute(&quot;username&quot;);</span>
+<span class="fc" id="L116">            User user = userDao.findByUsername(username);</span>
+<span class="pc bpc" id="L117" title="1 of 4 branches missed.">            if (user == null || !&quot;admin&quot;.equals(user.getUserType())) {</span>
+<span class="fc" id="L118">                ctx.status(HttpStatus.FORBIDDEN).json(&quot;Only admins can create teachers&quot;);</span>
+<span class="fc" id="L119">                return;</span>
+            }
+
+<span class="fc" id="L122">            JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();</span>
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">            String teacherUsername = body.has(&quot;username&quot;) ? body.get(&quot;username&quot;).getAsString() : null;</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">            String password = body.has(&quot;password&quot;) ? body.get(&quot;password&quot;).getAsString() : null;</span>
+
+<span class="pc bpc" id="L126" title="2 of 4 branches missed.">            if (teacherUsername == null || password == null) {</span>
+<span class="nc" id="L127">                ctx.status(HttpStatus.BAD_REQUEST).json(&quot;Missing parameters&quot;);</span>
+<span class="nc" id="L128">                return;</span>
+            }
+
+<span class="fc" id="L131">            String hashedPassword = BCryptUtil.hashPassword(password);</span>
+<span class="fc" id="L132">            User teacher = new User();</span>
+<span class="fc" id="L133">            teacher.setUsername(teacherUsername);</span>
+<span class="fc" id="L134">            teacher.setPasswordHash(hashedPassword);</span>
+<span class="fc" id="L135">            teacher.setUserType(&quot;teacher&quot;);</span>
+
+<span class="fc" id="L137">            User created = userDao.create(teacher);</span>
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">            if (created.getUserId() != null) {</span>
+<span class="fc" id="L139">                created.setPasswordHash(null);</span>
+<span class="fc" id="L140">                ctx.status(HttpStatus.CREATED).json(created);</span>
+            } else {
+<span class="nc" id="L142">                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Failed to create teacher&quot;);</span>
+            }
+<span class="nc" id="L144">        } catch (Exception e) {</span>
+<span class="nc" id="L145">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L146">        }</span>
+<span class="fc" id="L147">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

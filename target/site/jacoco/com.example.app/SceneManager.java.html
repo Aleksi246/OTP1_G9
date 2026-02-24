@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SceneManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">otp</a> &gt; <a href="index.source.html" class="el_package">com.example.app</a> &gt; <span class="el_source">SceneManager.java</span></div><h1>SceneManager.java</h1><pre class="source lang-java linenums">package com.example.app;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+<span class="nc" id="L7">public class SceneManager {</span>
+    private static Stage primaryStage;
+
+    public static void setPrimaryStage(Stage stage) {
+<span class="nc" id="L11">        primaryStage = stage;</span>
+<span class="nc" id="L12">    }</span>
+
+    public static void loadLogin() {
+        try {
+<span class="nc" id="L16">            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(&quot;/com/example/app/login.fxml&quot;));</span>
+<span class="nc" id="L17">            Scene scene = new Scene(loader.load());</span>
+<span class="nc" id="L18">            primaryStage.setTitle(&quot;Learning Platform - Login&quot;);</span>
+<span class="nc" id="L19">            primaryStage.setScene(scene);</span>
+<span class="nc" id="L20">            primaryStage.show();</span>
+<span class="nc" id="L21">        } catch (Exception e) {</span>
+<span class="nc" id="L22">            System.err.println(&quot;Error loading login scene: &quot; + e.getMessage());</span>
+<span class="nc" id="L23">            e.printStackTrace();</span>
+<span class="nc" id="L24">        }</span>
+<span class="nc" id="L25">    }</span>
+
+    public static void loadDashboard(String userType, String token, String username) {
+        try {
+<span class="nc bnc" id="L29" title="All 2 branches missed.">            if (&quot;admin&quot;.equals(userType)) {</span>
+<span class="nc" id="L30">                FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(&quot;/com/example/app/admin.fxml&quot;));</span>
+<span class="nc" id="L31">                AdminController controller = new AdminController();</span>
+<span class="nc" id="L32">                loader.setController(controller);</span>
+<span class="nc" id="L33">                Scene scene = new Scene(loader.load());</span>
+<span class="nc" id="L34">                controller.setAuthToken(token);</span>
+<span class="nc" id="L35">                primaryStage.setTitle(&quot;Learning Platform - Admin Dashboard&quot;);</span>
+<span class="nc" id="L36">                primaryStage.setScene(scene);</span>
+<span class="nc" id="L37">                primaryStage.show();</span>
+<span class="nc" id="L38">            } else {</span>
+<span class="nc" id="L39">                FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(&quot;/com/example/app/dashboard.fxml&quot;));</span>
+<span class="nc" id="L40">                DashboardController controller = new DashboardController();</span>
+<span class="nc" id="L41">                loader.setController(controller);</span>
+<span class="nc" id="L42">                Scene scene = new Scene(loader.load());</span>
+<span class="nc" id="L43">                controller.setUserInfo(userType, username);</span>
+<span class="nc" id="L44">                primaryStage.setTitle(&quot;Learning Platform - &quot; + capitalize(userType) + &quot; Dashboard&quot;);</span>
+<span class="nc" id="L45">                primaryStage.setScene(scene);</span>
+<span class="nc" id="L46">                primaryStage.show();</span>
+            }
+<span class="nc" id="L48">        } catch (Exception e) {</span>
+<span class="nc" id="L49">            System.err.println(&quot;Error loading dashboard scene: &quot; + e.getMessage());</span>
+<span class="nc" id="L50">            e.printStackTrace();</span>
+<span class="nc" id="L51">        }</span>
+<span class="nc" id="L52">    }</span>
+
+    private static String capitalize(String str) {
+<span class="nc" id="L55">        return str.substring(0, 1).toUpperCase() + str.substring(1);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

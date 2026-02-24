@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Course.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">otp</a> &gt; <a href="index.source.html" class="el_package">com.example.otp.model</a> &gt; <span class="el_source">Course.java</span></div><h1>Course.java</h1><pre class="source lang-java linenums">// java
+package com.example.otp.model;
+
+import java.sql.Timestamp;
+
+public class Course {
+    private Integer classId;
+    private String className;
+    private String topic;
+    private Timestamp createdAt;
+
+<span class="fc" id="L12">    public Course() {}</span>
+
+<span class="nc" id="L14">    public Course(Integer classId, String className, String topic, Timestamp createdAt) {</span>
+<span class="nc" id="L15">        this.classId = classId;</span>
+<span class="nc" id="L16">        this.className = className;</span>
+<span class="nc" id="L17">        this.topic = topic;</span>
+<span class="nc" id="L18">        this.createdAt = createdAt;</span>
+<span class="nc" id="L19">    }</span>
+
+<span class="fc" id="L21">    public Integer getClassId() { return classId; }</span>
+<span class="fc" id="L22">    public void setClassId(Integer classId) { this.classId = classId; }</span>
+<span class="fc" id="L23">    public String getClassName() { return className; }</span>
+<span class="fc" id="L24">    public void setClassName(String className) { this.className = className; }</span>
+<span class="fc" id="L25">    public String getTopic() { return topic; }</span>
+<span class="fc" id="L26">    public void setTopic(String topic) { this.topic = topic; }</span>
+<span class="fc" id="L27">    public Timestamp getCreatedAt() { return createdAt; }</span>
+<span class="fc" id="L28">    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

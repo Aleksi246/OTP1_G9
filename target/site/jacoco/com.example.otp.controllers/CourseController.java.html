@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CourseController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">otp</a> &gt; <a href="index.source.html" class="el_package">com.example.otp.controllers</a> &gt; <span class="el_source">CourseController.java</span></div><h1>CourseController.java</h1><pre class="source lang-java linenums">package com.example.otp.controllers;
+
+import com.example.otp.dao.CourseDao;
+import com.example.otp.dao.ParticipantDao;
+import com.example.otp.dao.UserDao;
+import com.example.otp.model.Course;
+import com.example.otp.model.User;
+import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.util.List;
+
+<span class="fc" id="L15">public class CourseController {</span>
+<span class="fc" id="L16">    private CourseDao courseDao = new CourseDao();</span>
+<span class="fc" id="L17">    private UserDao userDao = new UserDao();</span>
+<span class="fc" id="L18">    private ParticipantDao participantDao = new ParticipantDao();</span>
+
+    private boolean isTeacher(User user) {
+<span class="fc" id="L21">        return &quot;teacher&quot;.equals(user.getUserType());</span>
+    }
+
+    private boolean isEnrolled(User user, int classId) {
+        try {
+<span class="fc" id="L26">            List&lt;Integer&gt; classes = participantDao.findClassesByUser(user.getUserId());</span>
+<span class="fc" id="L27">            return classes.contains(classId);</span>
+<span class="nc" id="L28">        } catch (Exception e) {</span>
+<span class="nc" id="L29">            return false;</span>
+        }
+    }
+
+    public void getAllCourses(Context ctx) {
+        try {
+<span class="fc" id="L35">            List&lt;Course&gt; courses = courseDao.findAll();</span>
+<span class="fc" id="L36">            ctx.json(courses);</span>
+<span class="nc" id="L37">        } catch (Exception e) {</span>
+<span class="nc" id="L38">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L39">        }</span>
+<span class="fc" id="L40">    }</span>
+
+    public void getCourseById(Context ctx) {
+        try {
+<span class="fc" id="L44">            int id = Integer.parseInt(ctx.pathParam(&quot;id&quot;));</span>
+<span class="fc" id="L45">            Course course = courseDao.findById(id);</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">            if (course != null) {</span>
+<span class="fc" id="L47">                ctx.json(course);</span>
+            } else {
+<span class="nc" id="L49">                ctx.status(HttpStatus.NOT_FOUND).json(&quot;Course not found&quot;);</span>
+            }
+<span class="nc" id="L51">        } catch (Exception e) {</span>
+<span class="nc" id="L52">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L53">        }</span>
+<span class="fc" id="L54">    }</span>
+
+    public void createCourse(Context ctx) {
+        try {
+<span class="fc" id="L58">            String username = ctx.attribute(&quot;username&quot;);</span>
+<span class="fc" id="L59">            User user = userDao.findByUsername(username);</span>
+<span class="pc bpc" id="L60" title="2 of 4 branches missed.">            if (user == null || !isTeacher(user)) {</span>
+<span class="nc" id="L61">                ctx.status(HttpStatus.FORBIDDEN).json(&quot;Only teachers can create courses&quot;);</span>
+<span class="nc" id="L62">                return;</span>
+            }
+
+<span class="fc" id="L65">            JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">            String className = body.has(&quot;className&quot;) ? body.get(&quot;className&quot;).getAsString() : null;</span>
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">            String topic = body.has(&quot;topic&quot;) ? body.get(&quot;topic&quot;).getAsString() : null;</span>
+
+<span class="pc bpc" id="L69" title="2 of 4 branches missed.">            if (className == null || topic == null) {</span>
+<span class="nc" id="L70">                ctx.status(HttpStatus.BAD_REQUEST).json(&quot;Missing parameters&quot;);</span>
+<span class="nc" id="L71">                return;</span>
+            }
+
+<span class="fc" id="L74">            Course course = new Course();</span>
+<span class="fc" id="L75">            course.setClassName(className);</span>
+<span class="fc" id="L76">            course.setTopic(topic);</span>
+
+<span class="fc" id="L78">            Course created = courseDao.create(course);</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">            if (created.getClassId() != null) {</span>
+<span class="fc" id="L80">                participantDao.addParticipant(user.getUserId(), created.getClassId());</span>
+<span class="fc" id="L81">                ctx.status(HttpStatus.CREATED).json(created);</span>
+            } else {
+<span class="nc" id="L83">                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Failed to create course&quot;);</span>
+            }
+<span class="nc" id="L85">        } catch (Exception e) {</span>
+<span class="nc" id="L86">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L87">        }</span>
+<span class="fc" id="L88">    }</span>
+
+    public void updateCourse(Context ctx) {
+        try {
+<span class="fc" id="L92">            String username = ctx.attribute(&quot;username&quot;);</span>
+<span class="fc" id="L93">            User user = userDao.findByUsername(username);</span>
+<span class="fc" id="L94">            int id = Integer.parseInt(ctx.pathParam(&quot;id&quot;));</span>
+<span class="pc bpc" id="L95" title="2 of 6 branches missed.">            if (user == null || !isTeacher(user) || !isEnrolled(user, id)) {</span>
+<span class="fc" id="L96">                ctx.status(HttpStatus.FORBIDDEN).json(&quot;Only enrolled teachers can update courses&quot;);</span>
+<span class="fc" id="L97">                return;</span>
+            }
+
+<span class="fc" id="L100">            JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">            String className = body.has(&quot;className&quot;) ? body.get(&quot;className&quot;).getAsString() : null;</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">            String topic = body.has(&quot;topic&quot;) ? body.get(&quot;topic&quot;).getAsString() : null;</span>
+
+<span class="fc" id="L104">            Course course = courseDao.findById(id);</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">            if (course == null) {</span>
+<span class="nc" id="L106">                ctx.status(HttpStatus.NOT_FOUND).json(&quot;Course not found&quot;);</span>
+<span class="nc" id="L107">                return;</span>
+            }
+
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">            if (className != null) course.setClassName(className);</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">            if (topic != null) course.setTopic(topic);</span>
+
+<span class="fc" id="L113">            boolean success = courseDao.update(course);</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">            if (success) {</span>
+<span class="fc" id="L115">                ctx.json(course);</span>
+            } else {
+<span class="nc" id="L117">                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Failed to update course&quot;);</span>
+            }
+<span class="nc" id="L119">        } catch (Exception e) {</span>
+<span class="nc" id="L120">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L121">        }</span>
+<span class="fc" id="L122">    }</span>
+
+    public void deleteCourse(Context ctx) {
+        try {
+<span class="fc" id="L126">            String username = ctx.attribute(&quot;username&quot;);</span>
+<span class="fc" id="L127">            User user = userDao.findByUsername(username);</span>
+<span class="fc" id="L128">            int id = Integer.parseInt(ctx.pathParam(&quot;id&quot;));</span>
+<span class="pc bpc" id="L129" title="3 of 6 branches missed.">            if (user == null || !isTeacher(user) || !isEnrolled(user, id)) {</span>
+<span class="nc" id="L130">                ctx.status(HttpStatus.FORBIDDEN).json(&quot;Only enrolled teachers can delete courses&quot;);</span>
+<span class="nc" id="L131">                return;</span>
+            }
+
+<span class="fc" id="L134">            boolean success = courseDao.delete(id);</span>
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">            if (success) {</span>
+<span class="fc" id="L136">                JsonObject response = new JsonObject();</span>
+<span class="fc" id="L137">                response.addProperty(&quot;message&quot;, &quot;Course deleted&quot;);</span>
+<span class="fc" id="L138">                response.addProperty(&quot;id&quot;, id);</span>
+<span class="fc" id="L139">                ctx.json(response.toString());</span>
+<span class="fc" id="L140">            } else {</span>
+<span class="nc" id="L141">                ctx.status(HttpStatus.NOT_FOUND).json(&quot;Course not found&quot;);</span>
+            }
+<span class="nc" id="L143">        } catch (Exception e) {</span>
+<span class="nc" id="L144">            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(&quot;Error: &quot; + e.getMessage());</span>
+<span class="fc" id="L145">        }</span>
+<span class="fc" id="L146">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

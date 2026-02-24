@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    user_type ENUM('student', 'teacher') NOT NULL,
+    user_type ENUM('student', 'teacher', 'admin') NOT NULL,
     access_token VARCHAR(512),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS participants (
 CREATE TABLE IF NOT EXISTS  materials(
     file_id INT AUTO_INCREMENT PRIMARY KEY,
     original_filename VARCHAR(255) NOT NULL,
-    stored_filename CHAR(36) NOT NULL,
+    stored_filename VARCHAR(100) NOT NULL,
     filepath VARCHAR(512),
     material_type VARCHAR(100),
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
