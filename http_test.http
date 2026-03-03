@@ -17,7 +17,7 @@
 @user3Password = pass123
 
 ### Manual values (paste from responses)
-@creatorToken = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjcmVhdG9yX2FwaV90ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzcyNTY4Mzg4LCJleHAiOjE3NzI2NTQ3ODh9.53k0ltroN2lmdCsVvBxiIDLReqbGVVL7Ky9XLa8fSbQ
+@creatorToken = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjcmVhdG9yX2FwaV90ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzcyNTcwNTQxLCJleHAiOjE3NzI2NTY5NDF9.Ef4pAGqlgTTFx6FxrNO1FLH11sTn2FgVHNp_6_XSSlA
 @user2Token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMl9hcGlfdGVzdEBleGFtcGxlLmNvbSIsImlhdCI6MTc3MjU2ODU2MywiZXhwIjoxNzcyNjU0OTYzfQ.twjcVr71nI-rTbPutA09XUKi7d34YnLuZrvLPM2buro
 @user3Token = PASTE_USER3_TOKEN
 @creatorUserId = 166
@@ -79,8 +79,8 @@ POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "{{user2Username}}",
-  "password": "{{user2Password}}"
+  "username": "asd",
+  "password": "asdasd"
 }
 
 ### Login user3

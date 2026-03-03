@@ -48,18 +48,13 @@ public class Main extends Application {
             app.before("/api/materials", ctx -> checkAuth(ctx));
             app.before("/api/materials/{id}", ctx -> checkAuth(ctx));
             app.before("/api/materials/{id}/download", ctx -> checkAuth(ctx));
-            app.before("/api/participants", ctx -> checkAuth(ctx));
             app.before("/api/participants/enroll", ctx -> checkAuth(ctx));
             app.before("/api/participants/unenroll", ctx -> checkAuth(ctx));
             app.before("/api/participants/class/{classId}", ctx -> checkAuth(ctx));
             app.before("/api/participants/user/{userId}", ctx -> checkAuth(ctx));
-            app.before("/api/admin/create-teacher", ctx -> checkAuth(ctx));
 
             app.post("/api/auth/register", userController::register);
             app.post("/api/auth/login", userController::login);
-
-            // Admin routes
-            app.post("/api/admin/create-teacher", userController::createTeacher);
 
             // User routes
             app.get("/api/users", userController::getAllUsers);
@@ -75,6 +70,7 @@ public class Main extends Application {
             // Material routes
             app.get("/api/materials/course/{classId}", materialController::getMaterialsByCourse);
             app.get("/api/materials/{id}", materialController::getMaterialById);
+            app.get("/api/materials/{id}/download", materialController::downloadMaterial);
             app.post("/api/materials", materialController::uploadMaterial);
             app.put("/api/materials/{id}", materialController::updateMaterial);
             app.delete("/api/materials/{id}", materialController::deleteMaterial);

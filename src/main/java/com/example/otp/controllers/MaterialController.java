@@ -2,6 +2,7 @@ package com.example.otp.controllers;
 
 import com.example.otp.dao.CourseDao;
 import com.example.otp.dao.MaterialDao;
+import com.example.otp.dao.ParticipantDao;
 import com.example.otp.dao.UserDao;
 import com.example.otp.model.Course;
 import com.example.otp.model.Material;
@@ -23,6 +24,7 @@ public class MaterialController {
     private MaterialDao materialDao = new MaterialDao();
     private UserDao userDao = new UserDao();
     private CourseDao courseDao = new CourseDao();
+    private ParticipantDao participantDao = new ParticipantDao();
     private static final Path UPLOAD_DIR = Paths.get("uploads").toAbsolutePath();
 
     private void jsonMessage(Context ctx, HttpStatus status, String message) {
@@ -52,6 +54,47 @@ public class MaterialController {
             } else {
                 jsonMessage(ctx, HttpStatus.NOT_FOUND, "Material not found");
             }
+        } catch (Exception e) {
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+        }
+    }
+
+    public void downloadMaterial(Context ctx) {
+        try {
+            String email = ctx.attribute("email");
+            User user = userDao.findByEmail(email);
+            if (user == null) {
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Authentication required");
+                return;
+            }
+
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            Material material = materialDao.findById(id);
+            if (material == null) {
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "Material not found");
+                return;
+            }
+
+            List<Integer> enrolledClassIds = participantDao.findClassesByUser(user.getUserId());
+            if (!enrolledClassIds.contains(material.getClassId())) {
+                jsonMessage(ctx, HttpStatus.FORBIDDEN, "You must be enrolled in the course to download this material");
+                return;
+            }
+
+            Path filePath = Paths.get(material.getFilepath());
+            if (!Files.exists(filePath)) {
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "File not found on server");
+                return;
+            }
+
+            String contentType = Files.probeContentType(filePath);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            ctx.header("Content-Disposition", "attachment; filename=\"" + material.getOriginalFilename() + "\"");
+            ctx.contentType(contentType);
+            ctx.result(Files.newInputStream(filePath));
         } catch (Exception e) {
             jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }

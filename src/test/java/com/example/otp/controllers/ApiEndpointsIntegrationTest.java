@@ -26,6 +26,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Statement;
 
@@ -87,6 +90,7 @@ public class ApiEndpointsIntegrationTest {
 
         app.get("/api/materials/course/{classId}", materialController::getMaterialsByCourse);
         app.get("/api/materials/{id}", materialController::getMaterialById);
+        app.get("/api/materials/{id}/download", materialController::downloadMaterial);
         app.post("/api/materials", materialController::uploadMaterial);
         app.put("/api/materials/{id}", materialController::updateMaterial);
         app.delete("/api/materials/{id}", materialController::deleteMaterial);
@@ -159,6 +163,10 @@ public class ApiEndpointsIntegrationTest {
         material.setUserId(teacherId);
         material = materialDao.create(material);
         materialId = material.getFileId();
+
+        Path uploadsDir = Paths.get("uploads");
+        Files.createDirectories(uploadsDir);
+        Files.writeString(uploadsDir.resolve("seed-file-id.txt"), "seed-content");
 
         Review review = new Review();
         review.setReview("Seed review");
@@ -265,6 +273,8 @@ public class ApiEndpointsIntegrationTest {
     @Test
     void materialEndpoints_allRoutesCovered() throws Exception {
         String teacherToken = tokenFor("teacher_seed");
+      String studentToken = tokenFor("student_seed");
+      String student2Token = tokenFor("student2_seed");
 
         HttpResponse<String> getByCoursePublic = sendJson("GET", "/api/materials/course/" + classId, null, null);
         assertEquals(200, getByCoursePublic.statusCode());
@@ -274,6 +284,15 @@ public class ApiEndpointsIntegrationTest {
 
         HttpResponse<String> getById = sendJson("GET", "/api/materials/" + materialId, bearer(teacherToken), null);
         assertEquals(200, getById.statusCode());
+
+        HttpResponse<String> downloadNoToken = sendJson("GET", "/api/materials/" + materialId + "/download", null, null);
+        assertEquals(401, downloadNoToken.statusCode());
+
+        HttpResponse<String> downloadEnrolled = sendJson("GET", "/api/materials/" + materialId + "/download", bearer(studentToken), null);
+        assertEquals(200, downloadEnrolled.statusCode());
+
+        HttpResponse<String> downloadNotEnrolled = sendJson("GET", "/api/materials/" + materialId + "/download", bearer(student2Token), null);
+        assertEquals(403, downloadNotEnrolled.statusCode());
 
         HttpResponse<String> upload = sendMultipartUpload(teacherToken, classId, "lecture_notes", "upload-test.txt", "hello");
         assertEquals(201, upload.statusCode());
