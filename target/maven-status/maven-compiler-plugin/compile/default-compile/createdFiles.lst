@@ -9,9 +9,10 @@ com/example/otp/util/BCryptUtil.class
 com/example/otp/dao/CourseDao.class
 com/example/otp/model/Course.class
 com/example/otp/db/Database.class
-com/example/app/MainController.class
 com/example/app/LoginController.class
+com/example/app/MainController.class
 com/example/otp/model/Material.class
+com/example/otp/db/DatabaseInitializer.class
 com/example/otp/controllers/CourseController.class
 com/example/otp/controllers/UserController.class
 com/example/otp/dao/MaterialDao.class
@@ -23,3 +24,4 @@ com/example/otp/model/User.class
 com/example/app/JWTHelper.class
 com/example/otp/util/JWTUtil.class
 com/example/app/AdminController.class
+com/example/app/RegisterController.class

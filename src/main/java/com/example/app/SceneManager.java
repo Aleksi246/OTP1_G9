@@ -24,6 +24,19 @@ public class SceneManager {
         }
     }
 
+    public static void loadRegister() {
+        try {
+            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/register.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("Learning Platform - Register");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (Exception e) {
+            System.err.println("Error loading register scene: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     public static void loadDashboard(String userType, String token, String username) {
         try {
             String normalizedUserType = (userType == null || userType.isBlank()) ? "student" : userType;

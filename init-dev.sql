@@ -1,5 +1,7 @@
--- Safe initialization: only creates database/user/schema if missing
--- Does NOT drop existing data (idempotent for production)
+-- Development initialization: DESTRUCTIVE (drops and recreates everything)
+-- Use only in development/test environments, never in production!
+
+DROP DATABASE IF EXISTS otptestdb;
 
 CREATE DATABASE IF NOT EXISTS otptestdb;
 USE otptestdb;
@@ -55,4 +57,10 @@ CREATE TABLE IF NOT EXISTS reviews (
     FOREIGN KEY (file_id) REFERENCES materials(file_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
+
+-- Optional sample data for development (comment out if not needed)
+-- INSERT INTO users (username, password_hash, user_type) VALUES
+-- ('admin', 'admin_hash', 'admin'),
+-- ('teacher1', 'teacher_hash', 'teacher'),
+-- ('student1', 'student_hash', 'student');
 

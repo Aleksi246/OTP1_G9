@@ -16,10 +16,13 @@ public class UserController {
 
     public void register(Context ctx) {
         try {
+            System.out.println("[REGISTRATION] Received registration request");
             JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
             String username = body.has("username") ? body.get("username").getAsString() : null;
             String password = body.has("password") ? body.get("password").getAsString() : null;
             String userType = body.has("userType") ? body.get("userType").getAsString() : null;
+
+            System.out.println("[REGISTRATION] Username: " + username + ", UserType: " + userType);
 
             if (username == null || password == null) {
                 ctx.status(HttpStatus.BAD_REQUEST).json("Missing parameters");
@@ -28,13 +31,16 @@ public class UserController {
 
             User existing = userDao.findByUsername(username);
             if (existing != null) {
+                System.out.println("[REGISTRATION] User already exists: " + username);
                 ctx.status(HttpStatus.CONFLICT).json("Username already exists");
                 return;
             }
 
             if ("admin".equals(userType)) {
                 String adminKey = body.has("adminKey") ? body.get("adminKey").getAsString() : null;
+                System.out.println("[REGISTRATION] Checking admin key");
                 if (!"supersecretkey".equals(adminKey)) {
+                    System.out.println("[REGISTRATION] Invalid admin key");
                     ctx.status(HttpStatus.FORBIDDEN).json("Invalid admin key");
                     return;
                 }
@@ -48,14 +54,19 @@ public class UserController {
             user.setPasswordHash(hashedPassword);
             user.setUserType(userType);
 
+            System.out.println("[REGISTRATION] Creating user in database: " + username);
             User created = userDao.create(user);
             if (created.getUserId() != null) {
+                System.out.println("[REGISTRATION] User created successfully with ID: " + created.getUserId());
                 created.setPasswordHash(null);
                 ctx.status(HttpStatus.CREATED).json(created);
             } else {
+                System.out.println("[REGISTRATION] Failed to register user - no ID returned");
                 ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Failed to register user");
             }
         } catch (Exception e) {
+            System.err.println("[REGISTRATION] Exception: " + e.getMessage());
+            e.printStackTrace();
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
         }
     }

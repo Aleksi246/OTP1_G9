@@ -18,6 +18,21 @@ public class LoginController {
 
     private static final String API_URL = "http://localhost:7700";
     private final HttpClient httpClient = HttpClient.newHttpClient();
+    private boolean isRegisterMode = false;
+
+    @FXML
+    public void handlePrimaryAction() {
+        if (isRegisterMode) {
+            handleRegister();
+        } else {
+            handleLogin();
+        }
+    }
+
+    @FXML
+    public void handleSwitchContext() {
+        SceneManager.loadRegister();
+    }
 
     @FXML
     public void handleLogin() {

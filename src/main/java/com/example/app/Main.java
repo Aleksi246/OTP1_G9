@@ -2,6 +2,7 @@
 package com.example.app;
 
 import com.example.otp.controllers.*;
+import com.example.otp.db.DatabaseInitializer;
 import com.example.otp.util.JWTUtil;
 import io.javalin.Javalin;
 import io.javalin.http.HttpStatus;
@@ -20,6 +21,9 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
+        // Initialize database before starting the server
+        DatabaseInitializer.initializeDatabase();
+
         // Start Javalin server in another thread to avoid blocking JavaFX application
         new Thread(() -> {
 
@@ -32,8 +36,8 @@ public class Main extends Application {
 
             // Start Javalin server
             Javalin app = Javalin.create(config -> {
-                config.plugins.enableCors(cors -> {
-                    cors.add(it -> {
+                config.bundledPlugins.enableCors(cors -> {
+                    cors.addRule(it -> {
                         it.anyHost();
                     });
                 });
