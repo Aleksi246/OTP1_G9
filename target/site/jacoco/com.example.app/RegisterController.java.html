@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegisterController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">otp</a> &gt; <a href="index.source.html" class="el_package">com.example.app</a> &gt; <span class="el_source">RegisterController.java</span></div><h1>RegisterController.java</h1><pre class="source lang-java linenums">package com.example.app;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Hyperlink;
+
+<span class="nc" id="L10">public class RegisterController {</span>
+
+    @FXML
+    private TextField usernameField;
+
+    @FXML
+    private TextField emailField;
+
+    @FXML
+    private PasswordField passwordField;
+
+    @FXML
+    private TextField passwordTextField; // Plain text version for &quot;Show Password&quot;
+
+    @FXML
+    private PasswordField confirmPasswordField;
+
+    @FXML
+    private Label messageLabel;
+
+    @FXML
+    private Button toggleButton;
+
+<span class="nc" id="L33">    private boolean isPasswordVisible = false;</span>
+
+    @FXML
+    public void initialize() {
+        // Sync the masked and plain text fields so they always have the same text
+<span class="nc" id="L38">        passwordField.textProperty().bindBidirectional(passwordTextField.textProperty());</span>
+
+        // Ensure error label is clear on startup
+<span class="nc" id="L41">        messageLabel.setText(&quot;&quot;);</span>
+<span class="nc" id="L42">    }</span>
+
+    @FXML
+    private void handleRegister() {
+<span class="nc" id="L46">        messageLabel.setStyle(&quot;-fx-text-fill: #e74c3c;&quot;); // Default to error color</span>
+
+<span class="nc" id="L48">        String username = usernameField.getText();</span>
+<span class="nc" id="L49">        String email = emailField.getText();</span>
+<span class="nc" id="L50">        String pass = passwordField.getText();</span>
+<span class="nc" id="L51">        String confirm = confirmPasswordField.getText();</span>
+
+        // 1. Basic Validation
+<span class="nc bnc" id="L54" title="All 8 branches missed.">        if (username.isEmpty() || email.isEmpty() || pass.isEmpty() || confirm.isEmpty()) {</span>
+<span class="nc" id="L55">            messageLabel.setText(&quot;All fields are required!&quot;);</span>
+<span class="nc" id="L56">            return;</span>
+        }
+
+        // 2. Email Validation (Simple check)
+<span class="nc bnc" id="L60" title="All 4 branches missed.">        if (!email.contains(&quot;@&quot;) || !email.contains(&quot;.&quot;)) {</span>
+<span class="nc" id="L61">            messageLabel.setText(&quot;Please enter a valid email address.&quot;);</span>
+<span class="nc" id="L62">            return;</span>
+        }
+
+        // 3. Password Match Validation
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        if (!pass.equals(confirm)) {</span>
+<span class="nc" id="L67">            messageLabel.setText(&quot;Passwords do not match!&quot;);</span>
+<span class="nc" id="L68">            return;</span>
+        }
+
+        // 4. Password Strength (Optional check)
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (pass.length() &lt; 6) {</span>
+<span class="nc" id="L73">            messageLabel.setText(&quot;Password must be at least 6 characters.&quot;);</span>
+<span class="nc" id="L74">            return;</span>
+        }
+
+        // --- Logic Success ---
+        // Replace this with your database or API call logic
+<span class="nc" id="L79">        System.out.println(&quot;Registering User: &quot; + username + &quot; with email: &quot; + email);</span>
+
+<span class="nc" id="L81">        messageLabel.setStyle(&quot;-fx-text-fill: #27ae60;&quot;); // Success color</span>
+<span class="nc" id="L82">        messageLabel.setText(&quot;Registration successful!&quot;);</span>
+<span class="nc" id="L83">    }</span>
+
+    @FXML
+    private void togglePassword() {
+<span class="nc bnc" id="L87" title="All 2 branches missed.">        if (!isPasswordVisible) {</span>
+            // Show Plain Text
+<span class="nc" id="L89">            passwordTextField.setVisible(true);</span>
+<span class="nc" id="L90">            passwordTextField.setManaged(true);</span>
+<span class="nc" id="L91">            passwordField.setVisible(false);</span>
+<span class="nc" id="L92">            passwordField.setManaged(false);</span>
+
+<span class="nc" id="L94">            toggleButton.setText(&quot;🙈&quot;);</span>
+<span class="nc" id="L95">            isPasswordVisible = true;</span>
+
+            // Transfer focus to the visible field so the cursor doesn't disappear
+<span class="nc" id="L98">            passwordTextField.requestFocus();</span>
+<span class="nc" id="L99">            passwordTextField.selectEnd();</span>
+        } else {
+            // Show Masked
+<span class="nc" id="L102">            passwordField.setVisible(true);</span>
+<span class="nc" id="L103">            passwordField.setManaged(true);</span>
+<span class="nc" id="L104">            passwordTextField.setVisible(false);</span>
+<span class="nc" id="L105">            passwordTextField.setManaged(false);</span>
+
+<span class="nc" id="L107">            toggleButton.setText(&quot;👁&quot;);</span>
+<span class="nc" id="L108">            isPasswordVisible = false;</span>
+
+<span class="nc" id="L110">            passwordField.requestFocus();</span>
+<span class="nc" id="L111">            passwordField.selectEnd();</span>
+        }
+<span class="nc" id="L113">    }</span>
+
+    @FXML
+    public void handleSwitchContext() {
+<span class="nc" id="L117">        SceneManager.loadLogin();</span>
+<span class="nc" id="L118">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
