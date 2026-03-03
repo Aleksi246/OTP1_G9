@@ -1,19 +1,20 @@
 package com.example.otp.controllers;
 
+import com.example.otp.dao.CourseDao;
 import com.example.otp.dao.MaterialDao;
 import com.example.otp.dao.UserDao;
+import com.example.otp.model.Course;
 import com.example.otp.model.Material;
 import com.example.otp.model.User;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import io.javalin.http.UploadedFile;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -21,10 +22,15 @@ import com.google.gson.JsonParser;
 public class MaterialController {
     private MaterialDao materialDao = new MaterialDao();
     private UserDao userDao = new UserDao();
+    private CourseDao courseDao = new CourseDao();
     private static final Path UPLOAD_DIR = Paths.get("uploads").toAbsolutePath();
 
-    private boolean isTeacher(User user) {
-        return "teacher".equals(user.getUserType());
+    private void jsonMessage(Context ctx, HttpStatus status, String message) {
+        ctx.status(status).json(Map.of("message", message));
+    }
+
+    private boolean isClassCreator(User user, Course course) {
+        return user != null && course != null && user.getUserId() != null && user.getUserId().equals(course.getCreatorId());
     }
 
     public void getMaterialsByCourse(Context ctx) {
@@ -33,7 +39,7 @@ public class MaterialController {
             List<Material> materials = materialDao.findByClassId(classId);
             ctx.json(materials);
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
@@ -44,29 +50,38 @@ public class MaterialController {
             if (material != null) {
                 ctx.json(material);
             } else {
-                ctx.status(HttpStatus.NOT_FOUND).json("Material not found");
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "Material not found");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
     public void uploadMaterial(Context ctx) {
         try {
-            String username = ctx.attribute("username");
-            User user = userDao.findByUsername(username);
-            if (user == null || !isTeacher(user)) {
-                ctx.status(HttpStatus.FORBIDDEN).json("Only teachers can upload materials");
+            String email = ctx.attribute("email");
+            User user = userDao.findByEmail(email);
+            if (user == null) {
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Authentication required");
                 return;
             }
 
             UploadedFile file = ctx.uploadedFile("file");
             int classId = Integer.parseInt(ctx.formParam("classId"));
-            int userId = Integer.parseInt(ctx.formParam("userId"));
             String materialType = ctx.formParam("materialType");
 
             if (file == null || materialType == null) {
-                ctx.status(HttpStatus.BAD_REQUEST).json("Missing parameters");
+                jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
+                return;
+            }
+
+            Course course = courseDao.findById(classId);
+            if (course == null) {
+                jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Class does not exist");
+                return;
+            }
+            if (!isClassCreator(user, course)) {
+                jsonMessage(ctx, HttpStatus.FORBIDDEN, "Only class creator can upload materials");
                 return;
             }
 
@@ -91,32 +106,38 @@ public class MaterialController {
             material.setFilepath(filePath.toString());
             material.setMaterialType(materialType);
             material.setClassId(classId);
-            material.setUserId(userId);
+            material.setUserId(user.getUserId());
 
             Material created = materialDao.create(material);
             if (created.getFileId() != null) {
                 ctx.status(HttpStatus.CREATED).json(created);
             } else {
-                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Failed to upload material");
+                jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload material");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
     public void updateMaterial(Context ctx) {
         try {
-            String username = ctx.attribute("username");
-            User user = userDao.findByUsername(username);
-            if (user == null || !isTeacher(user)) {
-                ctx.status(HttpStatus.FORBIDDEN).json("Only teachers can update materials");
+            String email = ctx.attribute("email");
+            User user = userDao.findByEmail(email);
+            if (user == null) {
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Authentication required");
                 return;
             }
 
             int id = Integer.parseInt(ctx.pathParam("id"));
             Material material = materialDao.findById(id);
             if (material == null) {
-                ctx.status(HttpStatus.NOT_FOUND).json("Material not found");
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "Material not found");
+                return;
+            }
+
+            Course course = courseDao.findById(material.getClassId());
+            if (!isClassCreator(user, course)) {
+                jsonMessage(ctx, HttpStatus.FORBIDDEN, "Only class creator can update materials");
                 return;
             }
 
@@ -138,43 +159,46 @@ public class MaterialController {
             if (success) {
                 ctx.json(material);
             } else {
-                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Failed to update material");
+                jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update material");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
     public void deleteMaterial(Context ctx) {
         try {
-            String username = ctx.attribute("username");
-            User user = userDao.findByUsername(username);
-            if (user == null || !isTeacher(user)) {
-                ctx.status(HttpStatus.FORBIDDEN).json("Only teachers can delete materials");
+            String email = ctx.attribute("email");
+            User user = userDao.findByEmail(email);
+            if (user == null) {
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Authentication required");
                 return;
             }
 
             int id = Integer.parseInt(ctx.pathParam("id"));
             Material material = materialDao.findById(id);
             if (material != null) {
+                Course course = courseDao.findById(material.getClassId());
+                if (!isClassCreator(user, course)) {
+                    jsonMessage(ctx, HttpStatus.FORBIDDEN, "Only class creator can delete materials");
+                    return;
+                }
+
                 // Delete file
                 Path filePath = Paths.get(material.getFilepath());
                 Files.deleteIfExists(filePath);
 
                 boolean success = materialDao.delete(id);
                 if (success) {
-                    JsonObject response = new JsonObject();
-                    response.addProperty("message", "Material deleted");
-                    response.addProperty("id", id);
-                    ctx.json(response.toString());
+                    ctx.json(Map.of("message", "Material deleted", "id", id));
                 } else {
-                    ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Failed to delete material");
+                    jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete material");
                 }
             } else {
-                ctx.status(HttpStatus.NOT_FOUND).json("Material not found");
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "Material not found");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 }

@@ -6,25 +6,29 @@ import java.sql.Timestamp;
 public class Course {
     private Integer classId;
     private String className;
+    private Integer creatorId;
     private String topic;
     private Timestamp createdAt;
 
-<span class="fc" id="L12">    public Course() {}</span>
+<span class="fc" id="L13">    public Course() {}</span>
 
-<span class="nc" id="L14">    public Course(Integer classId, String className, String topic, Timestamp createdAt) {</span>
-<span class="nc" id="L15">        this.classId = classId;</span>
-<span class="nc" id="L16">        this.className = className;</span>
-<span class="nc" id="L17">        this.topic = topic;</span>
-<span class="nc" id="L18">        this.createdAt = createdAt;</span>
-<span class="nc" id="L19">    }</span>
+<span class="nc" id="L15">    public Course(Integer classId, String className, Integer creatorId, String topic, Timestamp createdAt) {</span>
+<span class="nc" id="L16">        this.classId = classId;</span>
+<span class="nc" id="L17">        this.className = className;</span>
+<span class="nc" id="L18">        this.creatorId = creatorId;</span>
+<span class="nc" id="L19">        this.topic = topic;</span>
+<span class="nc" id="L20">        this.createdAt = createdAt;</span>
+<span class="nc" id="L21">    }</span>
 
-<span class="fc" id="L21">    public Integer getClassId() { return classId; }</span>
-<span class="fc" id="L22">    public void setClassId(Integer classId) { this.classId = classId; }</span>
-<span class="fc" id="L23">    public String getClassName() { return className; }</span>
-<span class="fc" id="L24">    public void setClassName(String className) { this.className = className; }</span>
-<span class="fc" id="L25">    public String getTopic() { return topic; }</span>
-<span class="fc" id="L26">    public void setTopic(String topic) { this.topic = topic; }</span>
-<span class="fc" id="L27">    public Timestamp getCreatedAt() { return createdAt; }</span>
-<span class="fc" id="L28">    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }</span>
+<span class="fc" id="L23">    public Integer getClassId() { return classId; }</span>
+<span class="fc" id="L24">    public void setClassId(Integer classId) { this.classId = classId; }</span>
+<span class="fc" id="L25">    public String getClassName() { return className; }</span>
+<span class="fc" id="L26">    public void setClassName(String className) { this.className = className; }</span>
+<span class="fc" id="L27">    public Integer getCreatorId() { return creatorId; }</span>
+<span class="fc" id="L28">    public void setCreatorId(Integer creatorId) { this.creatorId = creatorId; }</span>
+<span class="fc" id="L29">    public String getTopic() { return topic; }</span>
+<span class="fc" id="L30">    public void setTopic(String topic) { this.topic = topic; }</span>
+<span class="fc" id="L31">    public Timestamp getCreatedAt() { return createdAt; }</span>
+<span class="fc" id="L32">    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -2,46 +2,33 @@
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 
-<span class="nc" id="L11">public class JWTUtil {</span>
-<span class="fc" id="L12">    private static final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);</span>
+<span class="nc" id="L9">public class JWTUtil {</span>
+<span class="fc" id="L10">    private static final SecretKey key = Jwts.SIG.HS256.key().build();</span>
     private static final long EXPIRATION_TIME = 86400000; // 24 hours
 
-    public static String generateToken(String username) {
-<span class="fc" id="L16">        return Jwts.builder()</span>
-<span class="fc" id="L17">                .setSubject(username)</span>
-<span class="fc" id="L18">                .claim(&quot;userType&quot;, &quot;student&quot;)</span>
-<span class="fc" id="L19">                .setIssuedAt(new Date())</span>
-<span class="fc" id="L20">                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))</span>
-<span class="fc" id="L21">                .signWith(key)</span>
-<span class="fc" id="L22">                .compact();</span>
-    }
-
-    public static String generateToken(String username, String userType) {
-<span class="fc" id="L26">        return Jwts.builder()</span>
-<span class="fc" id="L27">                .setSubject(username)</span>
-<span class="pc bpc" id="L28" title="2 of 4 branches missed.">                .claim(&quot;userType&quot;, userType == null || userType.isBlank() ? &quot;student&quot; : userType)</span>
-<span class="fc" id="L29">                .setIssuedAt(new Date())</span>
-<span class="fc" id="L30">                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))</span>
-<span class="fc" id="L31">                .signWith(key)</span>
-<span class="fc" id="L32">                .compact();</span>
+    public static String generateToken(String email) {
+<span class="fc" id="L14">        return Jwts.builder()</span>
+<span class="fc" id="L15">                .subject(email)</span>
+<span class="fc" id="L16">                .issuedAt(new Date())</span>
+<span class="fc" id="L17">                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))</span>
+<span class="fc" id="L18">                .signWith(key)</span>
+<span class="fc" id="L19">                .compact();</span>
     }
 
     public static String validateToken(String token) {
         try {
-<span class="fc" id="L37">            Claims claims = Jwts.parser()</span>
-<span class="fc" id="L38">                    .verifyWith(key)</span>
-<span class="fc" id="L39">                    .build()</span>
-<span class="fc" id="L40">                    .parseSignedClaims(token)</span>
-<span class="fc" id="L41">                    .getPayload();</span>
-<span class="fc" id="L42">            return claims.getSubject();</span>
-<span class="nc" id="L43">        } catch (Exception e) {</span>
-<span class="nc" id="L44">            return null;</span>
+<span class="fc" id="L24">            Claims claims = Jwts.parser()</span>
+<span class="fc" id="L25">                    .verifyWith(key)</span>
+<span class="fc" id="L26">                    .build()</span>
+<span class="fc" id="L27">                    .parseSignedClaims(token)</span>
+<span class="fc" id="L28">                    .getPayload();</span>
+<span class="fc" id="L29">            return claims.getSubject();</span>
+<span class="nc" id="L30">        } catch (Exception e) {</span>
+<span class="nc" id="L31">            return null;</span>
         }
     }
 }

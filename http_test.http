@@ -1,257 +1,336 @@
-### Comprehensive API Test Suite
-### Run this with VS Code REST Client extension
+### OTP Backend API Test Suite (current schema + rules)
+### Requires VS Code REST Client extension
+### Run top-to-bottom for a full flow.
 
 @baseUrl = http://localhost:7700
 
+@creatorUsername = creator_api_test
+@creatorEmail = creator_api_test@example.com
+@creatorPassword = pass123
 
-### ===========================================
-### 1. REGISTRATION AND AUTHENTICATION TESTS
-### ===========================================
+@user2Username = user2_api_test
+@user2Email = user2_api_test@example.com
+@user2Password = pass123
 
-### Test 1.1: Register Admin User
+@user3Username = user3_api_test
+@user3Email = user3_api_test@example.com
+@user3Password = pass123
+
+### Manual values (paste from responses)
+@creatorToken = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjcmVhdG9yX2FwaV90ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNzcyNTY4Mzg4LCJleHAiOjE3NzI2NTQ3ODh9.53k0ltroN2lmdCsVvBxiIDLReqbGVVL7Ky9XLa8fSbQ
+@user2Token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMl9hcGlfdGVzdEBleGFtcGxlLmNvbSIsImlhdCI6MTc3MjU2ODU2MywiZXhwIjoxNzcyNjU0OTYzfQ.twjcVr71nI-rTbPutA09XUKi7d34YnLuZrvLPM2buro
+@user3Token = PASTE_USER3_TOKEN
+@creatorUserId = 166
+@user2Id = 167
+@user3Id = 168
+@classId = 96
+@materialId = 1
+@reviewId = 1
+
+### ==============================
+### 1) Register users (email-based)
+### ==============================
+
+### Register creator
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
-  "username": "admin1",
-  "password": "admin123",
-  "userType": "admin",
-  "adminKey": "supersecretkey"
+  "username": "{{creatorUsername}}",
+  "email": "{{creatorEmail}}",
+  "password": "{{creatorPassword}}"
 }
 
-### Test 1.2: Login as Admin
-POST {{baseUrl}}/api/auth/login
-Content-Type: application/json
-
-{
-  "username": "admin1",
-  "password": "admin123"
-}
-
-### Test 1.3: Register Student 1
+### Register user2
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
-  "username": "student1",
-  "password": "student123"
+  "username": "{{user2Username}}",
+  "email": "{{user2Email}}",
+  "password": "{{user2Password}}"
 }
 
-### Test 1.4: Register Student 2
+### Register user3
 POST {{baseUrl}}/api/auth/register
 Content-Type: application/json
 
 {
-  "username": "student2",
-  "password": "student123"
+  "username": "{{user3Username}}",
+  "email": "{{user3Email}}",
+  "password": "{{user3Password}}"
 }
 
-### Test 1.5: Login as Student 1
+### ==============================
+### 2) Login (email OR username + password)
+### ==============================
+
+### Login creator
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "student1",
-  "password": "student123"
+  "email": "{{creatorEmail}}",
+  "password": "{{creatorPassword}}"
 }
 
-### Test 1.6: Login as Student 2
+### Login user2
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "student2",
-  "password": "student123"
+  "username": "{{user2Username}}",
+  "password": "{{user2Password}}"
 }
 
-### ===========================================
-### 2. ADMIN OPERATIONS - CREATE TEACHERS
-### ===========================================
-
-### Test 2.1: Create Teacher 1 (via Admin)
-POST {{baseUrl}}/api/admin/create-teacher
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3MTk0MTA4NiwiZXhwIjoxNzcyMDI3NDg2fQ.jHuc5pcV0UV2UBvgh1AfX30IERkgG0NscH33ItQopz0
-Content-Type: application/json
-
-{
-  "username": "teacher1",
-  "password": "teacher123"
-}
-
-### Test 2.2: Create Teacher 2 (via Admin)
-POST {{baseUrl}}/api/admin/create-teacher
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3MTkzNjQ4NiwiZXhwIjoxNzcyMDIyODg2fQ.2Qa6TLsWtNjs2GnoQjT6jX-FkAT59Oxn9EHZ9poRFGs
-Content-Type: application/json
-
-{
-  "username": "teacher2",
-  "password": "teacher123"
-}
-
-
-### Test 2.3: Login as Teacher 1
+### Login user3
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "teacher1",
-  "password": "teacher123"
+  "email": "{{user3Email}}",
+  "password": "{{user3Password}}"
 }
 
-### Test 2.4: Login as Teacher 2
-POST {{baseUrl}}/api/auth/login
-Content-Type: application/json
+### ======================================
+### 3) Users endpoints (protected)
+### ======================================
 
-{
-  "username": "teacher2",
-  "password": "teacher123"
-}
-
-
-### ===========================================
-### 3. USER OPERATIONS
-### ===========================================
-
-### Test 3.1: Get All Users
+### Get all users
 GET {{baseUrl}}/api/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZWFjaGVyMSIsImlhdCI6MTc3MTk0MTExMSwiZXhwIjoxNzcyMDI3NTExfQ.FO-V6_xGN2iVnkHE463CHr6MWLp-Q2XNRmKzfuJSQko
+Authorization: Bearer {{creatorToken}}
 
-### Test 3.2: Get User By ID (Teacher 1)
-GET {{baseUrl}}/api/users/1
+### Get creator user by ID
+GET {{baseUrl}}/api/users/{{creatorUserId}}
+Authorization: Bearer {{creatorToken}}
 
+### ======================================
+### 4) Courses (creator-owned)
+### ======================================
 
-### ===========================================
-### 4. COURSE OPERATIONS
-### ===========================================
-
-### Test 4.1: Create Course (Teacher 3)
+### Create course as creator (creator_id auto-set)
 POST {{baseUrl}}/api/courses
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZWFjaGVyMSIsImlhdCI6MTc3MTk0MTExMSwiZXhwIjoxNzcyMDI3NTExfQ.FO-V6_xGN2iVnkHE463CHr6MWLp-Q2XNRmKzfuJSQko
+Authorization: Bearer {{creatorToken}}
 Content-Type: application/json
 
 {
-  "className": "Mathematic2s 108",
-  "topic": "mat"
+  "className": "API Test Course Creator Owned",
+  "topic": "integration"
 }
 
-
-### Test 4.3: Get All Courses
+### Get all courses
 GET {{baseUrl}}/api/courses
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZWFjaGVyMSIsImlhdCI6MTc3MTk0MTExMSwiZXhwIjoxNzcyMDI3NTExfQ.FO-V6_xGN2iVnkHE463CHr6MWLp-Q2XNRmKzfuJSQko
+Authorization: Bearer {{creatorToken}}
 
+### Get course by ID
+GET {{baseUrl}}/api/courses/{{classId}}
+Authorization: Bearer {{creatorToken}}
 
-### Test 4.4: Get Course By ID (Course 1)
-GET {{baseUrl}}/api/courses/73
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZWFjaGVyMSIsImlhdCI6MTc3MTk0MTExMSwiZXhwIjoxNzcyMDI3NTExfQ.FO-V6_xGN2iVnkHE463CHr6MWLp-Q2XNRmKzfuJSQko
-
-
-### ===========================================
-### 5. PARTICIPANT / ENROLLMENT OPERATIONS
-### ===========================================
-
-### Test 5.1: Enroll Student 1 in Course 1
-POST {{baseUrl}}/api/participants/enroll
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZWFjaGVyMSIsImlhdCI6MTc3MTk0MTExMSwiZXhwIjoxNzcyMDI3NTExfQ.FO-V6_xGN2iVnkHE463CHr6MWLp-Q2XNRmKzfuJSQko
+### Update course as creator (allowed)
+PUT {{baseUrl}}/api/courses/{{classId}}
+Authorization: Bearer {{creatorToken}}
 Content-Type: application/json
 
 {
-  "userId": 162,
-  "classId": 73
+  "topic": "integration-updated"
 }
 
+### Update course as non-creator (expected 403)
+PUT {{baseUrl}}/api/courses/{{classId}}
+Authorization: Bearer {{user2Token}}
+Content-Type: application/json
 
+{
+  "topic": "should-fail"
+}
 
-### Test 5.4: Get Users in Course 1
-GET {{baseUrl}}/api/participants/class/73
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZWFjaGVyMSIsImlhdCI6MTc3MTk0MTExMSwiZXhwIjoxNzcyMDI3NTExfQ.FO-V6_xGN2iVnkHE463CHr6MWLp-Q2XNRmKzfuJSQko
+### =====================================================
+### 5) Participants (creator enrolls; users can unenroll themselves)
+### =====================================================
 
+### Enroll user2 by creator (allowed)
+POST {{baseUrl}}/api/participants/enroll
+Authorization: Bearer {{creatorToken}}
+Content-Type: application/json
 
-### Test 5.5: Get Courses for Student 1
-GET {{baseUrl}}/api/participants/user/162
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZWFjaGVyMSIsImlhdCI6MTc3MTk0MTExMSwiZXhwIjoxNzcyMDI3NTExfQ.FO-V6_xGN2iVnkHE463CHr6MWLp-Q2XNRmKzfuJSQko
+{
+  "userId": {{user2Id}},
+  "classId": {{classId}}
+}
 
+### Enroll user3 by non-creator (expected 403)
+POST {{baseUrl}}/api/participants/enroll
+Authorization: Bearer {{user2Token}}
+Content-Type: application/json
 
+{
+  "userId": {{user3Id}},
+  "classId": {{classId}}
+}
 
+### Get users by class
+GET {{baseUrl}}/api/participants/class/{{classId}}
+Authorization: Bearer {{creatorToken}}
 
-### ===========================================
-### 6. MATERIAL OPERATIONS
-### ===========================================
+### Get classes by user2
+GET {{baseUrl}}/api/participants/user/{{user2Id}}
+Authorization: Bearer {{user2Token}}
 
-### Test 6.1: Upload Material 1 to Course 1 (Teacher 1)
+### Unenroll user2 by non-creator (self-unenroll, allowed)
+DELETE {{baseUrl}}/api/participants/unenroll
+Authorization: Bearer {{user2Token}}
+Content-Type: application/json
+
+{
+  "userId": {{user2Id}},
+  "classId": {{classId}}
+}
+
+### Unenroll user2 by different non-creator (expected 403)
+DELETE {{baseUrl}}/api/participants/unenroll
+Authorization: Bearer {{user3Token}}
+Content-Type: application/json
+
+{
+  "userId": {{user2Id}},
+  "classId": {{classId}}
+}
+
+### ======================================
+### 6) Materials (only class creator can upload/update/delete)
+### ======================================
+
+### Upload material as creator (allowed)
 POST {{baseUrl}}/api/materials
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZWFjaGVyMSIsImlhdCI6MTc3MTk0MTExMSwiZXhwIjoxNzcyMDI3NTExfQ.FO-V6_xGN2iVnkHE463CHr6MWLp-Q2XNRmKzfuJSQko
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+Authorization: Bearer {{creatorToken}}
+Content-Type: multipart/form-data; boundary=----ApiBoundary
 
-------WebKitFormBoundary
-Content-Disposition: form-data; name="file"; filename="lecture_notes.txt"
+------ApiBoundary
+Content-Disposition: form-data; name="file"; filename="notes.txt"
 Content-Type: text/plain
 
-This is a test lecture notes file for Mathematics 101
-
-------WebKitFormBoundary
+hello from http_test
+------ApiBoundary
 Content-Disposition: form-data; name="classId"
 
-1
-------WebKitFormBoundary
-Content-Disposition: form-data; name="userId"
-
-2
-------WebKitFormBoundary
+{{classId}}
+------ApiBoundary
 Content-Disposition: form-data; name="materialType"
 
 lecture_notes
-------WebKitFormBoundary--
+------ApiBoundary--
 
+### Upload material as non-creator (expected 403)
+POST {{baseUrl}}/api/materials
+Authorization: Bearer {{user2Token}}
+Content-Type: multipart/form-data; boundary=----ApiBoundary2
 
-### Test 6.3: Get Materials for Course 1
-GET {{baseUrl}}/api/materials/course/1
+------ApiBoundary2
+Content-Disposition: form-data; name="file"; filename="notes2.txt"
+Content-Type: text/plain
 
-### Test 6.4: Get Material By ID (Material 1)
-GET {{baseUrl}}/api/materials/2
+should fail
+------ApiBoundary2
+Content-Disposition: form-data; name="classId"
 
+{{classId}}
+------ApiBoundary2
+Content-Disposition: form-data; name="materialType"
 
-### ===========================================
-### 7. REVIEW OPERATIONS
-### ===========================================
+lecture_notes
+------ApiBoundary2--
 
-### Test 7.1: Create Review for Material 1 (Student 1)
+### Get materials by course
+GET {{baseUrl}}/api/materials/course/{{classId}}
 
+### Get material by ID
+GET {{baseUrl}}/api/materials/{{materialId}}
 
-### Test 7.3: Create Review for Material 1 (Student 2)
-POST {{baseUrl}}/api/reviews
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZWFjaGVyMSIsImlhdCI6MTc3MTkzNjUxNywiZXhwIjoxNzcyMDIyOTE3fQ.17jfvtk3VUWb1r2dw8FG7a8Fl4d2JZtIlz1QRoGgKUs
+### Update material as non-creator (expected 403)
+PUT {{baseUrl}}/api/materials/{{materialId}}
+Authorization: Bearer {{user2Token}}
 Content-Type: application/json
 
 {
-  "review": "Good content but could be more detailed",
-  "rating": 4,
-  "fileId": 2
+  "materialType": "slides"
 }
 
-### Test 7.4: Get Reviews for Material 1
-GET {{baseUrl}}/api/reviews/material/2
-
-### Test 7.5: Get Review By ID (Review 1)
-GET {{baseUrl}}/api/reviews/1
-
-### Test 7.6: Update own Review (Student 1)
-PUT {{baseUrl}}/api/reviews/1
-Authorization: Bearer {{student1Token}}
+### Update material as creator (allowed)
+PUT {{baseUrl}}/api/materials/{{materialId}}
+Authorization: Bearer {{creatorToken}}
 Content-Type: application/json
 
 {
-  "review": "Excellent material, very clear and comprehensive",
+  "materialType": "slides"
+}
+
+### ======================================
+### 7) Reviews (owner can update/delete own review)
+### ======================================
+
+### Create review as user2
+POST {{baseUrl}}/api/reviews
+Authorization: Bearer {{user2Token}}
+Content-Type: application/json
+
+{
+  "review": "Good material",
+  "rating": 4,
+  "fileId": {{materialId}}
+}
+
+### Get reviews by material
+GET {{baseUrl}}/api/reviews/material/{{materialId}}
+
+### Get review by ID
+GET {{baseUrl}}/api/reviews/{{reviewId}}
+
+### Update review as non-owner (expected 403)
+PUT {{baseUrl}}/api/reviews/{{reviewId}}
+Authorization: Bearer {{creatorToken}}
+Content-Type: application/json
+
+{
+  "review": "I should not be able to update this",
+  "rating": 1
+}
+
+### Update review as owner (allowed)
+PUT {{baseUrl}}/api/reviews/{{reviewId}}
+Authorization: Bearer {{user2Token}}
+Content-Type: application/json
+
+{
+  "review": "Updated by owner",
   "rating": 5
 }
 
-### Test 7.10: Delete own Review (Student 1)
-DELETE {{baseUrl}}/api/reviews/1
-Authorization: Bearer {{student1Token}}
+### Delete review as non-owner (expected 403)
+DELETE {{baseUrl}}/api/reviews/{{reviewId}}
+Authorization: Bearer {{creatorToken}}
 
-### ===========================================
-### 9. FILE DOWNLOAD TEST
-### ===========================================
+### Delete review as owner (allowed)
+DELETE {{baseUrl}}/api/reviews/{{reviewId}}
+Authorization: Bearer {{user2Token}}
 
-### Test 9.1: Download Material File (Material 1)
-GET {{baseUrl}}/api/materials/2/download
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdHVkZW50MSIsImlhdCI6MTc3MTk0MDk4MywiZXhwIjoxNzcyMDI3MzgzfQ.Ybu-qeGTaxqnjlCCMNVbdbC0ffcDmViKJovzF2RzR0Q
+
+
+### ======================================
+### 9) Cleanup (delete material + course)
+### ======================================
+
+### Delete material as non-creator (expected 403)
+DELETE {{baseUrl}}/api/materials/{{materialId}}
+Authorization: Bearer {{user2Token}}
+
+### Delete material as creator (allowed)
+DELETE {{baseUrl}}/api/materials/{{materialId}}
+Authorization: Bearer {{creatorToken}}
+
+### Delete course as non-creator (expected 403)
+DELETE {{baseUrl}}/api/courses/{{classId}}
+Authorization: Bearer {{user2Token}}
+
+### Delete course as creator (allowed)
+DELETE {{baseUrl}}/api/courses/{{classId}}
+Authorization: Bearer {{creatorToken}}

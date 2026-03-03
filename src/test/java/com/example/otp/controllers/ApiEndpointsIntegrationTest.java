@@ -38,7 +38,6 @@ public class ApiEndpointsIntegrationTest {
     private static String baseUrl;
     private static final HttpClient CLIENT = HttpClient.newHttpClient();
 
-    private int adminId;
     private int teacherId;
     private int teacher2Id;
     private int studentId;
@@ -56,7 +55,7 @@ public class ApiEndpointsIntegrationTest {
         ReviewController reviewController = new ReviewController();
         ParticipantController participantController = new ParticipantController();
 
-        app = Javalin.create(config -> config.plugins.enableCors(cors -> cors.add(it -> it.anyHost())));
+        app = Javalin.create(config -> config.bundledPlugins.enableCors(cors -> cors.addRule(it -> it.anyHost())));
 
         app.before("/api/users", ApiEndpointsIntegrationTest::checkAuth);
         app.before("/api/users/{id}", ApiEndpointsIntegrationTest::checkAuth);
@@ -124,13 +123,11 @@ public class ApiEndpointsIntegrationTest {
         MaterialDao materialDao = new MaterialDao();
         ReviewDao reviewDao = new ReviewDao();
 
-        User admin = createUser(userDao, "admin_seed", "adminPass", "admin");
-        User teacher = createUser(userDao, "teacher_seed", "teacherPass", "teacher");
-        User teacher2 = createUser(userDao, "teacher2_seed", "teacherPass", "teacher");
-        User student = createUser(userDao, "student_seed", "studentPass", "student");
-        User student2 = createUser(userDao, "student2_seed", "studentPass", "student");
+        User teacher = createUser(userDao, "teacher_seed", "teacher_seed@example.com", "teacherPass");
+        User teacher2 = createUser(userDao, "teacher2_seed", "teacher2_seed@example.com", "teacherPass");
+        User student = createUser(userDao, "student_seed", "student_seed@example.com", "studentPass");
+        User student2 = createUser(userDao, "student2_seed", "student2_seed@example.com", "studentPass");
 
-        adminId = admin.getUserId();
         teacherId = teacher.getUserId();
         teacher2Id = teacher2.getUserId();
         studentId = student.getUserId();
@@ -138,12 +135,14 @@ public class ApiEndpointsIntegrationTest {
 
         Course c1 = new Course();
         c1.setClassName("Seed Class 1");
+        c1.setCreatorId(teacherId);
         c1.setTopic("Topic 1");
         c1 = courseDao.create(c1);
         classId = c1.getClassId();
 
         Course c2 = new Course();
         c2.setClassName("Seed Class 2");
+        c2.setCreatorId(teacher2Id);
         c2.setTopic("Topic 2");
         c2 = courseDao.create(c2);
         class2Id = c2.getClassId();
@@ -175,6 +174,7 @@ public class ApiEndpointsIntegrationTest {
         HttpResponse<String> register = sendJson("POST", "/api/auth/register", null, """
                 {
                   "username": "new_student",
+                  "email": "new_student@example.com",
                   "password": "newpass"
                 }
                 """);
@@ -182,12 +182,21 @@ public class ApiEndpointsIntegrationTest {
 
         HttpResponse<String> login = sendJson("POST", "/api/auth/login", null, """
                 {
-                  "username": "new_student",
+                  "email": "new_student@example.com",
                   "password": "newpass"
                 }
                 """);
         assertEquals(200, login.statusCode());
         assertTrue(login.body().contains("token"));
+
+        HttpResponse<String> loginByUsername = sendJson("POST", "/api/auth/login", null, """
+          {
+            "username": "new_student",
+            "password": "newpass"
+          }
+          """);
+        assertEquals(200, loginByUsername.statusCode());
+        assertTrue(loginByUsername.body().contains("token"));
     }
 
     @Test
@@ -204,24 +213,16 @@ public class ApiEndpointsIntegrationTest {
     }
 
     @Test
-    void adminEndpoint_createTeacher_adminOnly() throws Exception {
+    void adminEndpoint_createTeacher_deprecated() throws Exception {
         String studentToken = tokenFor("student_seed");
         HttpResponse<String> forbidden = sendJson("POST", "/api/admin/create-teacher", bearer(studentToken), """
                 {
                   "username": "teacher_forbidden",
+                  "email": "teacher_forbidden@example.com",
                   "password": "pass123"
                 }
                 """);
-        assertEquals(403, forbidden.statusCode());
-
-        String adminToken = tokenFor("admin_seed");
-        HttpResponse<String> created = sendJson("POST", "/api/admin/create-teacher", bearer(adminToken), """
-                {
-                  "username": "teacher_created",
-                  "password": "pass123"
-                }
-                """);
-        assertEquals(201, created.statusCode());
+        assertEquals(410, forbidden.statusCode());
     }
 
     @Test
@@ -274,7 +275,7 @@ public class ApiEndpointsIntegrationTest {
         HttpResponse<String> getById = sendJson("GET", "/api/materials/" + materialId, bearer(teacherToken), null);
         assertEquals(200, getById.statusCode());
 
-        HttpResponse<String> upload = sendMultipartUpload(teacherToken, classId, teacherId, "lecture_notes", "upload-test.txt", "hello");
+        HttpResponse<String> upload = sendMultipartUpload(teacherToken, classId, "lecture_notes", "upload-test.txt", "hello");
         assertEquals(201, upload.statusCode());
 
         HttpResponse<String> update = sendJson("PUT", "/api/materials/" + materialId, bearer(teacherToken), """
@@ -343,7 +344,9 @@ public class ApiEndpointsIntegrationTest {
     @Test
     void participantEndpoints_allRoutesCovered() throws Exception {
         String teacherToken = tokenFor("teacher_seed");
+        String teacher2Token = tokenFor("teacher2_seed");
         String studentToken = tokenFor("student_seed");
+      String student2Token = tokenFor("student2_seed");
 
         HttpResponse<String> enrollForbidden = sendJson("POST", "/api/participants/enroll", bearer(studentToken), """
                 {
@@ -359,21 +362,37 @@ public class ApiEndpointsIntegrationTest {
                   "classId": %d
                 }
                 """.formatted(student2Id, class2Id));
-        assertEquals(201, enroll.statusCode());
+        assertEquals(403, enroll.statusCode());
 
-        HttpResponse<String> getByClass = sendJson("GET", "/api/participants/class/" + class2Id, bearer(teacherToken), null);
+        HttpResponse<String> enrollByCreator = sendJson("POST", "/api/participants/enroll", bearer(teacher2Token), """
+          {
+            "userId": %d,
+            "classId": %d
+          }
+          """.formatted(student2Id, class2Id));
+        assertEquals(201, enrollByCreator.statusCode());
+
+        HttpResponse<String> getByClass = sendJson("GET", "/api/participants/class/" + class2Id, bearer(teacher2Token), null);
         assertEquals(200, getByClass.statusCode());
 
-        HttpResponse<String> getByUser = sendJson("GET", "/api/participants/user/" + student2Id, bearer(teacherToken), null);
+        HttpResponse<String> getByUser = sendJson("GET", "/api/participants/user/" + student2Id, bearer(teacher2Token), null);
         assertEquals(200, getByUser.statusCode());
 
-        HttpResponse<String> unenroll = sendJson("DELETE", "/api/participants/unenroll", bearer(teacherToken), """
-                {
-                  "userId": %d,
-                  "classId": %d
-                }
-                """.formatted(student2Id, class2Id));
-        assertEquals(200, unenroll.statusCode());
+        HttpResponse<String> unenrollOthersForbidden = sendJson("DELETE", "/api/participants/unenroll", bearer(studentToken), """
+          {
+            "userId": %d,
+            "classId": %d
+          }
+          """.formatted(student2Id, class2Id));
+        assertEquals(403, unenrollOthersForbidden.statusCode());
+
+        HttpResponse<String> selfUnenroll = sendJson("DELETE", "/api/participants/unenroll", bearer(student2Token), """
+          {
+            "userId": %d,
+            "classId": %d
+          }
+          """.formatted(student2Id, class2Id));
+        assertEquals(200, selfUnenroll.statusCode());
     }
 
     private static void checkAuth(Context ctx) {
@@ -382,11 +401,11 @@ public class ApiEndpointsIntegrationTest {
             throw new UnauthorizedResponse("Missing or invalid token");
         }
         String token = authHeader.substring(7);
-        String username = JWTUtil.validateToken(token);
-        if (username == null) {
+        String email = JWTUtil.validateToken(token);
+        if (email == null) {
             throw new UnauthorizedResponse("Invalid token");
         }
-        ctx.attribute("username", username);
+        ctx.attribute("email", email);
     }
 
     private static void clearAllTables() throws Exception {
@@ -399,16 +418,21 @@ public class ApiEndpointsIntegrationTest {
         }
     }
 
-    private static User createUser(UserDao dao, String username, String password, String userType) throws Exception {
+    private static User createUser(UserDao dao, String username, String email, String password) throws Exception {
         User user = new User();
         user.setUsername(username);
+        user.setEmail(email);
         user.setPasswordHash(BCryptUtil.hashPassword(password));
-        user.setUserType(userType);
         return dao.create(user);
     }
 
     private static String tokenFor(String username) {
-        return JWTUtil.generateToken(username);
+        try {
+            User user = new UserDao().findByUsername(username);
+            return JWTUtil.generateToken(user.getEmail());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static String bearer(String token) {
@@ -443,7 +467,7 @@ public class ApiEndpointsIntegrationTest {
         return CLIENT.send(builder.build(), HttpResponse.BodyHandlers.ofString());
     }
 
-    private static HttpResponse<String> sendMultipartUpload(String token, int classId, int userId, String materialType, String filename, String fileContent) throws IOException, InterruptedException {
+    private static HttpResponse<String> sendMultipartUpload(String token, int classId, String materialType, String filename, String fileContent) throws IOException, InterruptedException {
         String boundary = "----JavaBoundary" + System.currentTimeMillis();
         String body = "--" + boundary + "\r\n"
                 + "Content-Disposition: form-data; name=\"file\"; filename=\"" + filename + "\"\r\n"
@@ -452,9 +476,6 @@ public class ApiEndpointsIntegrationTest {
                 + "--" + boundary + "\r\n"
                 + "Content-Disposition: form-data; name=\"classId\"\r\n\r\n"
                 + classId + "\r\n"
-                + "--" + boundary + "\r\n"
-                + "Content-Disposition: form-data; name=\"userId\"\r\n\r\n"
-                + userId + "\r\n"
                 + "--" + boundary + "\r\n"
                 + "Content-Disposition: form-data; name=\"materialType\"\r\n\r\n"
                 + materialType + "\r\n"

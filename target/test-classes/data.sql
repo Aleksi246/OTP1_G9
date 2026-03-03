@@ -10,18 +10,18 @@ TRUNCATE TABLE users;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- MOCK DATA
-INSERT INTO users (username, password_hash, user_type, access_token)
+INSERT INTO users (username, password_hash, email)
 VALUES 
-('alice', 'hash1', 'student', NULL),
-('bob', 'hash2', 'student', NULL),
-('carol', 'hash3', 'teacher', NULL),
-('dave', 'hash4', 'teacher', NULL);
+('alice', 'hash1', 'alice@example.com'),
+('bob', 'hash2', 'bob@example.com'),
+('carol', 'hash3', 'carol@example.com'),
+('dave', 'hash4', 'dave@example.com');
 
-INSERT INTO classes (class_name, topic)
+INSERT INTO classes (class_name, creator_id, topic)
 VALUES
-('Math 101', 'Algebra'),
-('Physics 201', 'Mechanics'),
-('History 101', 'Ancient Civilizations');
+('Math 101', 3, 'Algebra'),
+('Physics 201', 4, 'Mechanics'),
+('History 101', 3, 'Ancient Civilizations');
 
 INSERT INTO participants (user_id, class_id)
 VALUES

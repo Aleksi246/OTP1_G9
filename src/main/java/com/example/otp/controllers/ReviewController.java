@@ -13,27 +13,32 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class ReviewController {
     private ReviewDao reviewDao = new ReviewDao();
     private UserDao userDao = new UserDao();
 
+    private void jsonMessage(Context ctx, HttpStatus status, String message) {
+        ctx.status(status).json(Map.of("message", message));
+    }
+
     private User getAuthenticatedUser(Context ctx) {
-        String username = ctx.attribute("username");
-        if (username == null) {
+        String email = ctx.attribute("email");
+        if (email == null) {
             String authHeader = ctx.header("Authorization");
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 return null;
             }
             String token = authHeader.substring(7);
-            username = JWTUtil.validateToken(token);
-            if (username == null) {
+            email = JWTUtil.validateToken(token);
+            if (email == null) {
                 return null;
             }
         }
         try {
-            return userDao.findByUsername(username);
+            return userDao.findByEmail(email);
         } catch (Exception e) {
             return null;
         }
@@ -45,7 +50,7 @@ public class ReviewController {
             List<Review> reviews = reviewDao.findByFileId(fileId);
             ctx.json(reviews);
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
@@ -56,10 +61,10 @@ public class ReviewController {
             if (review != null) {
                 ctx.json(review);
             } else {
-                ctx.status(HttpStatus.NOT_FOUND).json("Review not found");
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "Review not found");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
@@ -67,7 +72,7 @@ public class ReviewController {
         try {
             User user = getAuthenticatedUser(ctx);
             if (user == null) {
-                ctx.status(HttpStatus.UNAUTHORIZED).json("Authentication required");
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Authentication required");
                 return;
             }
 
@@ -77,7 +82,7 @@ public class ReviewController {
             int fileId = body.get("fileId").getAsInt();
 
             if (reviewText == null) {
-                ctx.status(HttpStatus.BAD_REQUEST).json("Missing parameters");
+                jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
                 return;
             }
 
@@ -91,10 +96,10 @@ public class ReviewController {
             if (created.getReviewId() != null) {
                 ctx.status(HttpStatus.CREATED).json(created);
             } else {
-                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Failed to create review");
+                jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create review");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
@@ -102,7 +107,7 @@ public class ReviewController {
         try {
             User user = getAuthenticatedUser(ctx);
             if (user == null) {
-                ctx.status(HttpStatus.UNAUTHORIZED).json("Authentication required");
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Authentication required");
                 return;
             }
 
@@ -113,12 +118,12 @@ public class ReviewController {
 
             Review review = reviewDao.findById(id);
             if (review == null) {
-                ctx.status(HttpStatus.NOT_FOUND).json("Review not found");
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "Review not found");
                 return;
             }
 
             if (!Objects.equals(user.getUserId(), review.getUserId())) {
-                ctx.status(HttpStatus.FORBIDDEN).json("You can only update your own reviews");
+                jsonMessage(ctx, HttpStatus.FORBIDDEN, "You can only update your own reviews");
                 return;
             }
 
@@ -129,10 +134,10 @@ public class ReviewController {
             if (success) {
                 ctx.json(review);
             } else {
-                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Failed to update review");
+                jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update review");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
@@ -140,33 +145,30 @@ public class ReviewController {
         try {
             User user = getAuthenticatedUser(ctx);
             if (user == null) {
-                ctx.status(HttpStatus.UNAUTHORIZED).json("Authentication required");
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Authentication required");
                 return;
             }
 
             int id = Integer.parseInt(ctx.pathParam("id"));
             Review review = reviewDao.findById(id);
             if (review == null) {
-                ctx.status(HttpStatus.NOT_FOUND).json("Review not found");
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "Review not found");
                 return;
             }
 
             if (!Objects.equals(user.getUserId(), review.getUserId())) {
-                ctx.status(HttpStatus.FORBIDDEN).json("You can only delete your own reviews");
+                jsonMessage(ctx, HttpStatus.FORBIDDEN, "You can only delete your own reviews");
                 return;
             }
 
             boolean success = reviewDao.delete(id);
             if (success) {
-                JsonObject response = new JsonObject();
-                response.addProperty("message", "Review deleted");
-                response.addProperty("id", id);
-                ctx.json(response.toString());
+                ctx.json(Map.of("message", "Review deleted", "id", id));
             } else {
-                ctx.status(HttpStatus.NOT_FOUND).json("Review not found");
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "Review not found");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 }

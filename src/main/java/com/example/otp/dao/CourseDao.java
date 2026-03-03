@@ -11,11 +11,16 @@ import java.util.List;
 public class CourseDao {
 
     public Course create(Course course) throws SQLException {
-        String sql = "INSERT INTO classes (class_name, topic) VALUES (?, ?)";
+        String sql = "INSERT INTO classes (class_name, creator_id, topic) VALUES (?, ?, ?)";
         try (Connection c = Database.getConnection();
              PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, course.getClassName());
-            ps.setString(2, course.getTopic());
+            if (course.getCreatorId() != null) {
+                ps.setInt(2, course.getCreatorId());
+            } else {
+                ps.setNull(2, Types.INTEGER);
+            }
+            ps.setString(3, course.getTopic());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) course.setClassId(rs.getInt(1));
@@ -25,7 +30,7 @@ public class CourseDao {
     }
 
     public Course findById(int id) throws SQLException {
-        String sql = "SELECT class_id, class_name, topic, created_at FROM classes WHERE class_id = ?";
+        String sql = "SELECT class_id, class_name, creator_id, topic, created_at FROM classes WHERE class_id = ?";
         try (Connection c = Database.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -37,7 +42,7 @@ public class CourseDao {
     }
 
     public List<Course> findAll() throws SQLException {
-        String sql = "SELECT class_id, class_name, topic, created_at FROM classes";
+        String sql = "SELECT class_id, class_name, creator_id, topic, created_at FROM classes";
         List<Course> list = new ArrayList<>();
         try (Connection c = Database.getConnection();
              PreparedStatement ps = c.prepareStatement(sql);
@@ -49,12 +54,17 @@ public class CourseDao {
 
     public boolean update(Course course) throws SQLException {
         if (course.getClassId() == null) return false;
-        String sql = "UPDATE classes SET class_name = ?, topic = ? WHERE class_id = ?";
+        String sql = "UPDATE classes SET class_name = ?, creator_id = ?, topic = ? WHERE class_id = ?";
         try (Connection c = Database.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, course.getClassName());
-            ps.setString(2, course.getTopic());
-            ps.setInt(3, course.getClassId());
+            if (course.getCreatorId() != null) {
+                ps.setInt(2, course.getCreatorId());
+            } else {
+                ps.setNull(2, Types.INTEGER);
+            }
+            ps.setString(3, course.getTopic());
+            ps.setInt(4, course.getClassId());
             return ps.executeUpdate() > 0;
         }
     }
@@ -72,6 +82,10 @@ public class CourseDao {
         Course c = new Course();
         c.setClassId(rs.getInt("class_id"));
         c.setClassName(rs.getString("class_name"));
+        int creatorId = rs.getInt("creator_id");
+        if (!rs.wasNull()) {
+            c.setCreatorId(creatorId);
+        }
         c.setTopic(rs.getString("topic"));
         c.setCreatedAt(rs.getTimestamp("created_at"));
         return c;

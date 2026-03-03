@@ -6,18 +6,16 @@ public class User {
     private Integer userId;
     private String username;
     private String passwordHash;
-    private String userType;
-    private String accessToken;
+    private String email;
     private Timestamp createdAt;
 
     public User() {}
 
-    public User(Integer userId, String username, String passwordHash, String userType, String accessToken, Timestamp createdAt) {
+    public User(Integer userId, String username, String passwordHash, String email, Timestamp createdAt) {
         this.userId = userId;
         this.username = username;
         this.passwordHash = passwordHash;
-        this.userType = userType;
-        this.accessToken = accessToken;
+        this.email = email;
         this.createdAt = createdAt;
     }
 
@@ -28,10 +26,8 @@ public class User {
     public void setUsername(String username) { this.username = username; }
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
-    public String getUserType() { return userType; }
-    public void setUserType(String userType) { this.userType = userType; }
-    public String getAccessToken() { return accessToken; }
-    public void setAccessToken(String accessToken) { this.accessToken = accessToken; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 }

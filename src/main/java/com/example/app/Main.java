@@ -5,12 +5,9 @@ import com.example.otp.controllers.*;
 import com.example.otp.db.DatabaseInitializer;
 import com.example.otp.util.JWTUtil;
 import io.javalin.Javalin;
-import io.javalin.http.HttpStatus;
 import io.javalin.http.UnauthorizedResponse;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -36,8 +33,8 @@ public class Main extends Application {
 
             // Start Javalin server
             Javalin app = Javalin.create(config -> {
-                config.plugins.enableCors(cors -> {
-                    cors.add(it -> {
+                config.bundledPlugins.enableCors(cors -> {
+                    cors.addRule(it -> {
                         it.anyHost();
                     });
                 });
@@ -107,10 +104,10 @@ public class Main extends Application {
             throw new UnauthorizedResponse("Missing or invalid token");
         }
         String token = authHeader.substring(7);
-        String username = JWTUtil.validateToken(token);
-        if (username == null) {
+        String email = JWTUtil.validateToken(token);
+        if (email == null) {
             throw new UnauthorizedResponse("Invalid token");
         }
-        ctx.attribute("username", username);
+        ctx.attribute("email", email);
     }
 }

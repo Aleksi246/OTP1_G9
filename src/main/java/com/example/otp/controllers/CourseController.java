@@ -11,23 +11,19 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.List;
+import java.util.Map;
 
 public class CourseController {
     private CourseDao courseDao = new CourseDao();
     private UserDao userDao = new UserDao();
     private ParticipantDao participantDao = new ParticipantDao();
 
-    private boolean isTeacher(User user) {
-        return "teacher".equals(user.getUserType());
+    private void jsonMessage(Context ctx, HttpStatus status, String message) {
+        ctx.status(status).json(Map.of("message", message));
     }
 
-    private boolean isEnrolled(User user, int classId) {
-        try {
-            List<Integer> classes = participantDao.findClassesByUser(user.getUserId());
-            return classes.contains(classId);
-        } catch (Exception e) {
-            return false;
-        }
+    private boolean isClassCreator(User user, Course course) {
+        return user != null && course != null && user.getUserId() != null && user.getUserId().equals(course.getCreatorId());
     }
 
     public void getAllCourses(Context ctx) {
@@ -35,7 +31,7 @@ public class CourseController {
             List<Course> courses = courseDao.findAll();
             ctx.json(courses);
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
@@ -46,19 +42,19 @@ public class CourseController {
             if (course != null) {
                 ctx.json(course);
             } else {
-                ctx.status(HttpStatus.NOT_FOUND).json("Course not found");
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "Course not found");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
     public void createCourse(Context ctx) {
         try {
-            String username = ctx.attribute("username");
-            User user = userDao.findByUsername(username);
-            if (user == null || !isTeacher(user)) {
-                ctx.status(HttpStatus.FORBIDDEN).json("Only teachers can create courses");
+            String email = ctx.attribute("email");
+            User user = userDao.findByEmail(email);
+            if (user == null) {
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Authentication required");
                 return;
             }
 
@@ -67,12 +63,13 @@ public class CourseController {
             String topic = body.has("topic") ? body.get("topic").getAsString() : null;
 
             if (className == null || topic == null) {
-                ctx.status(HttpStatus.BAD_REQUEST).json("Missing parameters");
+                jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
                 return;
             }
 
             Course course = new Course();
             course.setClassName(className);
+            course.setCreatorId(user.getUserId());
             course.setTopic(topic);
 
             Course created = courseDao.create(course);
@@ -80,32 +77,37 @@ public class CourseController {
                 participantDao.addParticipant(user.getUserId(), created.getClassId());
                 ctx.status(HttpStatus.CREATED).json(created);
             } else {
-                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Failed to create course");
+                jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create course");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
     public void updateCourse(Context ctx) {
         try {
-            String username = ctx.attribute("username");
-            User user = userDao.findByUsername(username);
             int id = Integer.parseInt(ctx.pathParam("id"));
-            if (user == null || !isTeacher(user) || !isEnrolled(user, id)) {
-                ctx.status(HttpStatus.FORBIDDEN).json("Only enrolled teachers can update courses");
+            String email = ctx.attribute("email");
+            User user = userDao.findByEmail(email);
+            if (user == null) {
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Authentication required");
+                return;
+            }
+
+            Course course = courseDao.findById(id);
+            if (course == null) {
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "Course not found");
+                return;
+            }
+
+            if (!isClassCreator(user, course)) {
+                jsonMessage(ctx, HttpStatus.FORBIDDEN, "Only class creator can update course");
                 return;
             }
 
             JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
             String className = body.has("className") ? body.get("className").getAsString() : null;
             String topic = body.has("topic") ? body.get("topic").getAsString() : null;
-
-            Course course = courseDao.findById(id);
-            if (course == null) {
-                ctx.status(HttpStatus.NOT_FOUND).json("Course not found");
-                return;
-            }
 
             if (className != null) course.setClassName(className);
             if (topic != null) course.setTopic(topic);
@@ -114,34 +116,42 @@ public class CourseController {
             if (success) {
                 ctx.json(course);
             } else {
-                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Failed to update course");
+                jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update course");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
     public void deleteCourse(Context ctx) {
         try {
-            String username = ctx.attribute("username");
-            User user = userDao.findByUsername(username);
             int id = Integer.parseInt(ctx.pathParam("id"));
-            if (user == null || !isTeacher(user) || !isEnrolled(user, id)) {
-                ctx.status(HttpStatus.FORBIDDEN).json("Only enrolled teachers can delete courses");
+            String email = ctx.attribute("email");
+            User user = userDao.findByEmail(email);
+            if (user == null) {
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Authentication required");
+                return;
+            }
+
+            Course course = courseDao.findById(id);
+            if (course == null) {
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "Course not found");
+                return;
+            }
+
+            if (!isClassCreator(user, course)) {
+                jsonMessage(ctx, HttpStatus.FORBIDDEN, "Only class creator can delete course");
                 return;
             }
 
             boolean success = courseDao.delete(id);
             if (success) {
-                JsonObject response = new JsonObject();
-                response.addProperty("message", "Course deleted");
-                response.addProperty("id", id);
-                ctx.json(response.toString());
+                ctx.json(Map.of("message", "Course deleted", "id", id));
             } else {
-                ctx.status(HttpStatus.NOT_FOUND).json("Course not found");
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "Course not found");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 }

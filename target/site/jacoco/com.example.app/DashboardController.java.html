@@ -7,18 +7,13 @@ import javafx.scene.control.Label;
 
     @FXML private Label welcomeLabel;
 
-    private String userType;
-    private String username;
-
     public void setUserInfo(String userType, String username) {
-<span class="nc" id="L14">        this.userType = userType;</span>
-<span class="nc" id="L15">        this.username = username;</span>
-<span class="nc" id="L16">        welcomeLabel.setText(&quot;Welcome, &quot; + username + &quot; (&quot; + userType + &quot;)&quot;);</span>
-<span class="nc" id="L17">    }</span>
+<span class="nc" id="L11">        welcomeLabel.setText(&quot;Welcome, &quot; + username + &quot; (&quot; + userType + &quot;)&quot;);</span>
+<span class="nc" id="L12">    }</span>
 
     @FXML
     public void handleLogout() {
-<span class="nc" id="L21">        SceneManager.loadLogin();</span>
-<span class="nc" id="L22">    }</span>
+<span class="nc" id="L16">        SceneManager.loadLogin();</span>
+<span class="nc" id="L17">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

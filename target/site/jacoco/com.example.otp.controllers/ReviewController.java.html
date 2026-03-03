@@ -20,20 +20,20 @@ import java.util.Objects;
 <span class="fc" id="L20">    private UserDao userDao = new UserDao();</span>
 
     private User getAuthenticatedUser(Context ctx) {
-<span class="fc" id="L23">        String username = ctx.attribute(&quot;username&quot;);</span>
-<span class="pc bpc" id="L24" title="1 of 2 branches missed.">        if (username == null) {</span>
+<span class="fc" id="L23">        String email = ctx.attribute(&quot;email&quot;);</span>
+<span class="pc bpc" id="L24" title="1 of 2 branches missed.">        if (email == null) {</span>
 <span class="fc" id="L25">            String authHeader = ctx.header(&quot;Authorization&quot;);</span>
 <span class="pc bpc" id="L26" title="1 of 4 branches missed.">            if (authHeader == null || !authHeader.startsWith(&quot;Bearer &quot;)) {</span>
 <span class="fc" id="L27">                return null;</span>
             }
 <span class="fc" id="L29">            String token = authHeader.substring(7);</span>
-<span class="fc" id="L30">            username = JWTUtil.validateToken(token);</span>
-<span class="pc bpc" id="L31" title="1 of 2 branches missed.">            if (username == null) {</span>
+<span class="fc" id="L30">            email = JWTUtil.validateToken(token);</span>
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">            if (email == null) {</span>
 <span class="nc" id="L32">                return null;</span>
             }
         }
         try {
-<span class="fc" id="L36">            return userDao.findByUsername(username);</span>
+<span class="fc" id="L36">            return userDao.findByEmail(email);</span>
 <span class="nc" id="L37">        } catch (Exception e) {</span>
 <span class="nc" id="L38">            return null;</span>
         }

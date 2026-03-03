@@ -1,7 +1,9 @@
 package com.example.otp.controllers;
 
+import com.example.otp.dao.CourseDao;
 import com.example.otp.dao.ParticipantDao;
 import com.example.otp.dao.UserDao;
+import com.example.otp.model.Course;
 import com.example.otp.model.User;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
@@ -9,17 +11,23 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.List;
+import java.util.Map;
 
 public class ParticipantController {
     private ParticipantDao participantDao = new ParticipantDao();
     private UserDao userDao = new UserDao();
+    private CourseDao courseDao = new CourseDao();
+
+    private void jsonMessage(Context ctx, HttpStatus status, String message) {
+        ctx.status(status).json(Map.of("message", message));
+    }
 
     public void enrollUser(Context ctx) {
         try {
-            String username = ctx.attribute("username");
-            User enrollingUser = userDao.findByUsername(username);
-            if (enrollingUser == null || !"teacher".equals(enrollingUser.getUserType())) {
-                ctx.status(HttpStatus.FORBIDDEN).json("Only teachers can enroll students");
+            String email = ctx.attribute("email");
+            User enrollingUser = userDao.findByEmail(email);
+            if (enrollingUser == null) {
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Authentication required");
                 return;
             }
 
@@ -27,37 +35,39 @@ public class ParticipantController {
             int userId = body.get("userId").getAsInt();
             int classId = body.get("classId").getAsInt();
 
-            User userToEnroll = userDao.findById(userId);
-            if (userToEnroll == null) {
-                ctx.status(HttpStatus.BAD_REQUEST).json("User to enroll does not exist");
+            Course course = courseDao.findById(classId);
+            if (course == null) {
+                jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Class does not exist");
                 return;
             }
-            if ("admin".equals(userToEnroll.getUserType())) {
-                ctx.status(HttpStatus.BAD_REQUEST).json("Cannot enroll admin users");
+            if (!enrollingUser.getUserId().equals(course.getCreatorId())) {
+                jsonMessage(ctx, HttpStatus.FORBIDDEN, "Only class creator can enroll users");
+                return;
+            }
+
+            User userToEnroll = userDao.findById(userId);
+            if (userToEnroll == null) {
+                jsonMessage(ctx, HttpStatus.BAD_REQUEST, "User to enroll does not exist");
                 return;
             }
 
             boolean success = participantDao.addParticipant(userId, classId);
             if (success) {
-                JsonObject response = new JsonObject();
-                response.addProperty("message", "User enrolled");
-                response.addProperty("userId", userId);
-                response.addProperty("classId", classId);
-                ctx.status(HttpStatus.CREATED).json(response.toString());
+                ctx.status(HttpStatus.CREATED).json(Map.of("message", "User enrolled", "userId", userId, "classId", classId));
             } else {
-                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Failed to enroll user");
+                jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to enroll user");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
     public void unenrollUser(Context ctx) {
         try {
-            String username = ctx.attribute("username");
-            User unenrollingUser = userDao.findByUsername(username);
-            if (unenrollingUser == null || !"teacher".equals(unenrollingUser.getUserType())) {
-                ctx.status(HttpStatus.FORBIDDEN).json("Only teachers can unenroll users");
+            String email = ctx.attribute("email");
+            User unenrollingUser = userDao.findByEmail(email);
+            if (unenrollingUser == null) {
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Authentication required");
                 return;
             }
 
@@ -65,18 +75,26 @@ public class ParticipantController {
             int userId = body.get("userId").getAsInt();
             int classId = body.get("classId").getAsInt();
 
+            Course course = courseDao.findById(classId);
+            if (course == null) {
+                jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Class does not exist");
+                return;
+            }
+            boolean isSelfUnenroll = unenrollingUser.getUserId().equals(userId);
+            boolean isClassCreator = unenrollingUser.getUserId().equals(course.getCreatorId());
+            if (!isSelfUnenroll && !isClassCreator) {
+                jsonMessage(ctx, HttpStatus.FORBIDDEN, "Only class creator can unenroll others");
+                return;
+            }
+
             boolean success = participantDao.removeParticipant(userId, classId);
             if (success) {
-                JsonObject response = new JsonObject();
-                response.addProperty("message", "User unenrolled");
-                response.addProperty("userId", userId);
-                response.addProperty("classId", classId);
-                ctx.json(response.toString());
+                ctx.json(Map.of("message", "User unenrolled", "userId", userId, "classId", classId));
             } else {
-                ctx.status(HttpStatus.NOT_FOUND).json("Enrollment not found");
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "Enrollment not found");
             }
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
@@ -86,7 +104,7 @@ public class ParticipantController {
             List<Integer> userIds = participantDao.findUsersByClass(classId);
             ctx.json(userIds);
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 
@@ -96,7 +114,7 @@ public class ParticipantController {
             List<Integer> classIds = participantDao.findClassesByUser(userId);
             ctx.json(classIds);
         } catch (Exception e) {
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json("Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
         }
     }
 }
