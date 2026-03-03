@@ -12,7 +12,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release> <!-- define this -->
         <javafx.version>23.0.1</javafx.version>
-        <javafx.platform>mac-aarch64</javafx.platform> <!-- use mac-aarch64 if on Apple Silicon and win/win-aarch64 respectively-->
+        <javafx.platform>linux</javafx.platform> <!-- use mac-aarch64 if on Apple Silicon and win/win-aarch64 respectively-->
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
     </properties>
 
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin</artifactId>
-            <version>6.3.0</version>
+            <version>5.6.3</version>
         </dependency>
 
         <!-- JWT dependencies -->

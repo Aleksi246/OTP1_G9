@@ -9,8 +9,8 @@ com/example/otp/util/BCryptUtil.class
 com/example/otp/dao/CourseDao.class
 com/example/otp/model/Course.class
 com/example/otp/db/Database.class
-com/example/app/LoginController.class
 com/example/app/MainController.class
+com/example/app/LoginController.class
 com/example/otp/model/Material.class
 com/example/otp/db/DatabaseInitializer.class
 com/example/otp/controllers/CourseController.class

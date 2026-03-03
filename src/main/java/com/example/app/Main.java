@@ -36,8 +36,8 @@ public class Main extends Application {
 
             // Start Javalin server
             Javalin app = Javalin.create(config -> {
-                config.bundledPlugins.enableCors(cors -> {
-                    cors.addRule(it -> {
+                config.plugins.enableCors(cors -> {
+                    cors.add(it -> {
                         it.anyHost();
                     });
                 });
