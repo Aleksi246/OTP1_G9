@@ -245,5 +245,19 @@ public class HomeController {
 
         return card;
     }
+
+    @FXML
+    private void handleJoinClass() {
+        // TODO: Implement join class dialog
+        System.out.println("Join Class clicked");
+        // You can add a dialog here to let users enter a class code
+    }
+
+    @FXML
+    private void handleCreateClass() {
+        // TODO: Implement create class dialog
+        System.out.println("Create Class clicked");
+        // You can add a dialog here to let users create a new class
+    }
 }
 

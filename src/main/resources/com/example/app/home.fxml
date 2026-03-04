@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.VBox?>
 
 <BorderPane prefHeight="900.0" prefWidth="1400.0" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.HomeController">
 
@@ -12,19 +15,25 @@
     </top>
 
     <center>
-        <VBox alignment="TOP_LEFT" spacing="20.0" style="-fx-padding: 40;">
+        <VBox alignment="TOP_LEFT" prefHeight="844.0" prefWidth="1165.0" spacing="20.0" style="-fx-padding: 40;">
             <!-- Header section -->
             <VBox spacing="8.0">
-                <Label fx:id="welcomeLabel" text="Welcome!" style="-fx-font-weight: bold; -fx-font-size: 32; -fx-text-fill: #2c3e50;" />
-                <Label text="Your enrolled classes" style="-fx-font-size: 14; -fx-text-fill: #7f8c8d;" />
+                <Label fx:id="welcomeLabel" style="-fx-font-weight: bold; -fx-font-size: 32; -fx-text-fill: #2c3e50;" text="Welcome!" />
+                <MenuButton mnemonicParsing="false" prefHeight="42.0" prefWidth="150.0" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" text="Manage Classes" textFill="WHITE">
+                    <items>
+                        <MenuItem onAction="#handleJoinClass" text="Join Class" />
+                        <MenuItem onAction="#handleCreateClass" text="Create Class" />
+                    </items>
+                </MenuButton>
+                <Label style="-fx-font-size: 14; -fx-text-fill: #7f8c8d;" text="Your enrolled classes" />
             </VBox>
 
             <!-- Loading label -->
-            <Label fx:id="loadingLabel" text="Loading your classes..." style="-fx-font-size: 14; -fx-text-fill: #95a5a6;" />
+            <Label fx:id="loadingLabel" style="-fx-font-size: 14; -fx-text-fill: #95a5a6;" text="Loading your classes..." />
 
             <!-- Classes Container with ScrollPane -->
             <ScrollPane fx:id="scrollPane" fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
-                <FlowPane fx:id="classesContainer" hgap="20.0" vgap="20.0" style="-fx-padding: 0; -fx-background-color: transparent; -fx-pref-wrap-length: 1200;" />
+                <FlowPane fx:id="classesContainer" hgap="20.0" style="-fx-padding: 0; -fx-background-color: transparent; -fx-pref-wrap-length: 1200;" vgap="20.0" />
             </ScrollPane>
         </VBox>
     </center>
