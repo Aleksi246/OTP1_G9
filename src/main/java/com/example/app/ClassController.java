@@ -403,7 +403,7 @@ public class ClassController {
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                return new ReviewsFetchResult(false, "Could not load reviews (" + response.statusCode() + ").", new ArrayList<>());
+                return new ReviewsFetchResult("Could not load reviews (" + response.statusCode() + ").", new ArrayList<>());
             }
 
             JsonArray reviewsArray = JsonParser.parseString(response.body()).getAsJsonArray();
@@ -427,9 +427,9 @@ public class ClassController {
             }
 
             String status = lines.isEmpty() ? "No reviews yet." : lines.size() + " review(s)";
-            return new ReviewsFetchResult(true, status, lines);
+            return new ReviewsFetchResult(status, lines);
         } catch (Exception e) {
-            return new ReviewsFetchResult(false, "Review list API unavailable. Connect backend GET /api/reviews/material/{fileId}.", new ArrayList<>());
+            return new ReviewsFetchResult("Review list API unavailable. Connect backend GET /api/reviews/material/{fileId}.", new ArrayList<>());
         }
     }
 
@@ -535,10 +535,8 @@ public class ClassController {
         try {
             JsonObject reviewData = new JsonObject();
             reviewData.addProperty("fileId", fileId);
-            reviewData.addProperty("userId", userId);
-            reviewData.addProperty("classId", classId);
             reviewData.addProperty("rating", rating);
-            reviewData.addProperty("comment", comment);
+            reviewData.addProperty("review", comment);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI("http://localhost:7700/api/reviews"))
@@ -856,12 +854,10 @@ public class ClassController {
     }
 
     private static class ReviewsFetchResult {
-        private final boolean success;
         private final String message;
         private final List<String> reviewLines;
 
-        private ReviewsFetchResult(boolean success, String message, List<String> reviewLines) {
-            this.success = success;
+        private ReviewsFetchResult(String message, List<String> reviewLines) {
             this.message = message;
             this.reviewLines = reviewLines;
         }
