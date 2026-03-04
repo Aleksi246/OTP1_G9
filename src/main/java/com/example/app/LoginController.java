@@ -79,7 +79,7 @@ public class LoginController {
                     String email = JWTHelper.getEmailFromToken(token);
                     // Store session info
                     SessionManager.setSession(username, email, token, userType);
-                    SceneManager.loadDashboard(userType, token, username);
+                    SceneManager.loadHome();
                 } else {
                     showError("Failed to extract token from response");
                 }

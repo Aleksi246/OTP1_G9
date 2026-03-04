@@ -62,6 +62,7 @@ public class Main extends Application {
             // User routes
             app.get("/api/users", userController::getAllUsers);
             app.get("/api/users/{id}", userController::getUserById);
+            app.get("/api/users/by-email/{email}", userController::getUserByEmail);
 
             // Course routes
             app.get("/api/courses", courseController::getAllCourses);

@@ -128,6 +128,21 @@ public class UserController {
         }
     }
 
+    public void getUserByEmail(Context ctx) {
+        try {
+            String email = ctx.pathParam("email");
+            User user = userDao.findByEmail(email);
+            if (user != null) {
+                user.setPasswordHash(null);
+                ctx.json(user);
+            } else {
+                jsonMessage(ctx, HttpStatus.NOT_FOUND, "User not found");
+            }
+        } catch (Exception e) {
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+        }
+    }
+
     public void changePassword(Context ctx) {
         try {
             String email = ctx.attribute("email");

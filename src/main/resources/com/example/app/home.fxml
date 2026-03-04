@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="CONTROLLER_NAME"
-            prefHeight="900.0" prefWidth="1400.0">
+<BorderPane prefHeight="900.0" prefWidth="1400.0" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.HomeController">
 
-</AnchorPane>
+    <top>
+        <fx:include source="topbar.fxml" />
+    </top>
+
+    <center>
+        <VBox alignment="TOP_LEFT" spacing="20.0" style="-fx-padding: 40;">
+            <!-- Header section -->
+            <VBox spacing="8.0">
+                <Label fx:id="welcomeLabel" text="Welcome!" style="-fx-font-weight: bold; -fx-font-size: 32; -fx-text-fill: #2c3e50;" />
+                <Label text="Your enrolled classes" style="-fx-font-size: 14; -fx-text-fill: #7f8c8d;" />
+            </VBox>
+
+            <!-- Loading label -->
+            <Label fx:id="loadingLabel" text="Loading your classes..." style="-fx-font-size: 14; -fx-text-fill: #95a5a6;" />
+
+            <!-- Classes Container with ScrollPane -->
+            <ScrollPane fx:id="scrollPane" fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+                <FlowPane fx:id="classesContainer" hgap="20.0" vgap="20.0" style="-fx-padding: 0; -fx-background-color: transparent; -fx-pref-wrap-length: 1200;" />
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>
