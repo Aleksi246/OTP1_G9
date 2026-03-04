@@ -8,18 +8,19 @@ import javafx.scene.control.Label;
 public class MainController {
 
     @FXML
-    private Label messageLabel;
-
-    @FXML
-    private Button clickButton;
-
-    @FXML
     private void initialize() {
-        messageLabel.setText("Ready");
+        System.out.println("MainController initialized");
     }
 
     @FXML
-    private void onClick() {
-        messageLabel.setText("Button clicked");
+    private void onLoginButtonClick() {
+        System.out.println("Login button clicked!");
+        SceneManager.loadLogin();
+    }
+
+    @FXML
+    private void onRegisterButtonClick() {
+        System.out.println("Register button clicked!");
+        SceneManager.loadRegister();
     }
 }

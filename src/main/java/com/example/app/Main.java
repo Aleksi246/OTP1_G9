@@ -14,7 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         SceneManager.setPrimaryStage(stage);
-        SceneManager.loadLogin();
+        SceneManager.loadMain();
     }
 
     public static void main(String[] args) {
