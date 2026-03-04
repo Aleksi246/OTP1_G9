@@ -183,9 +183,10 @@ public class HomeController {
 
     private VBox createClassCard(String className, String topic, Integer classId) {
         VBox card = new VBox();
-        card.setPrefWidth(280);
-        card.setMinHeight(240);
-        card.setMaxHeight(300);
+        card.setPrefWidth(320);
+        card.setMinHeight(280);
+        card.setMaxHeight(380);
+        card.setSpacing(0);
 
         // Generate a unique color for each class based on its ID
         String[] colors = {"#5B6FCC", "#E85554", "#43A1A9", "#F19A38", "#7D5FA3", "#4A90C5", "#2ECC71", "#E67E22"};
@@ -193,24 +194,24 @@ public class HomeController {
 
         // Create header with color
         VBox headerBox = new VBox();
-        headerBox.setPrefHeight(80);
+        headerBox.setPrefHeight(100);
         headerBox.setStyle(
                 "-fx-background-color: " + headerColor + "; " +
-                "-fx-background-radius: 12 12 0 0; " +
-                "-fx-padding: 15;"
+                "-fx-background-radius: 14 14 0 0; " +
+                "-fx-padding: 20;"
         );
-        headerBox.setAlignment(Pos.TOP_LEFT);
-        headerBox.setSpacing(5);
+        headerBox.setAlignment(Pos.CENTER_LEFT);
+        headerBox.setSpacing(8);
 
         // Class name in header
         Label classNameLabel = new Label(className);
         classNameLabel.setStyle(
-                "-fx-font-size: 16; " +
+                "-fx-font-size: 18; " +
                 "-fx-font-weight: bold; " +
                 "-fx-text-fill: white;"
         );
         classNameLabel.setWrapText(true);
-        classNameLabel.setMaxWidth(250);
+        classNameLabel.setMaxWidth(280);
 
         headerBox.getChildren().add(classNameLabel);
 
@@ -218,39 +219,53 @@ public class HomeController {
         VBox contentBox = new VBox();
         contentBox.setStyle(
                 "-fx-background-color: white; " +
-                "-fx-background-radius: 0 0 12 12; " +
-                "-fx-padding: 15;"
+                "-fx-background-radius: 0 0 14 14; " +
+                "-fx-padding: 20;"
         );
-        contentBox.setSpacing(10);
-        contentBox.setPrefHeight(160);
+        contentBox.setSpacing(12);
+        contentBox.setPrefHeight(180);
+        VBox.setVgrow(contentBox, Priority.ALWAYS);
 
-        // Topic label
-        Label topicLabel = new Label("Topic: " + (topic == null || topic.isEmpty() ? "No topic set" : topic));
-        topicLabel.setStyle(
+        // Topic label with icon
+        Label topicLabelHeader = new Label("📚 Topic");
+        topicLabelHeader.setStyle(
                 "-fx-font-size: 12; " +
-                "-fx-text-fill: #555555;"
+                "-fx-font-weight: bold; " +
+                "-fx-text-fill: #5a6c7d;"
+        );
+
+        Label topicLabel = new Label(topic == null || topic.isEmpty() ? "No topic set" : topic);
+        topicLabel.setStyle(
+                "-fx-font-size: 14; " +
+                "-fx-text-fill: #2c3e50; " +
+                "-fx-wrap-text: true;"
         );
         topicLabel.setWrapText(true);
-        topicLabel.setMaxWidth(250);
+        topicLabel.setMaxWidth(280);
 
         // Class ID label (smaller, subtle)
         Label classIdLabel = new Label("Class ID: " + classId);
         classIdLabel.setStyle(
-                "-fx-font-size: 10; " +
-                "-fx-text-fill: #999999; " +
+                "-fx-font-size: 11; " +
+                "-fx-text-fill: #a5b3bf; " +
                 "-fx-font-family: 'Courier New';"
         );
 
+        // Spacer to push button down
+        VBox spacer = new VBox();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+
         // View button
         Button viewButton = new Button("View Class");
-        viewButton.setPrefWidth(250);
+        viewButton.setPrefWidth(280);
+        viewButton.setPrefHeight(42);
         viewButton.setStyle(
                 "-fx-background-color: " + headerColor + "; " +
                 "-fx-text-fill: white; " +
                 "-fx-font-weight: bold; " +
                 "-fx-font-size: 13; " +
-                "-fx-padding: 10; " +
-                "-fx-background-radius: 6; " +
+                "-fx-padding: 0; " +
+                "-fx-background-radius: 8; " +
                 "-fx-cursor: hand; " +
                 "-fx-border: none;"
         );
@@ -258,16 +273,13 @@ public class HomeController {
             SceneManager.loadClass(classId);
         });
 
-        contentBox.getChildren().addAll(topicLabel, classIdLabel);
-        contentBox.setVgrow(topicLabel, Priority.ALWAYS);
+        contentBox.getChildren().addAll(topicLabelHeader, topicLabel, classIdLabel, spacer, viewButton);
 
-        VBox.setVgrow(contentBox, Priority.ALWAYS);
-
-        card.getChildren().addAll(headerBox, contentBox, viewButton);
+        card.getChildren().addAll(headerBox, contentBox);
         card.setStyle(
                 "-fx-background-color: white; " +
-                "-fx-background-radius: 12; " +
-                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 8, 0, 0, 3); " +
+                "-fx-background-radius: 14; " +
+                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 12, 0, 0, 4); " +
                 "-fx-cursor: hand;"
         );
 
@@ -275,8 +287,8 @@ public class HomeController {
         card.setOnMouseEntered(e -> {
             card.setStyle(
                     "-fx-background-color: white; " +
-                    "-fx-background-radius: 12; " +
-                    "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8); " +
+                    "-fx-background-radius: 14; " +
+                    "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.12), 20, 0, 0, 10); " +
                     "-fx-cursor: hand;"
             );
         });
@@ -284,8 +296,8 @@ public class HomeController {
         card.setOnMouseExited(e -> {
             card.setStyle(
                     "-fx-background-color: white; " +
-                    "-fx-background-radius: 12; " +
-                    "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 8, 0, 0, 3); " +
+                    "-fx-background-radius: 14; " +
+                    "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 12, 0, 0, 4); " +
                     "-fx-cursor: hand;"
             );
         });

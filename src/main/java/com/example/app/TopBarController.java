@@ -3,6 +3,7 @@ package com.example.app;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
 
 public class TopBarController {
 
@@ -13,7 +14,7 @@ public class TopBarController {
     private Button forwardButton;
 
     @FXML
-    private Button learningPlatformButton;
+    private ImageView learningPlatformImage;
 
     @FXML
     private Button profileButton;
@@ -64,13 +65,15 @@ public class TopBarController {
     private void updateButtonStates() {
         boolean isLoggedIn = SessionManager.isLoggedIn();
 
-        // Update learning platform button state
-        if (learningPlatformButton != null) {
-            learningPlatformButton.setDisable(!isLoggedIn);
+        // Update learning platform image state
+        if (learningPlatformImage != null) {
+            learningPlatformImage.setDisable(!isLoggedIn);
             if (!isLoggedIn) {
-                learningPlatformButton.setStyle("-fx-background-color: #e0e0e0; -fx-text-fill: #999999; -fx-cursor: default;");
+                learningPlatformImage.setOpacity(0.3);
+                learningPlatformImage.setStyle("-fx-cursor: default;");
             } else {
-                learningPlatformButton.setStyle("");
+                learningPlatformImage.setOpacity(1.0);
+                learningPlatformImage.setStyle("-fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 8, 0, 0, 3);");
             }
         }
 

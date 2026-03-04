@@ -87,7 +87,7 @@ public class SceneManager {
                 addToHistory("main");
             }
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/main.fxml"));
-            Scene scene = new Scene(loader.load());
+            Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
             primaryStage.setTitle("Learning Platform - Main");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -108,7 +108,7 @@ public class SceneManager {
                 addToHistory("login");
             }
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/login.fxml"));
-            Scene scene = new Scene(loader.load());
+            Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
             primaryStage.setTitle("Learning Platform - Login");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -128,7 +128,7 @@ public class SceneManager {
                 addToHistory("register");
             }
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/register.fxml"));
-            Scene scene = new Scene(loader.load());
+            Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
             primaryStage.setTitle("Learning Platform - Register");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -145,7 +145,7 @@ public class SceneManager {
             if ("admin".equals(normalizedUserType)) {
                 addToHistory("admin");
                 FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/admin.fxml"));
-                Scene scene = new Scene(loader.load());
+                Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
                 AdminController controller = loader.getController();
                 controller.setAuthToken(token);
                 primaryStage.setTitle("Learning Platform - Admin Dashboard");
@@ -154,7 +154,7 @@ public class SceneManager {
             } else {
                 addToHistory("dashboard");
                 FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/dashboard.fxml"));
-                Scene scene = new Scene(loader.load());
+                Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
                 DashboardController controller = loader.getController();
                 controller.setUserInfo(normalizedUserType, username);
                 primaryStage.setTitle("Learning Platform - " + capitalize(normalizedUserType) + " Dashboard");
@@ -177,7 +177,7 @@ public class SceneManager {
                 addToHistory("profile");
             }
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/profile.fxml"));
-            Scene scene = new Scene(loader.load());
+            Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
             primaryStage.setTitle("Learning Platform - Profile");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -197,7 +197,7 @@ public class SceneManager {
                 addToHistory("home");
             }
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/home.fxml"));
-            Scene scene = new Scene(loader.load());
+            Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
             primaryStage.setTitle("Learning Platform - Home");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -212,7 +212,7 @@ public class SceneManager {
             addToHistory("class");
             ClassContextHolder.setClassId(classId);
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/class.fxml"));
-            Scene scene = new Scene(loader.load());
+            Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
             primaryStage.setTitle("Learning Platform - Class");
             primaryStage.setScene(scene);
             primaryStage.show();
