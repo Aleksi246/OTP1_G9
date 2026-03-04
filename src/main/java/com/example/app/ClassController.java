@@ -1,20 +1,35 @@
 package com.example.app;
 
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class ClassController {
 
@@ -31,130 +46,312 @@ public class ClassController {
     private Label creatorLabel;
 
     @FXML
-    private VBox contentContainer;
+    private Button joinButton;
 
     @FXML
-    private Button joinButton;
+    private VBox uploadSection;
+
+    @FXML
+    private Label selectedFileLabel;
+
+    @FXML
+    private ComboBox<String> materialTypeCombo;
+
+    @FXML
+    private Button uploadButton;
+
+    @FXML
+    private Label uploadProgressLabel;
+
+    @FXML
+    private ProgressBar uploadProgressBar;
+
+    @FXML
+    private Label materialsStatusLabel;
+
+    @FXML
+    private VBox materialsContainer;
 
     private Integer classId;
     private Integer userId;
+    private Integer creatorId;
     private String token;
+
+    private boolean isCreator;
+    private boolean isEnrolled;
+
+    private File selectedFile;
+    private final HttpClient httpClient = HttpClient.newHttpClient();
 
     @FXML
     private void initialize() {
         if (!SessionManager.isLoggedIn()) {
-            Platform.runLater(() -> SceneManager.loadLogin());
+            Platform.runLater(SceneManager::loadLogin);
             return;
         }
 
         token = SessionManager.getToken();
         userId = SessionManager.getUserId();
-
-        // Retrieve classId from SceneManager or parameter
         classId = getClassIdFromContext();
 
-        if (classId != null) {
-            loadClassDetails();
-        } else {
+        materialTypeCombo.getItems().setAll("Lecture Notes", "Assignment", "Slides", "Reference", "Other");
+        materialTypeCombo.getSelectionModel().selectFirst();
+
+        setUploadSectionVisible(false);
+        setUploadProgressVisible(false, "");
+
+        if (classId == null) {
             showError("Error", "Class ID not provided");
+            return;
         }
+
+        loadClassDetails();
     }
 
     private Integer getClassIdFromContext() {
-        // This will be set via a method before the scene is shown
-        // For now, try to get it from a static holder or return null
         Integer id = ClassContextHolder.getClassId();
         ClassContextHolder.clear();
         return id;
     }
 
     private void loadClassDetails() {
-        new Thread(() -> {
+        runAsync(() -> {
             try {
-                HttpClient client = HttpClient.newHttpClient();
+                if (userId == null) {
+                    userId = fetchUserId();
+                    if (userId != null) {
+                        SessionManager.setUserId(userId);
+                    }
+                }
+
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(new URI("http://localhost:7700/api/courses/" + classId))
                         .header("Authorization", "Bearer " + token)
                         .GET()
                         .build();
 
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-                if (response.statusCode() == 200) {
-                    JsonObject courseJson = JsonParser.parseString(response.body()).getAsJsonObject();
-                    String className = courseJson.get("className").getAsString();
-                    String topic = courseJson.has("topic") ? courseJson.get("topic").getAsString() : "No topic";
-                    Integer creatorId = courseJson.get("creatorId").getAsInt();
-
-                    Platform.runLater(() -> {
-                        classNameLabel.setText(className);
-                        classIdLabel.setText("Class ID: " + classId);
-                        topicLabel.setText("Topic: " + topic);
-                        creatorLabel.setText("Created by: User #" + creatorId);
-
-                        // Check if current user is already enrolled
-                        checkEnrollmentStatus();
-                    });
-                } else {
+                if (response.statusCode() != 200) {
                     Platform.runLater(() -> showError("Error", "Failed to load class details"));
+                    return;
                 }
-            } catch (Exception e) {
+
+                JsonObject courseJson = JsonParser.parseString(response.body()).getAsJsonObject();
+                String className = getStringOrDefault(courseJson, "className", "Unknown class");
+                String topic = getStringOrDefault(courseJson, "topic", "No topic");
+                creatorId = courseJson.has("creatorId") && !courseJson.get("creatorId").isJsonNull()
+                        ? courseJson.get("creatorId").getAsInt()
+                        : null;
+
+                isCreator = creatorId != null && creatorId.equals(userId);
+                isEnrolled = isCreator || isUserEnrolled();
+
                 Platform.runLater(() -> {
-                    showError("Error", "Failed to load class: " + e.getMessage());
-                    e.printStackTrace();
+                    classNameLabel.setText(className);
+                    classIdLabel.setText("Class ID: " + classId);
+                    topicLabel.setText("Topic: " + topic);
+                    creatorLabel.setText("Created by: User #" + (creatorId == null ? "Unknown" : creatorId));
+                    updateAccessUi();
                 });
+
+                loadMaterials();
+            } catch (Exception e) {
+                Platform.runLater(() -> showError("Error", "Failed to load class: " + e.getMessage()));
             }
-        }).start();
+        });
     }
 
-    private void checkEnrollmentStatus() {
-        new Thread(() -> {
+    private Integer fetchUserId() {
+        try {
+            String email = SessionManager.getEmail();
+            if (email == null || email.isBlank()) {
+                return null;
+            }
+
+            String encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI("http://localhost:7700/api/users/by-email/" + encodedEmail))
+                    .header("Authorization", "Bearer " + token)
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                return null;
+            }
+
+            JsonObject userJson = JsonParser.parseString(response.body()).getAsJsonObject();
+            if (!userJson.has("userId") || userJson.get("userId").isJsonNull()) {
+                return null;
+            }
+            return userJson.get("userId").getAsInt();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private boolean isUserEnrolled() {
+        if (userId == null) {
+            return false;
+        }
+
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI("http://localhost:7700/api/participants/user/" + userId))
+                    .header("Authorization", "Bearer " + token)
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                return false;
+            }
+
+            JsonArray classesArray = JsonParser.parseString(response.body()).getAsJsonArray();
+            for (JsonElement element : classesArray) {
+                if (element.getAsInt() == classId) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void updateAccessUi() {
+        if (isCreator) {
+            joinButton.setText("Class Creator");
+            joinButton.setDisable(true);
+        } else if (isEnrolled) {
+            joinButton.setText("Already Enrolled");
+            joinButton.setDisable(true);
+        } else {
+            joinButton.setText("Join Class");
+            joinButton.setDisable(false);
+        }
+
+        setUploadSectionVisible(isCreator);
+
+        if (!isCreator && !isEnrolled) {
+            materialsStatusLabel.setText("Join this class to access shared files.");
+            materialsContainer.getChildren().clear();
+        }
+    }
+
+    private void setUploadSectionVisible(boolean visible) {
+        uploadSection.setVisible(visible);
+        uploadSection.setManaged(visible);
+    }
+
+    private void loadMaterials() {
+        if (!isCreator && !isEnrolled) {
+            return;
+        }
+
+        runAsync(() -> {
             try {
-                HttpClient client = HttpClient.newHttpClient();
+                Platform.runLater(() -> {
+                    materialsStatusLabel.setText("Loading files...");
+                    materialsContainer.getChildren().clear();
+                });
+
                 HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI("http://localhost:7700/api/participants/user/" + userId))
+                        .uri(new URI("http://localhost:7700/api/materials/course/" + classId))
                         .header("Authorization", "Bearer " + token)
                         .GET()
                         .build();
 
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-                if (response.statusCode() == 200) {
-                    var classesArray = JsonParser.parseString(response.body()).getAsJsonArray();
-                    boolean isEnrolled = false;
-                    for (var element : classesArray) {
-                        if (element.getAsInt() == classId) {
-                            isEnrolled = true;
-                            break;
-                        }
-                    }
-
-                    boolean finalIsEnrolled = isEnrolled;
-                    Platform.runLater(() -> {
-                        if (finalIsEnrolled) {
-                            joinButton.setText("Already Enrolled");
-                            joinButton.setDisable(true);
-                        } else {
-                            joinButton.setText("Join Class");
-                            joinButton.setDisable(false);
-                        }
-                    });
+                if (response.statusCode() != 200) {
+                    Platform.runLater(() -> materialsStatusLabel.setText("Could not load files right now."));
+                    return;
                 }
+
+                JsonArray materials = JsonParser.parseString(response.body()).getAsJsonArray();
+                List<JsonObject> rows = new ArrayList<>();
+                for (JsonElement element : materials) {
+                    if (element.isJsonObject()) {
+                        rows.add(element.getAsJsonObject());
+                    }
+                }
+                rows.sort(Comparator.comparing(o -> getStringOrDefault(o, "uploadedAt", ""), Comparator.reverseOrder()));
+
+                Platform.runLater(() -> renderMaterials(rows));
             } catch (Exception e) {
-                e.printStackTrace();
+                Platform.runLater(() -> materialsStatusLabel.setText("Could not load files."));
             }
-        }).start();
+        });
+    }
+
+    private void renderMaterials(List<JsonObject> materials) {
+        materialsContainer.getChildren().clear();
+
+        if (materials.isEmpty()) {
+            materialsStatusLabel.setText("No files uploaded yet.");
+            return;
+        }
+
+        materialsStatusLabel.setText(materials.size() + " file(s) available");
+
+        for (JsonObject material : materials) {
+            materialsContainer.getChildren().add(createMaterialCard(material));
+        }
+    }
+
+    private HBox createMaterialCard(JsonObject material) {
+        Integer fileId = material.has("fileId") && !material.get("fileId").isJsonNull() ? material.get("fileId").getAsInt() : null;
+        String filename = getStringOrDefault(material, "originalFilename", "Unnamed file");
+        String type = getStringOrDefault(material, "materialType", "Other");
+        String uploadedAt = getStringOrDefault(material, "uploadedAt", "Unknown date");
+        String uploader = material.has("userId") && !material.get("userId").isJsonNull()
+                ? "Uploaded by user #" + material.get("userId").getAsInt()
+                : "Uploader unknown";
+
+        Label nameLabel = new Label(filename);
+        nameLabel.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        Label metaLabel = new Label(type + " - " + uploader + " - " + uploadedAt.replace("T", " "));
+        metaLabel.setStyle("-fx-font-size: 12; -fx-text-fill: #7f8c8d;");
+
+        Label rowStatusLabel = new Label("");
+        rowStatusLabel.setStyle("-fx-font-size: 12; -fx-text-fill: #6c7a89;");
+        rowStatusLabel.setVisible(false);
+        rowStatusLabel.setManaged(false);
+
+        VBox infoBox = new VBox(4, nameLabel, metaLabel, rowStatusLabel);
+
+        Button downloadButton = new Button("Download");
+        downloadButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 7; -fx-cursor: hand;");
+        downloadButton.setDisable(fileId == null);
+
+        Button deleteButton = new Button("Delete");
+        deleteButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 7; -fx-cursor: hand;");
+        deleteButton.setDisable(fileId == null);
+        deleteButton.setVisible(isCreator);
+        deleteButton.setManaged(isCreator);
+
+        downloadButton.setOnAction(e -> handleDownloadMaterial(fileId, filename, downloadButton, deleteButton, rowStatusLabel));
+        deleteButton.setOnAction(e -> handleDeleteMaterial(fileId, filename, downloadButton, deleteButton, rowStatusLabel));
+
+        HBox actions = new HBox(8, downloadButton, deleteButton);
+        HBox row = new HBox(12, infoBox, actions);
+        row.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(infoBox, Priority.ALWAYS);
+        row.setStyle("-fx-background-color: #f8fafc; -fx-border-color: #dfe6ee; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12 14;");
+        return row;
     }
 
     @FXML
     private void handleJoinClass() {
-        new Thread(() -> {
+        runAsync(() -> {
             try {
                 JsonObject enrollData = new JsonObject();
                 enrollData.addProperty("userId", userId);
                 enrollData.addProperty("classId", classId);
 
-                HttpClient client = HttpClient.newHttpClient();
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(new URI("http://localhost:7700/api/participants/enroll"))
                         .header("Authorization", "Bearer " + token)
@@ -162,31 +359,259 @@ public class ClassController {
                         .POST(HttpRequest.BodyPublishers.ofString(enrollData.toString()))
                         .build();
 
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
                 Platform.runLater(() -> {
                     if (response.statusCode() == 201 || response.statusCode() == 200) {
+                        isEnrolled = true;
+                        updateAccessUi();
+                        loadMaterials();
                         showSuccess("Success", "You have successfully joined the class!");
-                        joinButton.setText("Already Enrolled");
-                        joinButton.setDisable(true);
-                    } else if (response.statusCode() == 403) {
-                        showError("Error", "Only the class creator can enroll users");
                     } else {
                         showError("Error", "Failed to join class: " + response.statusCode());
                     }
                 });
             } catch (Exception e) {
+                Platform.runLater(() -> showError("Error", "Failed to join class: " + e.getMessage()));
+            }
+        });
+    }
+
+    @FXML
+    private void handleChooseFile() {
+        if (!isCreator) {
+            showError("Forbidden", "Only the class creator can upload materials.");
+            return;
+        }
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Select Material File");
+        File file = chooser.showOpenDialog(classNameLabel.getScene().getWindow());
+        if (file != null) {
+            selectedFile = file;
+            selectedFileLabel.setText(file.getName());
+        }
+    }
+
+    @FXML
+    private void handleUploadMaterial() {
+        if (!isCreator) {
+            showError("Forbidden", "Only the class creator can upload materials.");
+            return;
+        }
+        if (selectedFile == null) {
+            showError("Missing file", "Choose a file before uploading.");
+            return;
+        }
+
+        String materialType = materialTypeCombo.getValue();
+        if (materialType == null || materialType.isBlank()) {
+            showError("Missing type", "Select a material type.");
+            return;
+        }
+
+        File fileToUpload = selectedFile;
+        setUploadProgressVisible(true, "Uploading " + fileToUpload.getName() + "...");
+        uploadButton.setDisable(true);
+        runAsync(() -> {
+            try {
+                String boundary = "----OTPBoundary" + System.currentTimeMillis();
+                byte[] body = buildMultipartBody(fileToUpload, boundary, classId, materialType);
+
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(new URI("http://localhost:7700/api/materials"))
+                        .header("Authorization", "Bearer " + token)
+                        .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                        .POST(HttpRequest.BodyPublishers.ofByteArray(body))
+                        .build();
+
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
                 Platform.runLater(() -> {
-                    showError("Error", "Failed to join class: " + e.getMessage());
-                    e.printStackTrace();
+                    uploadButton.setDisable(false);
+                    setUploadProgressVisible(false, "");
+                    if (response.statusCode() == 201 || response.statusCode() == 200) {
+                        selectedFile = null;
+                        selectedFileLabel.setText("No file selected");
+                        showSuccess("Uploaded", "Material uploaded successfully.");
+                        loadMaterials();
+                    } else {
+                        showError("Upload failed", extractApiMessage(response.body(), "Server responded with " + response.statusCode()));
+                    }
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    uploadButton.setDisable(false);
+                    setUploadProgressVisible(false, "");
+                    showError("Upload failed", e.getMessage());
                 });
             }
-        }).start();
+        });
+    }
+
+    private byte[] buildMultipartBody(File file, String boundary, Integer classId, String materialType) throws IOException {
+        String crlf = "\r\n";
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        writeTextPart(output, boundary, "classId", String.valueOf(classId));
+        writeTextPart(output, boundary, "materialType", materialType);
+
+        String contentType = Files.probeContentType(file.toPath());
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        output.write(("--" + boundary + crlf).getBytes(StandardCharsets.UTF_8));
+        output.write(("Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"" + crlf)
+                .getBytes(StandardCharsets.UTF_8));
+        output.write(("Content-Type: " + contentType + crlf + crlf).getBytes(StandardCharsets.UTF_8));
+        output.write(Files.readAllBytes(file.toPath()));
+        output.write(crlf.getBytes(StandardCharsets.UTF_8));
+
+        output.write(("--" + boundary + "--" + crlf).getBytes(StandardCharsets.UTF_8));
+        return output.toByteArray();
+    }
+
+    private void writeTextPart(ByteArrayOutputStream output, String boundary, String name, String value) throws IOException {
+        String crlf = "\r\n";
+        output.write(("--" + boundary + crlf).getBytes(StandardCharsets.UTF_8));
+        output.write(("Content-Disposition: form-data; name=\"" + name + "\"" + crlf + crlf).getBytes(StandardCharsets.UTF_8));
+        output.write(value.getBytes(StandardCharsets.UTF_8));
+        output.write(crlf.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private void handleDownloadMaterial(Integer fileId, String filename, Button downloadButton, Button deleteButton, Label rowStatusLabel) {
+        if (fileId == null) {
+            return;
+        }
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Save Material");
+        chooser.setInitialFileName(filename == null || filename.isBlank() ? "material" : filename);
+
+        File destination = chooser.showSaveDialog(classNameLabel.getScene().getWindow());
+        if (destination == null) {
+            return;
+        }
+
+        setRowActionState(downloadButton, deleteButton, rowStatusLabel, true, "Downloading...");
+        runAsync(() -> {
+            try {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(new URI("http://localhost:7700/api/materials/" + fileId + "/download"))
+                        .header("Authorization", "Bearer " + token)
+                        .GET()
+                        .build();
+
+                HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
+
+                if (response.statusCode() == 200) {
+                    Files.write(destination.toPath(), response.body());
+                    Platform.runLater(() -> {
+                        setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
+                        showSuccess("Download complete", "Saved to: " + destination.getAbsolutePath());
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
+                        showError("Download failed", "Server responded with " + response.statusCode());
+                    });
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
+                    showError("Download failed", e.getMessage());
+                });
+            }
+        });
+    }
+
+    private void handleDeleteMaterial(Integer fileId, String filename, Button downloadButton, Button deleteButton, Label rowStatusLabel) {
+        if (!isCreator || fileId == null) {
+            return;
+        }
+
+        setRowActionState(downloadButton, deleteButton, rowStatusLabel, true, "Deleting...");
+        runAsync(() -> {
+            try {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(new URI("http://localhost:7700/api/materials/" + fileId))
+                        .header("Authorization", "Bearer " + token)
+                        .DELETE()
+                        .build();
+
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+                Platform.runLater(() -> {
+                    setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
+                    if (response.statusCode() == 200) {
+                        showSuccess("Deleted", "Removed: " + filename);
+                        loadMaterials();
+                    } else {
+                        showError("Delete failed", extractApiMessage(response.body(), "Server responded with " + response.statusCode()));
+                    }
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
+                    showError("Delete failed", e.getMessage());
+                });
+            }
+        });
+    }
+
+    @FXML
+    private void handleRefreshMaterials() {
+        loadMaterials();
     }
 
     @FXML
     private void handleGoBack() {
         SceneManager.goBack();
+    }
+
+    private String getStringOrDefault(JsonObject obj, String field, String fallback) {
+        return obj.has(field) && !obj.get(field).isJsonNull() ? obj.get(field).getAsString() : fallback;
+    }
+
+    private void runAsync(Runnable task) {
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private void setUploadProgressVisible(boolean visible, String message) {
+        uploadProgressLabel.setText(message == null ? "" : message);
+        uploadProgressLabel.setVisible(visible);
+        uploadProgressLabel.setManaged(visible);
+        uploadProgressBar.setVisible(visible);
+        uploadProgressBar.setManaged(visible);
+        uploadProgressBar.setProgress(visible ? ProgressBar.INDETERMINATE_PROGRESS : 0);
+    }
+
+    private void setRowActionState(Button downloadButton, Button deleteButton, Label rowStatusLabel, boolean busy, String message) {
+        downloadButton.setDisable(busy);
+        if (deleteButton != null && deleteButton.isManaged()) {
+            deleteButton.setDisable(busy);
+        }
+
+        rowStatusLabel.setText(message == null ? "" : message);
+        rowStatusLabel.setVisible(busy);
+        rowStatusLabel.setManaged(busy);
+    }
+
+    private String extractApiMessage(String responseBody, String fallback) {
+        try {
+            JsonElement parsed = JsonParser.parseString(responseBody);
+            if (parsed.isJsonObject()) {
+                JsonObject obj = parsed.getAsJsonObject();
+                if (obj.has("message") && !obj.get("message").isJsonNull()) {
+                    return obj.get("message").getAsString();
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return fallback;
     }
 
     private void showError(String title, String message) {
@@ -206,7 +631,6 @@ public class ClassController {
     }
 }
 
-// Helper class to pass context between scenes
 class ClassContextHolder {
     private static Integer classId;
 
@@ -222,4 +646,3 @@ class ClassContextHolder {
         classId = null;
     }
 }
-

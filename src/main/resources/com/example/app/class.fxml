@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="900.0" prefWidth="1400.0" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.ClassController">
+<BorderPane prefHeight="900.0" prefWidth="1400.0" style="-fx-background-color: #eef2f7;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.ClassController">
 
     <top>
         <fx:include source="topbar.fxml" />
@@ -14,28 +18,41 @@
 
     <center>
         <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
-            <VBox alignment="TOP_LEFT" spacing="20.0" style="-fx-padding: 40;">
-                <!-- Header with back button -->
-                <VBox spacing="15.0">
-                    <Button onAction="#handleGoBack" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-pref-width: 100;" text="← Back" />
+            <VBox spacing="20.0" style="-fx-padding: 36;">
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <Button onAction="#handleGoBack" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 18; -fx-background-radius: 8; -fx-cursor: hand;" text="← Back" />
+                    <Button fx:id="joinButton" onAction="#handleJoinClass" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 18; -fx-background-radius: 8; -fx-cursor: hand;" text="Join Class" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#handleRefreshMaterials" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 18; -fx-background-radius: 8; -fx-cursor: hand;" text="Refresh Files" />
+                </HBox>
+
+                <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 28; -fx-background-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(20,30,60,0.10), 14, 0, 0, 6);">
+                    <Label fx:id="classNameLabel" style="-fx-font-size: 30; -fx-font-weight: bold; -fx-text-fill: #1f2d3d;" text="Class Name" />
+                    <Label fx:id="classIdLabel" style="-fx-font-size: 13; -fx-text-fill: #4a6fa5; -fx-font-family: 'Courier New';" text="Class ID: 0" />
+                    <Label fx:id="topicLabel" style="-fx-font-size: 15; -fx-text-fill: #52616b;" text="Topic: No topic" />
+                    <Label fx:id="creatorLabel" style="-fx-font-size: 15; -fx-text-fill: #52616b;" text="Created by: Unknown" />
                 </VBox>
 
-                <!-- Class Details Card -->
-                <VBox spacing="15.0" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
-                    <Label fx:id="classNameLabel" style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Class Name" />
-
-                    <Label fx:id="classIdLabel" style="-fx-font-size: 16; -fx-text-fill: #3498db; -fx-font-family: 'Courier New';" text="Class ID: 0" />
-
-                    <Label fx:id="topicLabel" style="-fx-font-size: 14; -fx-text-fill: #7f8c8d;" text="Topic: No topic" />
-
-                    <Label fx:id="creatorLabel" style="-fx-font-size: 14; -fx-text-fill: #7f8c8d;" text="Created by: Unknown" />
-
-                    <!-- Join Button -->
-                    <Button fx:id="joinButton" onAction="#handleJoinClass" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 12 30; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 14;" text="Join Class" />
+                <VBox fx:id="uploadSection" spacing="10.0" style="-fx-background-color: white; -fx-padding: 22; -fx-background-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(20,30,60,0.08), 10, 0, 0, 4);">
+                    <Label style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #1f2d3d;" text="Upload Class Material" />
+                    <Label style="-fx-font-size: 13; -fx-text-fill: #6c7a89;" text="Only the class creator can upload files for this class." />
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Button onAction="#handleChooseFile" style="-fx-background-color: #7f8c8d; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 9 14; -fx-background-radius: 8; -fx-cursor: hand;" text="Choose File" />
+                        <Label fx:id="selectedFileLabel" style="-fx-font-size: 13; -fx-text-fill: #6c7a89;" text="No file selected" />
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <ComboBox fx:id="materialTypeCombo" prefWidth="220.0" promptText="Material Type" />
+                        <Button fx:id="uploadButton" onAction="#handleUploadMaterial" style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 9 16; -fx-background-radius: 8; -fx-cursor: hand;" text="Upload" />
+                    </HBox>
+                    <Label fx:id="uploadProgressLabel" managed="false" style="-fx-font-size: 12; -fx-text-fill: #6c7a89;" text="Uploading..." visible="false" />
+                    <ProgressBar fx:id="uploadProgressBar" managed="false" prefWidth="340.0" progress="-1.0" visible="false" />
                 </VBox>
 
-                <!-- Content Container for future use (materials, etc.) -->
-                <VBox fx:id="contentContainer" spacing="20.0" style="-fx-padding: 20;" />
+                <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 22; -fx-background-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(20,30,60,0.08), 10, 0, 0, 4);">
+                    <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #1f2d3d;" text="Class Materials" />
+                    <Label fx:id="materialsStatusLabel" style="-fx-font-size: 13; -fx-text-fill: #6c7a89;" text="Loading files..." />
+                    <VBox fx:id="materialsContainer" spacing="10.0" />
+                </VBox>
             </VBox>
         </ScrollPane>
     </center>
