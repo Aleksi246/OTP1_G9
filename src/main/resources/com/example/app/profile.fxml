@@ -4,18 +4,25 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane minHeight="900.0" minWidth="1400.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.ProfileController" style="-fx-background-color: #f5f7fa; -fx-font-family: 'Times New Roman';">
+<BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.ProfileController" style="-fx-background-color: #f5f7fa; -fx-font-family: 'Times New Roman';">
     <top>
         <fx:include source="topbar.fxml" />
     </top>
     <center>
-        <VBox alignment="TOP_CENTER" spacing="20.0" style="-fx-padding: 40;">
-            <!-- Profile Card -->
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" style="-fx-background: transparent; -fx-background-color: transparent;">
+            <VBox alignment="TOP_CENTER" spacing="20.0" style="-fx-padding: 40;">
+                <!-- Back Button -->
+                <HBox alignment="TOP_LEFT">
+                    <Button fx:id="backToHomeButton" onAction="#handleBackToHome" text="← Back to Home" style="-fx-background-color: #ecf0f1; -fx-cursor: hand; -fx-padding: 10 20; -fx-background-radius: 6; -fx-font-size: 14px; -fx-font-weight: bold; -fx-font-family: 'Times New Roman'; -fx-text-fill: #2c3e50;" />
+                </HBox>
+
+                <!-- Profile Card -->
             <VBox spacing="20.0" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 12, 0, 0, 5);" prefWidth="500.0">
                 <padding>
                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
@@ -44,17 +51,17 @@
 
                 <VBox spacing="8.0">
                     <Label text="Current Password" style="-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-family: 'Times New Roman';" />
-                    <PasswordField fx:id="currentPasswordField" promptText="Enter your current password" style="-fx-padding: 10; -fx-font-size: 14; -fx-border-color: #d0d0d0; -fx-border-radius: 6; -fx-font-family: 'Times New Roman';" />
+                    <PasswordField fx:id="currentPasswordField" promptText="Enter your current password" style="-fx-padding: 10; -fx-font-size: 14; -fx-background-radius: 6; -fx-font-family: 'Times New Roman';" />
                 </VBox>
 
                 <VBox spacing="8.0">
                     <Label text="New Password" style="-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-family: 'Times New Roman';" />
-                    <PasswordField fx:id="newPasswordField" promptText="Enter new password" style="-fx-padding: 10; -fx-font-size: 14; -fx-border-color: #d0d0d0; -fx-border-radius: 6; -fx-font-family: 'Times New Roman';" />
+                    <PasswordField fx:id="newPasswordField" promptText="Enter new password" style="-fx-padding: 10; -fx-font-size: 14; -fx-background-radius: 6; -fx-font-family: 'Times New Roman';" />
                 </VBox>
 
                 <VBox spacing="8.0">
                     <Label text="Confirm New Password" style="-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-family: 'Times New Roman';" />
-                    <PasswordField fx:id="confirmPasswordField" promptText="Confirm new password" style="-fx-padding: 10; -fx-font-size: 14; -fx-border-color: #d0d0d0; -fx-border-radius: 6; -fx-font-family: 'Times New Roman';" />
+                    <PasswordField fx:id="confirmPasswordField" promptText="Confirm new password" style="-fx-padding: 10; -fx-font-size: 14; -fx-background-radius: 6; -fx-font-family: 'Times New Roman';" />
                 </VBox>
 
                 <!-- Error/Success Message -->
@@ -67,5 +74,6 @@
                 </HBox>
             </VBox>
         </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>

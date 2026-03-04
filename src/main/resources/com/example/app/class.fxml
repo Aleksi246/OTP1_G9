@@ -12,14 +12,14 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane minHeight="900.0" minWidth="1400.0" style="-fx-background-color: #f5f7fa; -fx-font-family: 'Times New Roman';" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.ClassController">
+<BorderPane style="-fx-background-color: #f5f7fa; -fx-font-family: 'Times New Roman';" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.ClassController">
 
     <top>
         <fx:include source="topbar.fxml" />
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" style="-fx-background: transparent; -fx-background-color: transparent;">
             <VBox spacing="20.0" style="-fx-padding: 36;">
                 <HBox alignment="CENTER_LEFT" spacing="12.0">
                     <Button onAction="#handleGoBack" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 18; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-family: 'Times New Roman';" text="← Back" />

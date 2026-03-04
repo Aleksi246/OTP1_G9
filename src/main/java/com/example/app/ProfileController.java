@@ -129,6 +129,11 @@ public class ProfileController {
         SceneManager.loadLogin();
     }
 
+    @FXML
+    public void handleBackToHome() {
+        SceneManager.loadHome();
+    }
+
     private void showError(String message) {
         messageLabel.setText(message);
         messageLabel.setStyle("-fx-text-fill: #d32f2f;");
