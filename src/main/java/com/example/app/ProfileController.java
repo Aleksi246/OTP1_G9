@@ -97,13 +97,12 @@ public class ProfileController {
                          "\",\"newPassword\":\"" + escapeJson(newPassword) + "\"}";
 
             String token = SessionManager.getToken();
-            String email = SessionManager.getEmail();
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(API_URL + "/api/users/change-password"))
+                    .uri(URI.create(API_URL + "/api/auth/change-password"))
                     .header("Content-Type", "application/json")
                     .header("Authorization", "Bearer " + token)
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .PUT(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
