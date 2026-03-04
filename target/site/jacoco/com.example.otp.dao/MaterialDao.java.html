@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialDao.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">otp</a> &gt; <a href="index.source.html" class="el_package">com.example.otp.dao</a> &gt; <span class="el_source">MaterialDao.java</span></div><h1>MaterialDao.java</h1><pre class="source lang-java linenums">// java
+package com.example.otp.dao;
+
+import com.example.otp.db.Database;
+import com.example.otp.model.Material;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+<span class="fc" id="L11">public class MaterialDao {</span>
+
+    public Material create(Material m) throws SQLException {
+<span class="fc" id="L14">        String sql = &quot;INSERT INTO materials (original_filename, stored_filename, filepath, material_type, class_id, user_id) VALUES (?, ?, ?, ?, ?, ?)&quot;;</span>
+<span class="fc" id="L15">        try (Connection c = Database.getConnection();</span>
+<span class="fc" id="L16">             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {</span>
+<span class="fc" id="L17">            ps.setString(1, m.getOriginalFilename());</span>
+<span class="fc" id="L18">            ps.setString(2, m.getStoredFilename());</span>
+<span class="fc" id="L19">            ps.setString(3, m.getFilepath());</span>
+<span class="fc" id="L20">            ps.setString(4, m.getMaterialType());</span>
+<span class="pc bpc" id="L21" title="1 of 2 branches missed.">            if (m.getClassId() != null) ps.setInt(5, m.getClassId()); else ps.setNull(5, Types.INTEGER);</span>
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">            if (m.getUserId() != null) ps.setInt(6, m.getUserId()); else ps.setNull(6, Types.INTEGER);</span>
+<span class="fc" id="L23">            ps.executeUpdate();</span>
+<span class="fc" id="L24">            try (ResultSet rs = ps.getGeneratedKeys()) {</span>
+<span class="pc bpc" id="L25" title="1 of 2 branches missed.">                if (rs.next()) m.setFileId(rs.getInt(1));</span>
+            }
+        }
+<span class="fc" id="L28">        return m;</span>
+    }
+
+    public Material findById(int id) throws SQLException {
+<span class="fc" id="L32">        String sql = &quot;SELECT file_id, original_filename, stored_filename, filepath, material_type, uploaded_at, class_id, user_id FROM materials WHERE file_id = ?&quot;;</span>
+<span class="fc" id="L33">        try (Connection c = Database.getConnection();</span>
+<span class="fc" id="L34">             PreparedStatement ps = c.prepareStatement(sql)) {</span>
+<span class="fc" id="L35">            ps.setInt(1, id);</span>
+<span class="fc" id="L36">            try (ResultSet rs = ps.executeQuery()) {</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">                if (rs.next()) return mapRow(rs);</span>
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">            }</span>
+<span class="pc bpc" id="L39" title="2 of 4 branches missed.">        }</span>
+<span class="fc" id="L40">        return null;</span>
+    }
+
+    public List&lt;Material&gt; findByClassId(int classId) throws SQLException {
+<span class="fc" id="L44">        String sql = &quot;SELECT file_id, original_filename, stored_filename, filepath, material_type, uploaded_at, class_id, user_id FROM materials WHERE class_id = ?&quot;;</span>
+<span class="fc" id="L45">        List&lt;Material&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L46">        try (Connection c = Database.getConnection();</span>
+<span class="fc" id="L47">             PreparedStatement ps = c.prepareStatement(sql)) {</span>
+<span class="fc" id="L48">            ps.setInt(1, classId);</span>
+<span class="fc" id="L49">            try (ResultSet rs = ps.executeQuery()) {</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">                while (rs.next()) list.add(mapRow(rs));</span>
+            }
+        }
+<span class="fc" id="L53">        return list;</span>
+    }
+
+    public boolean update(Material m) throws SQLException {
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">        if (m.getFileId() == null) return false;</span>
+<span class="fc" id="L58">        String sql = &quot;UPDATE materials SET original_filename = ?, stored_filename = ?, filepath = ?, material_type = ?, class_id = ?, user_id = ? WHERE file_id = ?&quot;;</span>
+<span class="fc" id="L59">        try (Connection c = Database.getConnection();</span>
+<span class="fc" id="L60">             PreparedStatement ps = c.prepareStatement(sql)) {</span>
+<span class="fc" id="L61">            ps.setString(1, m.getOriginalFilename());</span>
+<span class="fc" id="L62">            ps.setString(2, m.getStoredFilename());</span>
+<span class="fc" id="L63">            ps.setString(3, m.getFilepath());</span>
+<span class="fc" id="L64">            ps.setString(4, m.getMaterialType());</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">            if (m.getClassId() != null) ps.setInt(5, m.getClassId()); else ps.setNull(5, Types.INTEGER);</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">            if (m.getUserId() != null) ps.setInt(6, m.getUserId()); else ps.setNull(6, Types.INTEGER);</span>
+<span class="fc" id="L67">            ps.setInt(7, m.getFileId());</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">            return ps.executeUpdate() &gt; 0;</span>
+        }
+    }
+
+    public boolean delete(int id) throws SQLException {
+<span class="fc" id="L73">        String sql = &quot;DELETE FROM materials WHERE file_id = ?&quot;;</span>
+<span class="fc" id="L74">        try (Connection c = Database.getConnection();</span>
+<span class="fc" id="L75">             PreparedStatement ps = c.prepareStatement(sql)) {</span>
+<span class="fc" id="L76">            ps.setInt(1, id);</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">            return ps.executeUpdate() &gt; 0;</span>
+        }
+    }
+
+    private Material mapRow(ResultSet rs) throws SQLException {
+<span class="fc" id="L82">        Material m = new Material();</span>
+<span class="fc" id="L83">        m.setFileId(rs.getInt(&quot;file_id&quot;));</span>
+<span class="fc" id="L84">        m.setOriginalFilename(rs.getString(&quot;original_filename&quot;));</span>
+<span class="fc" id="L85">        m.setStoredFilename(rs.getString(&quot;stored_filename&quot;));</span>
+<span class="fc" id="L86">        m.setFilepath(rs.getString(&quot;filepath&quot;));</span>
+<span class="fc" id="L87">        m.setMaterialType(rs.getString(&quot;material_type&quot;));</span>
+<span class="fc" id="L88">        m.setUploadedAt(rs.getTimestamp(&quot;uploaded_at&quot;));</span>
+<span class="fc" id="L89">        int cid = rs.getInt(&quot;class_id&quot;);</span>
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">        if (!rs.wasNull()) m.setClassId(cid);</span>
+<span class="fc" id="L91">        int uid = rs.getInt(&quot;user_id&quot;);</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        if (!rs.wasNull()) m.setUserId(uid);</span>
+<span class="fc" id="L93">        return m;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

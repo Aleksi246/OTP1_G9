@@ -39,8 +39,7 @@ public class UserDaoTest {
         String base = "testuser_" + System.currentTimeMillis();
         u.setUsername(base);
         u.setPasswordHash("hash");
-        u.setUserType("student");
-        u.setAccessToken(null);
+        u.setEmail(base + "@example.com");
 
         User created = dao.create(u);
         assertNotNull(created.getUserId(), "created user id should be set");
@@ -49,7 +48,7 @@ public class UserDaoTest {
         User found = dao.findById(created.getUserId());
         assertNotNull(found);
         assertEquals(base, found.getUsername());
-        assertEquals("student", found.getUserType());
+        assertEquals(base + "@example.com", found.getEmail());
 
         // findAll contains the new user
         List<User> all = dao.findAll();
@@ -59,15 +58,13 @@ public class UserDaoTest {
         // update
         created.setUsername(base + "_upd");
         created.setPasswordHash("newhash");
-        created.setUserType("teacher");
-        created.setAccessToken("tok");
+        created.setEmail(base + "_upd@example.com");
         assertTrue(dao.update(created), "update should return true");
 
         User updated = dao.findById(created.getUserId());
         assertNotNull(updated);
         assertEquals(base + "_upd", updated.getUsername());
-        assertEquals("teacher", updated.getUserType());
-        assertEquals("tok", updated.getAccessToken());
+        assertEquals(base + "_upd@example.com", updated.getEmail());
 
         // delete
         assertTrue(dao.delete(created.getUserId()), "delete should return true");

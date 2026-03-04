@@ -43,7 +43,7 @@ public class MaterialDaoTest {
         String uname = "material_user_" + System.currentTimeMillis();
         u.setUsername(uname);
         u.setPasswordHash("hash");
-        u.setUserType("teacher");
+        u.setEmail(uname + "@example.com");
         User createdUser = userDao.create(u);
         assertNotNull(createdUser.getUserId());
 

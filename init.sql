@@ -1,4 +1,5 @@
-DROP DATABASE IF EXISTS otptestdb;
+-- Safe initialization: only creates database/user/schema if missing
+-- Does NOT drop existing data (idempotent for production)
 
 CREATE DATABASE IF NOT EXISTS otptestdb;
 USE otptestdb;
@@ -11,16 +12,17 @@ CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    user_type ENUM('student', 'teacher') NOT NULL,
-    access_token VARCHAR(512),
+    email VARCHAR(100) UNIQUE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS classes (
     class_id INT AUTO_INCREMENT PRIMARY KEY,
     class_name VARCHAR(100) UNIQUE NOT NULL,
+    creator_id INT,
     topic VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (creator_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS participants (
@@ -34,7 +36,7 @@ CREATE TABLE IF NOT EXISTS participants (
 CREATE TABLE IF NOT EXISTS  materials(
     file_id INT AUTO_INCREMENT PRIMARY KEY,
     original_filename VARCHAR(255) NOT NULL,
-    stored_filename CHAR(36) NOT NULL,
+    stored_filename VARCHAR(100) NOT NULL,
     filepath VARCHAR(512),
     material_type VARCHAR(100),
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
