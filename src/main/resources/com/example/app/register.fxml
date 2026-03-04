@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #f0f2f5; -fx-font-family: 'Segoe UI', sans-serif;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.RegisterController">
+<BorderPane prefHeight="900.0" prefWidth="1400.0" style="-fx-background-color: #f0f2f5; -fx-font-family: 'Segoe UI', sans-serif;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.RegisterController">
     <top>
         <fx:include source="topbar.fxml" />
     </top>

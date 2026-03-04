@@ -76,6 +76,9 @@ public class LoginController {
                 if (token != null) {
                     errorLabel.setText("Login successful!");
                     String userType = JWTHelper.getUserTypeFromToken(token);
+                    String email = JWTHelper.getEmailFromToken(token);
+                    // Store session info
+                    SessionManager.setSession(username, email, token, userType);
                     SceneManager.loadDashboard(userType, token, username);
                 } else {
                     showError("Failed to extract token from response");

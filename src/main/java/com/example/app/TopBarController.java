@@ -19,6 +19,13 @@ public class TopBarController {
     }
 
     @FXML
+    public void handleSwitchToProfile() {
+        SceneManager.loadProfile();
+        // Update button states after navigation
+        Platform.runLater(this::updateButtonStates);
+    }
+
+    @FXML
     private void handleBack() {
         SceneManager.goBack();
         // Update button states after navigation
