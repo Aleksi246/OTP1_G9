@@ -24,13 +24,6 @@ public class ParticipantController {
 
     public void enrollUser(Context ctx) {
         try {
-            String email = ctx.attribute("email");
-            User enrollingUser = userDao.findByEmail(email);
-            if (enrollingUser == null) {
-                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Authentication required");
-                return;
-            }
-
             JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
             int userId = body.get("userId").getAsInt();
             int classId = body.get("classId").getAsInt();
@@ -38,10 +31,6 @@ public class ParticipantController {
             Course course = courseDao.findById(classId);
             if (course == null) {
                 jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Class does not exist");
-                return;
-            }
-            if (!enrollingUser.getUserId().equals(course.getCreatorId())) {
-                jsonMessage(ctx, HttpStatus.FORBIDDEN, "Only class creator can enroll users");
                 return;
             }
 

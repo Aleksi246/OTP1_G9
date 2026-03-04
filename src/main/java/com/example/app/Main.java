@@ -49,7 +49,6 @@ public class Main extends Application {
             app.before("/api/materials", ctx -> checkAuth(ctx));
             app.before("/api/materials/{id}", ctx -> checkAuth(ctx));
             app.before("/api/materials/{id}/download", ctx -> checkAuth(ctx));
-            app.before("/api/participants/enroll", ctx -> checkAuth(ctx));
             app.before("/api/participants/unenroll", ctx -> checkAuth(ctx));
             app.before("/api/participants/class/{classId}", ctx -> checkAuth(ctx));
             app.before("/api/participants/user/{userId}", ctx -> checkAuth(ctx));

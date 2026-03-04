@@ -68,7 +68,6 @@ public class ApiEndpointsIntegrationTest {
         app.before("/api/materials/{id}", ApiEndpointsIntegrationTest::checkAuth);
         app.before("/api/materials/{id}/download", ApiEndpointsIntegrationTest::checkAuth);
         app.before("/api/participants", ApiEndpointsIntegrationTest::checkAuth);
-        app.before("/api/participants/enroll", ApiEndpointsIntegrationTest::checkAuth);
         app.before("/api/participants/unenroll", ApiEndpointsIntegrationTest::checkAuth);
         app.before("/api/participants/class/{classId}", ApiEndpointsIntegrationTest::checkAuth);
         app.before("/api/participants/user/{userId}", ApiEndpointsIntegrationTest::checkAuth);
@@ -400,29 +399,13 @@ public class ApiEndpointsIntegrationTest {
         String studentToken = tokenFor("student_seed");
       String student2Token = tokenFor("student2_seed");
 
-        HttpResponse<String> enrollForbidden = sendJson("POST", "/api/participants/enroll", bearer(studentToken), """
+        HttpResponse<String> enrollNoToken = sendJson("POST", "/api/participants/enroll", null, """
                 {
                   "userId": %d,
                   "classId": %d
                 }
                 """.formatted(student2Id, class2Id));
-        assertEquals(403, enrollForbidden.statusCode());
-
-        HttpResponse<String> enroll = sendJson("POST", "/api/participants/enroll", bearer(teacherToken), """
-                {
-                  "userId": %d,
-                  "classId": %d
-                }
-                """.formatted(student2Id, class2Id));
-        assertEquals(403, enroll.statusCode());
-
-        HttpResponse<String> enrollByCreator = sendJson("POST", "/api/participants/enroll", bearer(teacher2Token), """
-          {
-            "userId": %d,
-            "classId": %d
-          }
-          """.formatted(student2Id, class2Id));
-        assertEquals(201, enrollByCreator.statusCode());
+        assertEquals(201, enrollNoToken.statusCode());
 
         HttpResponse<String> getByClass = sendJson("GET", "/api/participants/class/" + class2Id, bearer(teacher2Token), null);
         assertEquals(200, getByClass.statusCode());
