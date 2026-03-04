@@ -9,7 +9,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Aleksi246/OTP1_G9.git'
+                deleteDir()
+                git branch: 'main', url: 'https://github.com/Aleksi246/OTP1_G9.git'
             }
         }
 
