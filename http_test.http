@@ -79,8 +79,8 @@ POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "asd",
-  "password": "asdasd"
+  "username": "{{user2Username}}",
+  "password": "{{user2Password}}"
 }
 
 ### Login user3

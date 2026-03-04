@@ -4,15 +4,99 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SceneManager {
     private static Stage primaryStage;
+    private static List<String> navigationHistory = new ArrayList<>();
+    private static int currentIndex = -1;
 
     public static void setPrimaryStage(Stage stage) {
         primaryStage = stage;
     }
 
-    public static void loadLogin() {
+    private static void addToHistory(String sceneName) {
+        // Remove any forward history if we're navigating to a new scene
+        if (currentIndex < navigationHistory.size() - 1) {
+            navigationHistory = new ArrayList<>(navigationHistory.subList(0, currentIndex + 1));
+        }
+        navigationHistory.add(sceneName);
+        currentIndex++;
+    }
+
+    public static boolean canGoBack() {
+        return currentIndex > 0;
+    }
+
+    public static boolean canGoForward() {
+        return currentIndex < navigationHistory.size() - 1;
+    }
+
+    public static void goBack() {
+        if (canGoBack()) {
+            currentIndex--;
+            loadSceneByName(navigationHistory.get(currentIndex), false);
+        }
+    }
+
+    public static void goForward() {
+        if (canGoForward()) {
+            currentIndex++;
+            loadSceneByName(navigationHistory.get(currentIndex), false);
+        }
+    }
+
+    private static void loadSceneByName(String sceneName, boolean addToHistory) {
+        switch (sceneName) {
+            case "main":
+                loadMainInternal(addToHistory);
+                break;
+            case "login":
+                loadLoginInternal(addToHistory);
+                break;
+            case "register":
+                loadRegisterInternal(addToHistory);
+                break;
+            case "dashboard":
+            case "admin":
+                // Dashboard requires additional parameters, so we can't reload it from history
+                // For now, just load main
+                loadMainInternal(addToHistory);
+                break;
+        }
+    }
+
+    public static void loadMain() {
+        loadMainInternal(true);
+    }
+
+    private static void loadMainInternal(boolean addToHistory) {
         try {
+            if (addToHistory) {
+                addToHistory("main");
+            }
+            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/main.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("Learning Platform - Main");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (Exception e) {
+            System.err.println("Error loading main scene: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void loadLogin() {
+        loadLoginInternal(true);
+    }
+
+    private static void loadLoginInternal(boolean addToHistory) {
+        try {
+            if (addToHistory) {
+                addToHistory("login");
+            }
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/login.fxml"));
             Scene scene = new Scene(loader.load());
             primaryStage.setTitle("Learning Platform - Login");
@@ -25,7 +109,14 @@ public class SceneManager {
     }
 
     public static void loadRegister() {
+        loadRegisterInternal(true);
+    }
+
+    private static void loadRegisterInternal(boolean addToHistory) {
         try {
+            if (addToHistory) {
+                addToHistory("register");
+            }
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/register.fxml"));
             Scene scene = new Scene(loader.load());
             primaryStage.setTitle("Learning Platform - Register");
@@ -42,6 +133,7 @@ public class SceneManager {
             String normalizedUserType = (userType == null || userType.isBlank()) ? "student" : userType;
 
             if ("admin".equals(normalizedUserType)) {
+                addToHistory("admin");
                 FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/admin.fxml"));
                 Scene scene = new Scene(loader.load());
                 AdminController controller = loader.getController();
@@ -50,6 +142,7 @@ public class SceneManager {
                 primaryStage.setScene(scene);
                 primaryStage.show();
             } else {
+                addToHistory("dashboard");
                 FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/dashboard.fxml"));
                 Scene scene = new Scene(loader.load());
                 DashboardController controller = loader.getController();
