@@ -64,6 +64,10 @@ public class SceneManager {
             case "home":
                 loadHomeInternal(addToHistory);
                 break;
+            case "class":
+                // Can't reload class from history without class ID context
+                loadHomeInternal(addToHistory);
+                break;
             case "dashboard":
             case "admin":
                 // Dashboard requires additional parameters, so we can't reload it from history
@@ -199,6 +203,21 @@ public class SceneManager {
             primaryStage.show();
         } catch (Exception e) {
             System.err.println("Error loading home scene: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public static void loadClass(Integer classId) {
+        try {
+            addToHistory("class");
+            ClassContextHolder.setClassId(classId);
+            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/class.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("Learning Platform - Class");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (Exception e) {
+            System.err.println("Error loading class scene: " + e.getMessage());
             e.printStackTrace();
         }
     }
