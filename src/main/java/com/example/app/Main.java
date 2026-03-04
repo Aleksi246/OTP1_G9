@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
+        stage.setMaximized(true);
         SceneManager.setPrimaryStage(stage);
         SceneManager.loadMain();
     }

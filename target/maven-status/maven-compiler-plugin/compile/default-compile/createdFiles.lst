@@ -2,10 +2,12 @@ com/example/app/SceneManager.class
 com/example/App.class
 com/example/otp/controllers/ParticipantController.class
 com/example/app/DashboardController.class
+com/example/app/ProfileController.class
 com/example/otp/controllers/ReviewController.class
 com/example/otp/dao/ReviewDao.class
 com/example/app/Main.class
 com/example/otp/util/BCryptUtil.class
+com/example/app/SessionManager.class
 com/example/otp/dao/CourseDao.class
 com/example/otp/model/Course.class
 com/example/otp/db/Database.class

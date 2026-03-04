@@ -1,10 +1,12 @@
 /Users/eliaseide/IdeaProjects/OTP1_G9/src/main/java/com/example/otp/dao/CourseDao.java
 /Users/eliaseide/IdeaProjects/OTP1_G9/src/main/java/com/example/app/DashboardController.java
 /Users/eliaseide/IdeaProjects/OTP1_G9/src/main/java/com/example/app/JWTHelper.java
+/Users/eliaseide/IdeaProjects/OTP1_G9/src/main/java/com/example/app/ProfileController.java
 /Users/eliaseide/IdeaProjects/OTP1_G9/src/main/java/com/example/otp/controllers/UserController.java
 /Users/eliaseide/IdeaProjects/OTP1_G9/src/main/java/com/example/otp/util/BCryptUtil.java
 /Users/eliaseide/IdeaProjects/OTP1_G9/src/main/java/com/example/otp/controllers/CourseController.java
 /Users/eliaseide/IdeaProjects/OTP1_G9/src/main/java/com/example/otp/controllers/ReviewController.java
+/Users/eliaseide/IdeaProjects/OTP1_G9/src/main/java/com/example/app/SessionManager.java
 /Users/eliaseide/IdeaProjects/OTP1_G9/src/main/java/com/example/otp/controllers/MaterialController.java
 /Users/eliaseide/IdeaProjects/OTP1_G9/src/main/java/com/example/otp/model/Material.java
 /Users/eliaseide/IdeaProjects/OTP1_G9/src/main/java/com/example/otp/model/Course.java

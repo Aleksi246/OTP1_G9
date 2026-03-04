@@ -58,6 +58,9 @@ public class SceneManager {
             case "register":
                 loadRegisterInternal(addToHistory);
                 break;
+            case "profile":
+                loadProfileInternal(addToHistory);
+                break;
             case "dashboard":
             case "admin":
                 // Dashboard requires additional parameters, so we can't reload it from history
@@ -153,6 +156,26 @@ public class SceneManager {
             }
         } catch (Exception e) {
             System.err.println("Error loading dashboard scene: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public static void loadProfile() {
+        loadProfileInternal(true);
+    }
+
+    private static void loadProfileInternal(boolean addToHistory) {
+        try {
+            if (addToHistory) {
+                addToHistory("profile");
+            }
+            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/profile.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("Learning Platform - Profile");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (Exception e) {
+            System.err.println("Error loading profile scene: " + e.getMessage());
             e.printStackTrace();
         }
     }
