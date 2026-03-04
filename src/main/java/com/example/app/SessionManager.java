@@ -8,12 +8,17 @@ public class SessionManager {
     private static String currentEmail;
     private static String currentToken;
     private static String currentUserType;
+    private static Integer currentUserId;
 
     public static void setSession(String username, String email, String token, String userType) {
         currentUsername = username;
         currentEmail = email;
         currentToken = token;
         currentUserType = userType;
+    }
+
+    public static void setUserId(Integer userId) {
+        currentUserId = userId;
     }
 
     public static void clearSession() {
@@ -37,6 +42,10 @@ public class SessionManager {
 
     public static String getUserType() {
         return currentUserType;
+    }
+
+    public static Integer getUserId() {
+        return currentUserId;
     }
 
     public static boolean isLoggedIn() {

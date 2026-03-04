@@ -60,10 +60,10 @@ public class CourseController {
 
             JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
             String className = body.has("className") ? body.get("className").getAsString() : null;
-            String topic = body.has("topic") ? body.get("topic").getAsString() : null;
+            String topic = body.has("topic") ? body.get("topic").getAsString() : "";
 
-            if (className == null || topic == null) {
-                jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
+            if (className == null || className.trim().isEmpty()) {
+                jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Class name is required");
                 return;
             }
 
