@@ -61,6 +61,9 @@ public class SceneManager {
             case "profile":
                 loadProfileInternal(addToHistory);
                 break;
+            case "home":
+                loadHomeInternal(addToHistory);
+                break;
             case "dashboard":
             case "admin":
                 // Dashboard requires additional parameters, so we can't reload it from history
@@ -176,6 +179,26 @@ public class SceneManager {
             primaryStage.show();
         } catch (Exception e) {
             System.err.println("Error loading profile scene: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public static void loadHome() {
+        loadHomeInternal(true);
+    }
+
+    private static void loadHomeInternal(boolean addToHistory) {
+        try {
+            if (addToHistory) {
+                addToHistory("home");
+            }
+            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/home.fxml"));
+            Scene scene = new Scene(loader.load());
+            primaryStage.setTitle("Learning Platform - Home");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (Exception e) {
+            System.err.println("Error loading home scene: " + e.getMessage());
             e.printStackTrace();
         }
     }

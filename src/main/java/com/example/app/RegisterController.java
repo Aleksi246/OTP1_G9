@@ -142,7 +142,7 @@ public class RegisterController {
                     String email = JWTHelper.getEmailFromToken(token);
                     // Store session info
                     SessionManager.setSession(username, email, token, userType);
-                    SceneManager.loadDashboard(userType, token, username);
+                    SceneManager.loadHome();
                 } else {
                     messageLabel.setText("Login failed: Unable to extract token");
                 }

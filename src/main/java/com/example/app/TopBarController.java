@@ -13,14 +13,36 @@ public class TopBarController {
     private Button forwardButton;
 
     @FXML
+    private Button learningPlatformButton;
+
+    @FXML
+    private Button profileButton;
+
+    @FXML
     private void initialize() {
         // Update button states after a short delay to allow scene to fully load
         Platform.runLater(this::updateButtonStates);
     }
 
     @FXML
+    public void handleLearningPlatformClick() {
+        // Only navigate if user is logged in
+        if (SessionManager.isLoggedIn()) {
+            SceneManager.loadHome();
+            // Update button states after navigation
+            Platform.runLater(this::updateButtonStates);
+        }
+        // Do nothing if not logged in (button should be disabled)
+    }
+
+    @FXML
     public void handleSwitchToProfile() {
-        SceneManager.loadProfile();
+        if (SessionManager.isLoggedIn()) {
+            SceneManager.loadProfile();
+        } else {
+            // Navigate to login if not logged in
+            SceneManager.loadLogin();
+        }
         // Update button states after navigation
         Platform.runLater(this::updateButtonStates);
     }
@@ -40,6 +62,29 @@ public class TopBarController {
     }
 
     private void updateButtonStates() {
+        boolean isLoggedIn = SessionManager.isLoggedIn();
+
+        // Update learning platform button state
+        if (learningPlatformButton != null) {
+            learningPlatformButton.setDisable(!isLoggedIn);
+            if (!isLoggedIn) {
+                learningPlatformButton.setStyle("-fx-background-color: #e0e0e0; -fx-text-fill: #999999; -fx-cursor: default;");
+            } else {
+                learningPlatformButton.setStyle("");
+            }
+        }
+
+        // Update profile button text and styling
+        if (profileButton != null) {
+            if (isLoggedIn) {
+                profileButton.setText("Profile");
+                profileButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;");
+            } else {
+                profileButton.setText("Log in");
+                profileButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;");
+            }
+        }
+
         if (backButton != null) {
             backButton.setDisable(!SceneManager.canGoBack());
             if (!SceneManager.canGoBack()) {
