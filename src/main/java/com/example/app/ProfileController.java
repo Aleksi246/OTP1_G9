@@ -1,10 +1,10 @@
 package com.example.app;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -92,36 +92,35 @@ public class ProfileController {
     }
 
     private void changePassword(String currentPassword, String newPassword) {
-        try {
-            String json = "{\"currentPassword\":\"" + escapeJson(currentPassword) +
-                         "\",\"newPassword\":\"" + escapeJson(newPassword) + "\"}";
+        String json = "{\"currentPassword\":\"" + escapeJson(currentPassword) +
+                     "\",\"newPassword\":\"" + escapeJson(newPassword) + "\"}";
 
-            String token = SessionManager.getToken();
-            String email = SessionManager.getEmail();
+        String token = SessionManager.getToken();
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(API_URL + "/api/users/change-password"))
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", "Bearer " + token)
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(API_URL + "/api/users/change-password"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                showSuccess("Password changed successfully!");
-                // Clear the password fields
-                currentPasswordField.clear();
-                newPasswordField.clear();
-                confirmPasswordField.clear();
-            } else if (response.statusCode() == 401) {
-                showError("Current password is incorrect");
-            } else {
-                showError("Password change failed: " + response.statusCode());
-            }
-        } catch (IOException | InterruptedException ex) {
-            showError("Connection error: " + ex.getMessage());
-        }
+        httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenAccept(response -> Platform.runLater(() -> {
+                    if (response.statusCode() == 200) {
+                        showSuccess("Password changed successfully!");
+                        currentPasswordField.clear();
+                        newPasswordField.clear();
+                        confirmPasswordField.clear();
+                    } else if (response.statusCode() == 401) {
+                        showError("Current password is incorrect");
+                    } else {
+                        showError("Password change failed: " + response.statusCode());
+                    }
+                }))
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> showError("Connection error: " + ex.getMessage()));
+                    return null;
+                });
     }
 
     @FXML
