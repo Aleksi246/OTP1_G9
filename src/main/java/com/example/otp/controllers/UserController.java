@@ -78,7 +78,8 @@ public class UserController {
             String username = body.has("username") ? body.get("username").getAsString() : null;
             String password = body.has("password") ? body.get("password").getAsString() : null;
 
-            if ((email == null || email.isBlank()) && (username == null || username.isBlank()) || password == null) {
+            if ((email == null || email.isBlank()) && (username == null || username.isBlank())
+                    || password == null || password.isBlank()) {
                 jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
                 return;
             }
@@ -88,11 +89,18 @@ public class UserController {
                 user = userDao.findByEmail(email);
             } else {
                 user = userDao.findByUsername(username);
+                if (user == null && username != null && username.contains("@")) {
+                    user = userDao.findByEmail(username);
+                }
             }
 
             if (user != null && BCryptUtil.verifyPassword(password, user.getPasswordHash())) {
                 String token = JWTUtil.generateToken(user.getEmail());
-                ctx.json(Map.of("token", token));
+                ctx.json(Map.of(
+                        "token", token,
+                        "username", user.getUsername(),
+                        "email", user.getEmail()
+                ));
             } else {
                 jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Invalid credentials");
             }

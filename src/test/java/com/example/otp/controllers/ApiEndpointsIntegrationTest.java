@@ -204,6 +204,15 @@ public class ApiEndpointsIntegrationTest {
           """);
         assertEquals(200, loginByUsername.statusCode());
         assertTrue(loginByUsername.body().contains("token"));
+
+        HttpResponse<String> loginWithEmailInUsernameField = sendJson("POST", "/api/auth/login", null, """
+          {
+            "username": "new_student@example.com",
+            "password": "newpass"
+          }
+          """);
+        assertEquals(200, loginWithEmailInUsernameField.statusCode());
+        assertTrue(loginWithEmailInUsernameField.body().contains("token"));
     }
 
     @Test
