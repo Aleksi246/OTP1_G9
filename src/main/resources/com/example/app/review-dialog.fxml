@@ -12,26 +12,26 @@
       xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.app.ReviewDialogController"
-      style="-fx-background-color: white;">
+      style="-fx-background-color: white; -fx-font-family: 'Times New Roman';">
     <padding>
         <Insets bottom="14.0" left="14.0" right="14.0" top="14.0"/>
     </padding>
 
-    <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="Review Material"/>
-    <Label text="File:"/>
-    <Label fx:id="materialNameLabel" style="-fx-font-size: 13; -fx-text-fill: #2c3e50;" wrapText="true"/>
+    <Label style="-fx-font-size: 16; -fx-font-weight: bold; -fx-font-family: 'Times New Roman';" text="Review Material"/>
+    <Label text="File:" style="-fx-font-family: 'Times New Roman';" />
+    <Label fx:id="materialNameLabel" style="-fx-font-size: 13; -fx-text-fill: #2c3e50; -fx-font-family: 'Times New Roman';" wrapText="true"/>
 
-    <Label text="Rating (1-5)"/>
-    <ComboBox fx:id="ratingCombo" prefWidth="120.0"/>
+    <Label text="Rating (1-5)" style="-fx-font-family: 'Times New Roman';" />
+    <ComboBox fx:id="ratingCombo" prefWidth="120.0" style="-fx-font-family: 'Times New Roman';" />
 
-    <Label text="Comment"/>
-    <TextArea fx:id="commentTextArea" prefHeight="140.0" promptText="Share your feedback..." wrapText="true"/>
+    <Label text="Comment" style="-fx-font-family: 'Times New Roman';" />
+    <TextArea fx:id="commentTextArea" prefHeight="140.0" promptText="Share your feedback..." wrapText="true" style="-fx-font-family: 'Times New Roman';" />
 
-    <Label fx:id="validationLabel" style="-fx-text-fill: #e74c3c;" wrapText="true"/>
+    <Label fx:id="validationLabel" style="-fx-text-fill: #e74c3c; -fx-font-family: 'Times New Roman';" wrapText="true"/>
 
     <HBox alignment="CENTER_RIGHT" spacing="8.0">
-        <Button mnemonicParsing="false" onAction="#handleCancel" text="Cancel"/>
-        <Button mnemonicParsing="false" onAction="#handleSubmit" text="Submit Review"/>
+        <Button mnemonicParsing="false" onAction="#handleCancel" text="Cancel" style="-fx-font-family: 'Times New Roman'; -fx-background-radius: 6;" />
+        <Button mnemonicParsing="false" onAction="#handleSubmit" text="Submit Review" style="-fx-font-family: 'Times New Roman'; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 6;" />
     </HBox>
 </VBox>
 

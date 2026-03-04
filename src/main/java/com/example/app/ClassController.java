@@ -11,8 +11,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -51,6 +54,15 @@ public class ClassController {
 
     @FXML
     private Button joinButton;
+
+    @FXML
+    private MenuButton classActionsMenu;
+
+    @FXML
+    private MenuItem deleteClassMenuItem;
+
+    @FXML
+    private MenuItem leaveClassMenuItem;
 
     @FXML
     private VBox uploadSection;
@@ -230,12 +242,18 @@ public class ClassController {
         if (isCreator) {
             joinButton.setText("Class Creator");
             joinButton.setDisable(true);
+            deleteClassMenuItem.setVisible(true);
+            leaveClassMenuItem.setVisible(false);
         } else if (isEnrolled) {
             joinButton.setText("Already Enrolled");
             joinButton.setDisable(true);
+            deleteClassMenuItem.setVisible(false);
+            leaveClassMenuItem.setVisible(true);
         } else {
             joinButton.setText("Join Class");
             joinButton.setDisable(false);
+            deleteClassMenuItem.setVisible(false);
+            leaveClassMenuItem.setVisible(false);
         }
 
         setUploadSectionVisible(isCreator);
@@ -825,6 +843,86 @@ public class ClassController {
         } catch (Exception ignored) {
         }
         return fallback;
+    }
+
+    @FXML
+    private void handleDeleteClass() {
+        if (!isCreator) {
+            showError("Error", "Only the class creator can delete this class.");
+            return;
+        }
+
+        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmDialog.setTitle("Delete Class");
+        confirmDialog.setHeaderText("Are you sure?");
+        confirmDialog.setContentText("Deleting this class will remove it permanently for all users. This action cannot be undone.");
+
+        if (confirmDialog.showAndWait().isEmpty() || confirmDialog.getResult() != ButtonType.OK) {
+            return;
+        }
+
+        runAsync(() -> {
+            try {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(new URI("http://localhost:7700/api/courses/" + classId))
+                        .header("Authorization", "Bearer " + token)
+                        .DELETE()
+                        .build();
+
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+                if (response.statusCode() == 200 || response.statusCode() == 204) {
+                    Platform.runLater(() -> {
+                        showSuccess("Success", "Class deleted successfully.");
+                        SceneManager.loadHome();
+                    });
+                } else {
+                    Platform.runLater(() -> showError("Error", "Failed to delete class. Status: " + response.statusCode()));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> showError("Error", "Failed to delete class: " + e.getMessage()));
+            }
+        });
+    }
+
+    @FXML
+    private void handleLeaveClass() {
+        if (!isEnrolled || isCreator) {
+            showError("Error", "You are not enrolled in this class or you are the creator.");
+            return;
+        }
+
+        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmDialog.setTitle("Leave Class");
+        confirmDialog.setHeaderText("Are you sure?");
+        confirmDialog.setContentText("You will be removed from this class and lose access to the materials.");
+
+        if (confirmDialog.showAndWait().isEmpty() || confirmDialog.getResult() != ButtonType.OK) {
+            return;
+        }
+
+        runAsync(() -> {
+            try {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(new URI("http://localhost:7700/api/participants/unenroll?userId=" + userId + "&classId=" + classId))
+                        .header("Authorization", "Bearer " + token)
+                        .DELETE()
+                        .build();
+
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+                if (response.statusCode() == 200 || response.statusCode() == 204) {
+                    Platform.runLater(() -> {
+                        showSuccess("Success", "You have left the class.");
+                        SceneManager.loadHome();
+                    });
+                } else {
+                    Platform.runLater(() -> showError("Error", "Failed to leave class. Status: " + response.statusCode()));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> showError("Error", "Failed to leave class: " + e.getMessage()));
+            }
+        });
     }
 
     private void showError(String title, String message) {
