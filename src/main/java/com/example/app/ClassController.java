@@ -6,7 +6,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -16,6 +18,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -82,6 +86,8 @@ public class ClassController {
 
     private File selectedFile;
     private final HttpClient httpClient = HttpClient.newHttpClient();
+
+    private static final int REVIEW_COMMENT_MAX_LENGTH = 500;
 
     @FXML
     private void initialize() {
@@ -327,6 +333,12 @@ public class ClassController {
         downloadButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 7; -fx-cursor: hand;");
         downloadButton.setDisable(fileId == null);
 
+        Button reviewButton = new Button("Review");
+        reviewButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 7; -fx-cursor: hand;");
+        reviewButton.setDisable(fileId == null || !isEnrolled);
+        reviewButton.setVisible(!isCreator);
+        reviewButton.setManaged(!isCreator);
+
         Button deleteButton = new Button("Delete");
         deleteButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 7; -fx-cursor: hand;");
         deleteButton.setDisable(fileId == null);
@@ -334,14 +346,141 @@ public class ClassController {
         deleteButton.setManaged(isCreator);
 
         downloadButton.setOnAction(e -> handleDownloadMaterial(fileId, filename, downloadButton, deleteButton, rowStatusLabel));
+        reviewButton.setOnAction(e -> openReviewDialog(fileId, filename, downloadButton, deleteButton, reviewButton, rowStatusLabel));
         deleteButton.setOnAction(e -> handleDeleteMaterial(fileId, filename, downloadButton, deleteButton, rowStatusLabel));
 
-        HBox actions = new HBox(8, downloadButton, deleteButton);
+        HBox actions = new HBox(8, downloadButton, reviewButton, deleteButton);
         HBox row = new HBox(12, infoBox, actions);
         row.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(infoBox, Priority.ALWAYS);
         row.setStyle("-fx-background-color: #f8fafc; -fx-border-color: #dfe6ee; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12 14;");
         return row;
+    }
+
+    private void openReviewDialog(Integer fileId,
+                                  String filename,
+                                  Button downloadButton,
+                                  Button deleteButton,
+                                  Button reviewButton,
+                                  Label rowStatusLabel) {
+        if (isCreator) {
+            showError("Forbidden", "Creators cannot review class materials.");
+            return;
+        }
+        if (fileId == null) {
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/app/review-dialog.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            ReviewDialogController dialogController = loader.getController();
+            dialogController.setMaterialName(filename);
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Review Material");
+            dialogStage.initOwner(classNameLabel.getScene().getWindow());
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setScene(scene);
+            dialogStage.showAndWait();
+
+            if (dialogController.isSubmitted()) {
+                handleSubmitReview(
+                        fileId,
+                        dialogController.getSelectedRating(),
+                        dialogController.getComment(),
+                        downloadButton,
+                        deleteButton,
+                        reviewButton,
+                        rowStatusLabel
+                );
+            }
+        } catch (Exception e) {
+            showError("Review", "Could not open review form: " + e.getMessage());
+        }
+    }
+
+    private void handleSubmitReview(Integer fileId,
+                                    Integer rating,
+                                    String comment,
+                                    Button downloadButton,
+                                    Button deleteButton,
+                                    Button reviewButton,
+                                    Label rowStatusLabel) {
+        if (isCreator) {
+            showError("Forbidden", "Creators cannot review class materials.");
+            return;
+        }
+
+        String trimmedComment = comment == null ? "" : comment.trim();
+        if (rating == null || rating < 1 || rating > 5) {
+            showError("Invalid review", "Rating must be between 1 and 5.");
+            return;
+        }
+        if (trimmedComment.isBlank() || trimmedComment.length() > REVIEW_COMMENT_MAX_LENGTH) {
+            showError("Invalid review", "Comment must be between 1 and " + REVIEW_COMMENT_MAX_LENGTH + " characters.");
+            return;
+        }
+
+        downloadButton.setDisable(true);
+        reviewButton.setDisable(true);
+        if (deleteButton != null && deleteButton.isManaged()) {
+            deleteButton.setDisable(true);
+        }
+        rowStatusLabel.setText("Submitting review...");
+        rowStatusLabel.setVisible(true);
+        rowStatusLabel.setManaged(true);
+
+        runAsync(() -> {
+            ReviewSubmitResult result = submitMaterialReview(fileId, rating, trimmedComment);
+            Platform.runLater(() -> {
+                downloadButton.setDisable(false);
+                reviewButton.setDisable(false);
+                if (deleteButton != null && deleteButton.isManaged()) {
+                    deleteButton.setDisable(false);
+                }
+
+                rowStatusLabel.setText(result.message);
+                rowStatusLabel.setVisible(true);
+                rowStatusLabel.setManaged(true);
+
+                if (result.success) {
+                    showSuccess("Review submitted", "Thanks! Your review was submitted.");
+                } else {
+                    showError("Review failed", result.message);
+                }
+            });
+        });
+    }
+
+    private ReviewSubmitResult submitMaterialReview(Integer fileId, Integer rating, String comment) {
+        try {
+            JsonObject reviewData = new JsonObject();
+            reviewData.addProperty("fileId", fileId);
+            reviewData.addProperty("userId", userId);
+            reviewData.addProperty("classId", classId);
+            reviewData.addProperty("rating", rating);
+            reviewData.addProperty("comment", comment);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI("http://localhost:7700/api/reviews"))
+                    .header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(reviewData.toString()))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200 || response.statusCode() == 201) {
+                return new ReviewSubmitResult(true, "Review submitted");
+            }
+
+            String fallbackMessage = "Could not submit review right now (" + response.statusCode() + ").";
+            return new ReviewSubmitResult(false, extractApiMessage(response.body(), fallbackMessage));
+        } catch (Exception e) {
+            return new ReviewSubmitResult(false, "Review API unavailable. Connect backend endpoint /api/reviews. Details: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -628,6 +767,16 @@ public class ClassController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private static class ReviewSubmitResult {
+        private final boolean success;
+        private final String message;
+
+        private ReviewSubmitResult(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
     }
 }
 
