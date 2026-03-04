@@ -3,85 +3,51 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane minHeight="900.0" minWidth="1400.0" style="-fx-background-color: #f5f7fa; -fx-font-family: 'Times New Roman';" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.LoginController">
+<BorderPane style="-fx-background-color: #f5f7fa; -fx-font-family: 'Times New Roman';" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.LoginController">
     <top>
         <fx:include source="topbar.fxml" />
     </top>
 
     <center>
-        <VBox alignment="CENTER" spacing="20.0">
-            <VBox alignment="CENTER_LEFT" maxWidth="450.0" spacing="25.0" style="-fx-background-color: white; -fx-padding: 50px; -fx-background-radius: 12px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 12, 0, 0, 6);">
-                <children>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" style="-fx-background: transparent; -fx-background-color: transparent;">
+            <VBox alignment="CENTER" spacing="20.0">
+                <VBox alignment="CENTER_LEFT" maxWidth="450.0" spacing="25.0" style="-fx-background-color: white; -fx-padding: 50px; -fx-background-radius: 12px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 12, 0, 0, 6);">
+                    <children>
 
                 <VBox spacing="5.0">
                     <children>
-                        <Label prefHeight="39.0" prefWidth="243.0" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Times New Roman';" text="Learning Platform" textOverrun="WORD_ELLIPSIS">
-                            <font>
-                                <Font size="32.0" />
-                            </font>
-                        </Label>
-                        <Label fx:id="contextLabel" style="-fx-text-fill: #7f8c8d; -fx-font-family: 'Times New Roman';" text="Welcome back! Please sign in to continue.">
-                            <font>
-                                <Font size="16.0" />
-                            </font>
-                        </Label>
+                        <Label prefHeight="39.0" prefWidth="243.0" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Times New Roman'; -fx-font-size: 32px;" text="Learning Platform" textOverrun="WORD_ELLIPSIS" />
+                        <Label fx:id="contextLabel" style="-fx-text-fill: #7f8c8d; -fx-font-family: 'Times New Roman'; -fx-font-size: 16px;" text="Welcome back! Please sign in to continue." />
                     </children>
                 </VBox>
 
                 <VBox spacing="15.0">
                     <children>
-                        <TextField fx:id="usernameField" prefHeight="45.0" promptText="👤 Username or Email" style="-fx-background-radius: 6px; -fx-border-color: #dcdde1; -fx-border-radius: 6px; -fx-border-width: 1px; -fx-font-family: 'Times New Roman'; -fx-font-size: 13;">
-                            <font>
-                                <Font size="14.0" />
-                            </font>
-                        </TextField>
+                        <TextField fx:id="usernameField" prefHeight="45.0" promptText="👤 Username or Email" style="-fx-background-radius: 6px; -fx-font-family: 'Times New Roman'; -fx-font-size: 14px;" />
 
-                        <PasswordField fx:id="passwordField" prefHeight="45.0" promptText="🔒 Password" style="-fx-background-radius: 6px; -fx-border-color: #dcdde1; -fx-border-radius: 6px; -fx-border-width: 1px; -fx-font-family: 'Times New Roman'; -fx-font-size: 13;">
-                            <font>
-                                <Font size="14.0" />
-                            </font>
-                        </PasswordField>
+                        <PasswordField fx:id="passwordField" prefHeight="45.0" promptText="🔒 Password" style="-fx-background-radius: 6px; -fx-font-family: 'Times New Roman'; -fx-font-size: 14px;" />
 
-                        <PasswordField fx:id="confirmPasswordField" managed="false" prefHeight="45.0" promptText="🔒 Confirm Password" style="-fx-background-radius: 6px; -fx-border-color: #dcdde1; -fx-border-radius: 6px; -fx-border-width: 1px; -fx-font-family: 'Times New Roman'; -fx-font-size: 13;" visible="false">
-                            <font>
-                                <Font size="14.0" />
-                            </font>
-                        </PasswordField>
+                        <PasswordField fx:id="confirmPasswordField" managed="false" prefHeight="45.0" promptText="🔒 Confirm Password" style="-fx-background-radius: 6px; -fx-font-family: 'Times New Roman'; -fx-font-size: 14px;" visible="false" />
                     </children>
                 </VBox>
 
-                <Label fx:id="errorLabel" style="-fx-text-fill: #e74c3c; -fx-font-family: 'Times New Roman';" wrapText="true">
-                    <font>
-                        <Font size="13.0" />
-                    </font>
-                </Label>
+                <Label fx:id="errorLabel" style="-fx-text-fill: #e74c3c; -fx-font-family: 'Times New Roman'; -fx-font-size: 13px;" wrapText="true" />
 
                 <VBox spacing="15.0">
                     <children>
-                        <Button fx:id="primaryActionButton" maxWidth="Infinity" onAction="#handlePrimaryAction" prefHeight="45.0" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 6px; -fx-cursor: hand; -fx-font-weight: bold; -fx-font-family: 'Times New Roman'; -fx-font-size: 14;" text="Sign In">
-                            <font>
-                                <Font size="16.0" />
-                            </font>
-                        </Button>
+                        <Button fx:id="primaryActionButton" maxWidth="Infinity" onAction="#handlePrimaryAction" prefHeight="45.0" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 6px; -fx-cursor: hand; -fx-font-weight: bold; -fx-font-family: 'Times New Roman'; -fx-font-size: 16px;" text="Sign In" />
 
                         <HBox alignment="CENTER" spacing="5.0">
                             <children>
-                                <Label fx:id="switchContextLabel" style="-fx-text-fill: #7f8c8d; -fx-font-family: 'Times New Roman';" text="Don't have an account?">
-                                    <font>
-                                        <Font size="14.0" />
-                                    </font>
-                                </Label>
-                                <Button fx:id="switchActionButton" onAction="#handleSwitchContext" style="-fx-background-color: transparent; -fx-text-fill: #3498db; -fx-padding: 0; -fx-cursor: hand; -fx-font-family: 'Times New Roman'; -fx-font-weight: bold;" text="Register Now">
-                                    <font>
-                                        <Font size="14.0" />
-                                    </font>
-                                </Button>
+                                <Label fx:id="switchContextLabel" style="-fx-text-fill: #7f8c8d; -fx-font-family: 'Times New Roman'; -fx-font-size: 14px;" text="Don't have an account?" />
+                                <Button fx:id="switchActionButton" onAction="#handleSwitchContext" style="-fx-background-color: transparent; -fx-text-fill: #3498db; -fx-padding: 0; -fx-cursor: hand; -fx-font-family: 'Times New Roman'; -fx-font-weight: bold; -fx-font-size: 14px;" text="Register Now" />
                             </children>
                         </HBox>
                     </children>
@@ -89,5 +55,6 @@
                 </children>
             </VBox>
         </VBox>
+        </ScrollPane>
     </center>
 </BorderPane>
