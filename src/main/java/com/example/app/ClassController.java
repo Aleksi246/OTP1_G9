@@ -333,6 +333,10 @@ public class ClassController {
         downloadButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 7; -fx-cursor: hand;");
         downloadButton.setDisable(fileId == null);
 
+        Button viewReviewsButton = new Button("👁 View");
+        viewReviewsButton.setStyle("-fx-background-color: #5d6d7e; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 7; -fx-cursor: hand;");
+        viewReviewsButton.setDisable(fileId == null);
+
         Button reviewButton = new Button("Review");
         reviewButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 7; -fx-cursor: hand;");
         reviewButton.setDisable(fileId == null || !isEnrolled);
@@ -346,15 +350,87 @@ public class ClassController {
         deleteButton.setManaged(isCreator);
 
         downloadButton.setOnAction(e -> handleDownloadMaterial(fileId, filename, downloadButton, deleteButton, rowStatusLabel));
+        viewReviewsButton.setOnAction(e -> openViewReviewsDialog(fileId, filename));
         reviewButton.setOnAction(e -> openReviewDialog(fileId, filename, downloadButton, deleteButton, reviewButton, rowStatusLabel));
         deleteButton.setOnAction(e -> handleDeleteMaterial(fileId, filename, downloadButton, deleteButton, rowStatusLabel));
 
-        HBox actions = new HBox(8, downloadButton, reviewButton, deleteButton);
+        HBox actions = new HBox(8, downloadButton, viewReviewsButton, reviewButton, deleteButton);
         HBox row = new HBox(12, infoBox, actions);
         row.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(infoBox, Priority.ALWAYS);
         row.setStyle("-fx-background-color: #f8fafc; -fx-border-color: #dfe6ee; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12 14;");
         return row;
+    }
+
+    private void openViewReviewsDialog(Integer fileId, String filename) {
+        if (fileId == null) {
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/app/view-reviews-dialog.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            ViewReviewsDialogController controller = loader.getController();
+            controller.setMaterialName(filename);
+            controller.setStatus("Loading reviews...");
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Material Reviews");
+            dialogStage.initOwner(classNameLabel.getScene().getWindow());
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setScene(scene);
+
+            runAsync(() -> {
+                ReviewsFetchResult result = fetchMaterialReviews(fileId);
+                Platform.runLater(() -> controller.setReviewLines(result.reviewLines, result.message));
+            });
+
+            dialogStage.showAndWait();
+        } catch (Exception e) {
+            showError("Reviews", "Could not open reviews: " + e.getMessage());
+        }
+    }
+
+    private ReviewsFetchResult fetchMaterialReviews(Integer fileId) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI("http://localhost:7700/api/reviews/material/" + fileId))
+                    .header("Authorization", "Bearer " + token)
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                return new ReviewsFetchResult(false, "Could not load reviews (" + response.statusCode() + ").", new ArrayList<>());
+            }
+
+            JsonArray reviewsArray = JsonParser.parseString(response.body()).getAsJsonArray();
+            List<String> lines = new ArrayList<>();
+            for (JsonElement element : reviewsArray) {
+                if (!element.isJsonObject()) {
+                    continue;
+                }
+                JsonObject review = element.getAsJsonObject();
+                String rating = review.has("rating") && !review.get("rating").isJsonNull()
+                        ? String.valueOf(review.get("rating").getAsInt())
+                        : "-";
+                String reviewer = review.has("userId") && !review.get("userId").isJsonNull()
+                        ? "User #" + review.get("userId").getAsInt()
+                        : "Unknown user";
+                String comment = getStringOrDefault(review, "comment", getStringOrDefault(review, "review", ""));
+                if (comment.isBlank()) {
+                    comment = "(No comment)";
+                }
+                lines.add(rating + "/5 - " + reviewer + " - " + comment);
+            }
+
+            String status = lines.isEmpty() ? "No reviews yet." : lines.size() + " review(s)";
+            return new ReviewsFetchResult(true, status, lines);
+        } catch (Exception e) {
+            return new ReviewsFetchResult(false, "Review list API unavailable. Connect backend GET /api/reviews/material/{fileId}.", new ArrayList<>());
+        }
     }
 
     private void openReviewDialog(Integer fileId,
@@ -776,6 +852,18 @@ public class ClassController {
         private ReviewSubmitResult(boolean success, String message) {
             this.success = success;
             this.message = message;
+        }
+    }
+
+    private static class ReviewsFetchResult {
+        private final boolean success;
+        private final String message;
+        private final List<String> reviewLines;
+
+        private ReviewsFetchResult(boolean success, String message, List<String> reviewLines) {
+            this.success = success;
+            this.message = message;
+            this.reviewLines = reviewLines;
         }
     }
 }
