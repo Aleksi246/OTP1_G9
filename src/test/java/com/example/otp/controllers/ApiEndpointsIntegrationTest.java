@@ -72,12 +72,11 @@ public class ApiEndpointsIntegrationTest {
         app.before("/api/participants/unenroll", ApiEndpointsIntegrationTest::checkAuth);
         app.before("/api/participants/class/{classId}", ApiEndpointsIntegrationTest::checkAuth);
         app.before("/api/participants/user/{userId}", ApiEndpointsIntegrationTest::checkAuth);
-        app.before("/api/admin/create-teacher", ApiEndpointsIntegrationTest::checkAuth);
+        app.before("/api/auth/change-password", ApiEndpointsIntegrationTest::checkAuth);
 
         app.post("/api/auth/register", userController::register);
         app.post("/api/auth/login", userController::login);
-
-        app.post("/api/admin/create-teacher", userController::createTeacher);
+        app.put("/api/auth/change-password", userController::changePassword);
 
         app.get("/api/users", userController::getAllUsers);
         app.get("/api/users/{id}", userController::getUserById);
@@ -208,6 +207,44 @@ public class ApiEndpointsIntegrationTest {
     }
 
     @Test
+    void authEndpoints_changePassword_successAndInvalidCurrentPassword() throws Exception {
+        String teacherToken = tokenFor("teacher_seed");
+
+        HttpResponse<String> invalidCurrent = sendJson("PUT", "/api/auth/change-password", bearer(teacherToken), """
+                {
+                  "currentPassword": "wrong-password",
+                  "newPassword": "newTeacherPass123"
+                }
+                """);
+        assertEquals(401, invalidCurrent.statusCode());
+
+        HttpResponse<String> changed = sendJson("PUT", "/api/auth/change-password", bearer(teacherToken), """
+                {
+                  "currentPassword": "teacherPass",
+                  "newPassword": "newTeacherPass123"
+                }
+                """);
+        assertEquals(200, changed.statusCode());
+
+        HttpResponse<String> oldPasswordLogin = sendJson("POST", "/api/auth/login", null, """
+                {
+                  "username": "teacher_seed",
+                  "password": "teacherPass"
+                }
+                """);
+        assertEquals(401, oldPasswordLogin.statusCode());
+
+        HttpResponse<String> newPasswordLogin = sendJson("POST", "/api/auth/login", null, """
+                {
+                  "username": "teacher_seed",
+                  "password": "newTeacherPass123"
+                }
+                """);
+        assertEquals(200, newPasswordLogin.statusCode());
+        assertTrue(newPasswordLogin.body().contains("token"));
+    }
+
+    @Test
     void userEndpoints_getAllAndGetById_requireToken() throws Exception {
         HttpResponse<String> noToken = sendJson("GET", "/api/users", null, null);
         assertEquals(401, noToken.statusCode());
@@ -218,19 +255,6 @@ public class ApiEndpointsIntegrationTest {
 
         HttpResponse<String> byId = sendJson("GET", "/api/users/" + studentId, bearer(teacherToken), null);
         assertEquals(200, byId.statusCode());
-    }
-
-    @Test
-    void adminEndpoint_createTeacher_deprecated() throws Exception {
-        String studentToken = tokenFor("student_seed");
-        HttpResponse<String> forbidden = sendJson("POST", "/api/admin/create-teacher", bearer(studentToken), """
-                {
-                  "username": "teacher_forbidden",
-                  "email": "teacher_forbidden@example.com",
-                  "password": "pass123"
-                }
-                """);
-        assertEquals(410, forbidden.statusCode());
     }
 
     @Test

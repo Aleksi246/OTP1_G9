@@ -53,9 +53,11 @@ public class Main extends Application {
             app.before("/api/participants/unenroll", ctx -> checkAuth(ctx));
             app.before("/api/participants/class/{classId}", ctx -> checkAuth(ctx));
             app.before("/api/participants/user/{userId}", ctx -> checkAuth(ctx));
+            app.before("/api/auth/change-password", ctx -> checkAuth(ctx));
 
             app.post("/api/auth/register", userController::register);
             app.post("/api/auth/login", userController::login);
+            app.put("/api/auth/change-password", userController::changePassword);
 
             // User routes
             app.get("/api/users", userController::getAllUsers);

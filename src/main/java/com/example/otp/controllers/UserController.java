@@ -128,7 +128,44 @@ public class UserController {
         }
     }
 
-    public void createTeacher(Context ctx) {
-        jsonMessage(ctx, HttpStatus.GONE, "User types are removed; use /api/auth/register");
+    public void changePassword(Context ctx) {
+        try {
+            String email = ctx.attribute("email");
+            if (email == null || email.isBlank()) {
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Unauthorized");
+                return;
+            }
+
+            JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
+            String currentPassword = body.has("currentPassword") ? body.get("currentPassword").getAsString() : null;
+            String newPassword = body.has("newPassword") ? body.get("newPassword").getAsString() : null;
+
+            if (currentPassword == null || currentPassword.isBlank() || newPassword == null || newPassword.isBlank()) {
+                jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
+                return;
+            }
+
+            User user = userDao.findByEmail(email);
+            if (user == null) {
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Unauthorized");
+                return;
+            }
+
+            if (!BCryptUtil.verifyPassword(currentPassword, user.getPasswordHash())) {
+                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Current password is incorrect");
+                return;
+            }
+
+            String newHash = BCryptUtil.hashPassword(newPassword);
+            boolean updated = userDao.updatePassword(user.getUserId(), newHash);
+
+            if (updated) {
+                jsonMessage(ctx, HttpStatus.OK, "Password changed successfully");
+            } else {
+                jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to change password");
+            }
+        } catch (Exception e) {
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+        }
     }
 }

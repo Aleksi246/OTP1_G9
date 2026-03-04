@@ -88,6 +88,16 @@ public class UserDao {
         }
     }
 
+    public boolean updatePassword(int userId, String passwordHash) throws SQLException {
+        String sql = "UPDATE users SET password_hash = ? WHERE user_id = ?";
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, passwordHash);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
     public boolean delete(int id) throws SQLException {
         String sql = "DELETE FROM users WHERE user_id = ?";
         try (Connection c = Database.getConnection();

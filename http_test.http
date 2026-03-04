@@ -7,6 +7,7 @@
 @creatorUsername = creator_api_test
 @creatorEmail = creator_api_test@example.com
 @creatorPassword = pass123
+@creatorNewPassword = pass123_new
 
 @user2Username = user2_api_test
 @user2Email = user2_api_test@example.com
@@ -90,6 +91,44 @@ Content-Type: application/json
 {
   "email": "{{user3Email}}",
   "password": "{{user3Password}}"
+}
+
+### Change creator password (wrong current password, expected 401)
+PUT {{baseUrl}}/api/auth/change-password
+Authorization: Bearer {{creatorToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "wrong_password",
+  "newPassword": "{{creatorNewPassword}}"
+}
+
+### Change creator password (allowed)
+PUT {{baseUrl}}/api/auth/change-password
+Authorization: Bearer {{creatorToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "{{creatorPassword}}",
+  "newPassword": "{{creatorNewPassword}}"
+}
+
+### Login creator with old password (expected 401 after password change)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{creatorEmail}}",
+  "password": "{{creatorPassword}}"
+}
+
+### Login creator with new password (allowed)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{creatorEmail}}",
+  "password": "{{creatorNewPassword}}"
 }
 
 ### ======================================
