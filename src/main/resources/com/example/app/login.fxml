@@ -36,7 +36,7 @@
 
                 <VBox spacing="15.0">
                     <children>
-                        <TextField fx:id="usernameField" prefHeight="45.0" promptText="👤 Username" style="-fx-background-radius: 5px; -fx-border-color: #bdc3c7; -fx-border-radius: 5px; -fx-border-width: 1px;">
+                        <TextField fx:id="usernameField" prefHeight="45.0" promptText="👤 Username or Email" style="-fx-background-radius: 5px; -fx-border-color: #bdc3c7; -fx-border-radius: 5px; -fx-border-width: 1px;">
                             <font>
                                 <Font size="14.0" />
                             </font>
