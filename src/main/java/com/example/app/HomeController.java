@@ -183,124 +183,90 @@ public class HomeController {
 
     private VBox createClassCard(String className, String topic, Integer classId) {
         VBox card = new VBox();
-        card.setPrefWidth(320);
-        card.setMinHeight(280);
-        card.setMaxHeight(380);
+        card.setPrefWidth(300);
+        card.setMinHeight(240);
+        card.setMaxHeight(360);
         card.setSpacing(0);
 
-        // Generate a unique color for each class based on its ID
-        String[] colors = {"#5B6FCC", "#E85554", "#43A1A9", "#F19A38", "#7D5FA3", "#4A90C5", "#2ECC71", "#E67E22"};
-        String headerColor = colors[classId % colors.length];
+        // Generate a unique accent color per class
+        String[] colors = {"#3b82f6", "#8b5cf6", "#06b6d4", "#f59e0b", "#10b981", "#ef4444", "#6366f1", "#f97316"};
+        String accentColor = colors[Math.abs(classId % colors.length)];
 
-        // Create header with color
+        // ── Colored top bar (accent stripe) ──────────────────
         VBox headerBox = new VBox();
-        headerBox.setPrefHeight(100);
+        headerBox.setPrefHeight(90);
+        headerBox.setAlignment(Pos.BOTTOM_LEFT);
+        headerBox.setSpacing(4);
         headerBox.setStyle(
-                "-fx-background-color: " + headerColor + "; " +
-                "-fx-background-radius: 14 14 0 0; " +
-                "-fx-padding: 20;"
+                "-fx-background-color: " + accentColor + ";" +
+                "-fx-background-radius: 14 14 0 0;" +
+                "-fx-padding: 16 18 14 18;"
         );
-        headerBox.setAlignment(Pos.CENTER_LEFT);
-        headerBox.setSpacing(8);
 
-        // Class name in header
         Label classNameLabel = new Label(className);
         classNameLabel.setStyle(
-                "-fx-font-size: 18; " +
-                "-fx-font-weight: bold; " +
-                "-fx-text-fill: white;"
+                "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;" +
+                "-fx-font-family: 'Segoe UI';"
         );
         classNameLabel.setWrapText(true);
-        classNameLabel.setMaxWidth(280);
+        classNameLabel.setMaxWidth(264);
 
-        headerBox.getChildren().add(classNameLabel);
+        Label idBadge = new Label("ID " + classId);
+        idBadge.setStyle(
+                "-fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.75);" +
+                "-fx-font-family: 'Segoe UI'; -fx-font-weight: bold;"
+        );
 
-        // Content box with padding
+        headerBox.getChildren().addAll(classNameLabel, idBadge);
+
+        // ── White content area ────────────────────────────────
         VBox contentBox = new VBox();
-        contentBox.setStyle(
-                "-fx-background-color: white; " +
-                "-fx-background-radius: 0 0 14 14; " +
-                "-fx-padding: 20;"
-        );
-        contentBox.setSpacing(12);
-        contentBox.setPrefHeight(180);
+        contentBox.setStyle("-fx-background-color: white; -fx-background-radius: 0 0 14 14; -fx-padding: 16 18 18 18;");
+        contentBox.setSpacing(10);
         VBox.setVgrow(contentBox, Priority.ALWAYS);
-
-        // Topic label with icon
-        Label topicLabelHeader = new Label("📚 Topic");
-        topicLabelHeader.setStyle(
-                "-fx-font-size: 12; " +
-                "-fx-font-weight: bold; " +
-                "-fx-text-fill: #5a6c7d;"
-        );
 
         Label topicLabel = new Label(topic == null || topic.isEmpty() ? "No topic set" : topic);
         topicLabel.setStyle(
-                "-fx-font-size: 14; " +
-                "-fx-text-fill: #2c3e50; " +
-                "-fx-wrap-text: true;"
+                "-fx-font-size: 13px; -fx-text-fill: #475569; -fx-font-family: 'Segoe UI';"
         );
         topicLabel.setWrapText(true);
-        topicLabel.setMaxWidth(280);
+        topicLabel.setMaxWidth(264);
 
-        // Class ID label (smaller, subtle)
-        Label classIdLabel = new Label("Class ID: " + classId);
-        classIdLabel.setStyle(
-                "-fx-font-size: 11; " +
-                "-fx-text-fill: #a5b3bf; " +
-                "-fx-font-family: 'Courier New';"
-        );
-
-        // Spacer to push button down
         VBox spacer = new VBox();
         VBox.setVgrow(spacer, Priority.ALWAYS);
 
-        // View button
-        Button viewButton = new Button("View Class");
-        viewButton.setPrefWidth(280);
-        viewButton.setPrefHeight(42);
+        Button viewButton = new Button("Open Class →");
+        viewButton.setPrefWidth(264);
+        viewButton.setPrefHeight(38);
         viewButton.setStyle(
-                "-fx-background-color: " + headerColor + "; " +
-                "-fx-text-fill: white; " +
-                "-fx-font-weight: bold; " +
-                "-fx-font-size: 13; " +
-                "-fx-padding: 0; " +
-                "-fx-background-radius: 8; " +
-                "-fx-cursor: hand; " +
-                "-fx-border: none;"
+                "-fx-background-color: " + accentColor + ";" +
+                "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;" +
+                "-fx-background-radius: 8; -fx-cursor: hand; -fx-font-family: 'Segoe UI';"
         );
-        viewButton.setOnAction(e -> {
-            SceneManager.loadClass(classId);
-        });
+        viewButton.setOnAction(e -> SceneManager.loadClass(classId));
 
-        contentBox.getChildren().addAll(topicLabelHeader, topicLabel, classIdLabel, spacer, viewButton);
+        contentBox.getChildren().addAll(topicLabel, spacer, viewButton);
 
         card.getChildren().addAll(headerBox, contentBox);
         card.setStyle(
-                "-fx-background-color: white; " +
-                "-fx-background-radius: 14; " +
-                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 12, 0, 0, 4); " +
+                "-fx-background-color: white;" +
+                "-fx-background-radius: 14;" +
+                "-fx-effect: dropshadow(gaussian, rgba(15,23,42,0.09), 16, 0, 0, 4);" +
                 "-fx-cursor: hand;"
         );
 
-        // Add hover effect with smooth transition
-        card.setOnMouseEntered(e -> {
-            card.setStyle(
-                    "-fx-background-color: white; " +
-                    "-fx-background-radius: 14; " +
-                    "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.12), 20, 0, 0, 10); " +
-                    "-fx-cursor: hand;"
-            );
-        });
-
-        card.setOnMouseExited(e -> {
-            card.setStyle(
-                    "-fx-background-color: white; " +
-                    "-fx-background-radius: 14; " +
-                    "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 12, 0, 0, 4); " +
-                    "-fx-cursor: hand;"
-            );
-        });
+        card.setOnMouseEntered(e -> card.setStyle(
+                "-fx-background-color: white;" +
+                "-fx-background-radius: 14;" +
+                "-fx-effect: dropshadow(gaussian, rgba(15,23,42,0.16), 22, 0, 0, 8);" +
+                "-fx-cursor: hand;"
+        ));
+        card.setOnMouseExited(e -> card.setStyle(
+                "-fx-background-color: white;" +
+                "-fx-background-radius: 14;" +
+                "-fx-effect: dropshadow(gaussian, rgba(15,23,42,0.09), 16, 0, 0, 4);" +
+                "-fx-cursor: hand;"
+        ));
 
         return card;
     }
@@ -422,4 +388,3 @@ public class HomeController {
         alert.showAndWait();
     }
 }
-

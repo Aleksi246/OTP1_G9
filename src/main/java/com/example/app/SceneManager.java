@@ -68,12 +68,6 @@ public class SceneManager {
                 // Can't reload class from history without class ID context
                 loadHomeInternal(addToHistory);
                 break;
-            case "dashboard":
-            case "admin":
-                // Dashboard requires additional parameters, so we can't reload it from history
-                // For now, just load main
-                loadMainInternal(addToHistory);
-                break;
         }
     }
 
@@ -138,34 +132,6 @@ public class SceneManager {
         }
     }
 
-    public static void loadDashboard(String userType, String token, String username) {
-        try {
-            String normalizedUserType = (userType == null || userType.isBlank()) ? "student" : userType;
-
-            if ("admin".equals(normalizedUserType)) {
-                addToHistory("admin");
-                FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/admin.fxml"));
-                Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
-                AdminController controller = loader.getController();
-                controller.setAuthToken(token);
-                primaryStage.setTitle("Learning Platform - Admin Dashboard");
-                primaryStage.setScene(scene);
-                primaryStage.show();
-            } else {
-                addToHistory("dashboard");
-                FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/dashboard.fxml"));
-                Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
-                DashboardController controller = loader.getController();
-                controller.setUserInfo(normalizedUserType, username);
-                primaryStage.setTitle("Learning Platform - " + capitalize(normalizedUserType) + " Dashboard");
-                primaryStage.setScene(scene);
-                primaryStage.show();
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading dashboard scene: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     public static void loadProfile() {
         loadProfileInternal(true);

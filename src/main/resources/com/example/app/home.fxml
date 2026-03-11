@@ -1,46 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<BorderPane style="-fx-background-color: #f5f7fa; -fx-font-family: 'Times New Roman';" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.HomeController">
-
+<BorderPane style="-fx-background-color: #f1f5f9;"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.app.HomeController">
     <top>
         <fx:include source="topbar.fxml" />
     </top>
 
     <center>
-        <VBox alignment="TOP_CENTER" spacing="30.0" style="-fx-padding: 50 40 40 40;">
-            <!-- Header section -->
-            <VBox alignment="CENTER" spacing="12.0" style="-fx-padding: 0;">
-                <Label fx:id="welcomeLabel" style="-fx-font-weight: bold; -fx-font-size: 36; -fx-text-fill: #1f2d3d; -fx-font-family: 'Times New Roman';" text="Welcome!" />
-                <Label style="-fx-font-size: 16; -fx-text-fill: #5a6c7d; -fx-font-family: 'Times New Roman';" text="Your Learning Journey Awaits" />
-            </VBox>
+        <VBox spacing="0.0" style="-fx-background-color: #f1f5f9;">
 
-            <!-- Action buttons section -->
-            <VBox alignment="CENTER" spacing="15.0">
-                <MenuButton mnemonicParsing="false" prefHeight="48.0" prefWidth="200.0" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 14; -fx-font-family: 'Times New Roman'; -fx-padding: 0 20;" text="Manage Classes" textFill="WHITE">
+            <!-- Page header bar -->
+            <HBox alignment="CENTER_LEFT" spacing="16.0"
+                  style="-fx-background-color: white; -fx-padding: 20 32 20 32;
+                         -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;">
+                <VBox spacing="3.0" HBox.hgrow="ALWAYS">
+                    <Label fx:id="welcomeLabel"
+                           style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
+                                  -fx-font-family: 'Segoe UI';"
+                           text="Welcome!" />
+                    <Label style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI';"
+                           text="Here are your enrolled classes." />
+                </VBox>
+                <MenuButton mnemonicParsing="false" prefHeight="40.0" prefWidth="160.0"
+                            text="＋  Manage Classes" textFill="WHITE"
+                            style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;
+                                   -fx-background-radius: 9; -fx-cursor: hand; -fx-font-size: 13px;
+                                   -fx-font-family: 'Segoe UI';
+                                   -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.32), 6, 0, 0, 2);">
                     <items>
-                        <MenuItem onAction="#handleJoinClass" text="Join Class" />
-                        <MenuItem onAction="#handleCreateClass" text="Create Class" />
+                        <MenuItem onAction="#handleJoinClass" text="🔗  Join a Class" />
+                        <MenuItem onAction="#handleCreateClass" text="🏫  Create a Class" />
                     </items>
                 </MenuButton>
-                <Label style="-fx-font-size: 15; -fx-text-fill: #2c3e50; -fx-font-weight: bold; -fx-font-family: 'Times New Roman';" text="Your Enrolled Classes" />
-            </VBox>
+            </HBox>
 
             <!-- Loading label -->
-            <Label fx:id="loadingLabel" style="-fx-font-size: 14; -fx-text-fill: #95a5a6; -fx-font-family: 'Times New Roman';" text="Loading your classes..." />
+            <Label fx:id="loadingLabel" text="Loading your classes…"
+                   style="-fx-font-size: 14px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';
+                          -fx-padding: 20 32 0 32;" />
 
-            <!-- Classes Container with ScrollPane -->
-            <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" style="-fx-background: transparent; -fx-background-color: transparent; -fx-padding: 0;" VBox.vgrow="ALWAYS">
-                <FlowPane fx:id="classesContainer" alignment="CENTER" columnHalignment="CENTER" hgap="28.0" prefWrapLength="0.0" style="-fx-padding: 20 40; -fx-background-color: transparent;" vgap="28.0" />
+            <!-- Classes grid -->
+            <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER"
+                        vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS"
+                        style="-fx-background: transparent; -fx-background-color: transparent;">
+                <FlowPane fx:id="classesContainer" alignment="TOP_CENTER"
+                          columnHalignment="CENTER" hgap="24.0" vgap="24.0"
+                          style="-fx-padding: 28 32 32 32; -fx-background-color: transparent;" />
             </ScrollPane>
         </VBox>
     </center>

@@ -64,6 +64,7 @@ public class ClassController {
     @FXML
     private MenuItem leaveClassMenuItem;
 
+
     @FXML
     private VBox uploadSection;
 
@@ -173,6 +174,7 @@ public class ClassController {
                     updateAccessUi();
                 });
 
+
                 loadMaterials();
             } catch (Exception e) {
                 Platform.runLater(() -> showError("Error", "Failed to load class: " + e.getMessage()));
@@ -258,6 +260,7 @@ public class ClassController {
 
         setUploadSectionVisible(isCreator);
 
+
         if (!isCreator && !isEnrolled) {
             materialsStatusLabel.setText("Join this class to access shared files.");
             materialsContainer.getChildren().clear();
@@ -268,6 +271,7 @@ public class ClassController {
         uploadSection.setVisible(visible);
         uploadSection.setManaged(visible);
     }
+
 
     private void loadMaterials() {
         if (!isCreator && !isEnrolled) {
@@ -334,35 +338,56 @@ public class ClassController {
                 ? "Uploaded by user #" + material.get("userId").getAsInt()
                 : "Uploader unknown";
 
-        Label nameLabel = new Label(filename);
-        nameLabel.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        // File type badge color
+        String badgeColor = switch (type.toLowerCase()) {
+            case "lecture notes" -> "#3b82f6";
+            case "assignment"    -> "#f59e0b";
+            case "slides"        -> "#8b5cf6";
+            case "reference"     -> "#06b6d4";
+            default              -> "#64748b";
+        };
 
-        Label metaLabel = new Label(type + " - " + uploader + " - " + uploadedAt.replace("T", " "));
-        metaLabel.setStyle("-fx-font-size: 12; -fx-text-fill: #7f8c8d;");
+        Label nameLabel = new Label(filename);
+        nameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0f172a; -fx-font-family: 'Segoe UI';");
+
+        Label typeBadge = new Label(type);
+        typeBadge.setStyle(
+                "-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: white; -fx-font-family: 'Segoe UI';" +
+                "-fx-background-color: " + badgeColor + "; -fx-background-radius: 20; -fx-padding: 2 9;"
+        );
+
+        Label metaLabel = new Label(uploader + "  ·  " + uploadedAt.replace("T", " "));
+        metaLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';");
 
         Label rowStatusLabel = new Label("");
-        rowStatusLabel.setStyle("-fx-font-size: 12; -fx-text-fill: #6c7a89;");
+        rowStatusLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI';");
         rowStatusLabel.setVisible(false);
         rowStatusLabel.setManaged(false);
 
-        VBox infoBox = new VBox(4, nameLabel, metaLabel, rowStatusLabel);
+        HBox badgeRow = new HBox(8, typeBadge);
+        badgeRow.setAlignment(Pos.CENTER_LEFT);
+        VBox infoBox = new VBox(5, nameLabel, badgeRow, metaLabel, rowStatusLabel);
+        infoBox.setAlignment(Pos.CENTER_LEFT);
 
-        Button downloadButton = new Button("Download");
-        downloadButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 7; -fx-cursor: hand;");
+        String btnBase = "-fx-font-size: 12px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';" +
+                         "-fx-padding: 7 14; -fx-background-radius: 7; -fx-cursor: hand;";
+
+        Button downloadButton = new Button("⬇ Download");
+        downloadButton.setStyle(btnBase + "-fx-background-color: #22c55e; -fx-text-fill: white;");
         downloadButton.setDisable(fileId == null);
 
-        Button viewReviewsButton = new Button("👁 View");
-        viewReviewsButton.setStyle("-fx-background-color: #5d6d7e; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 7; -fx-cursor: hand;");
+        Button viewReviewsButton = new Button("📋 Reviews");
+        viewReviewsButton.setStyle(btnBase + "-fx-background-color: #e2e8f0; -fx-text-fill: #334155;");
         viewReviewsButton.setDisable(fileId == null);
 
-        Button reviewButton = new Button("Review");
-        reviewButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 7; -fx-cursor: hand;");
+        Button reviewButton = new Button("⭐ Review");
+        reviewButton.setStyle(btnBase + "-fx-background-color: #3b82f6; -fx-text-fill: white;");
         reviewButton.setDisable(fileId == null || !isEnrolled);
         reviewButton.setVisible(!isCreator);
         reviewButton.setManaged(!isCreator);
 
-        Button deleteButton = new Button("Delete");
-        deleteButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 14; -fx-background-radius: 7; -fx-cursor: hand;");
+        Button deleteButton = new Button("🗑 Delete");
+        deleteButton.setStyle(btnBase + "-fx-background-color: #fee2e2; -fx-text-fill: #dc2626;");
         deleteButton.setDisable(fileId == null);
         deleteButton.setVisible(isCreator);
         deleteButton.setManaged(isCreator);
@@ -373,10 +398,14 @@ public class ClassController {
         deleteButton.setOnAction(e -> handleDeleteMaterial(fileId, filename, downloadButton, deleteButton, rowStatusLabel));
 
         HBox actions = new HBox(8, downloadButton, viewReviewsButton, reviewButton, deleteButton);
-        HBox row = new HBox(12, infoBox, actions);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+        HBox row = new HBox(16, infoBox, actions);
         row.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(infoBox, Priority.ALWAYS);
-        row.setStyle("-fx-background-color: #f8fafc; -fx-border-color: #dfe6ee; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12 14;");
+        row.setStyle(
+                "-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0;" +
+                "-fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 14 16;"
+        );
         return row;
     }
 

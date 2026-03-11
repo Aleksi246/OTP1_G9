@@ -7,73 +7,133 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.ProfileController" style="-fx-background-color: #f5f7fa; -fx-font-family: 'Times New Roman';">
+<BorderPane style="-fx-background-color: #f1f5f9;"
+            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.app.ProfileController">
     <top>
         <fx:include source="topbar.fxml" />
     </top>
     <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" style="-fx-background: transparent; -fx-background-color: transparent;">
-            <VBox alignment="TOP_CENTER" spacing="20.0" style="-fx-padding: 40;">
-                <!-- Back Button -->
-                <HBox alignment="TOP_LEFT">
-                    <Button fx:id="backToHomeButton" onAction="#handleBackToHome" text="← Back to Home" style="-fx-background-color: #ecf0f1; -fx-cursor: hand; -fx-padding: 10 20; -fx-background-radius: 6; -fx-font-size: 14px; -fx-font-weight: bold; -fx-font-family: 'Times New Roman'; -fx-text-fill: #2c3e50;" />
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                    style="-fx-background: transparent; -fx-background-color: transparent;">
+            <VBox alignment="TOP_CENTER" spacing="0.0" style="-fx-padding: 32 32 40 32;">
+
+                <!-- Back -->
+                <HBox alignment="TOP_LEFT" style="-fx-padding: 0 0 18 0;">
+                    <Button fx:id="backToHomeButton" onAction="#handleBackToHome"
+                            text="← Back to Home"
+                            style="-fx-background-color: #e2e8f0; -fx-text-fill: #334155; -fx-font-weight: bold;
+                                   -fx-padding: 9 16; -fx-background-radius: 8; -fx-cursor: hand;
+                                   -fx-font-size: 13px; -fx-font-family: 'Segoe UI';" />
                 </HBox>
 
                 <!-- Profile Card -->
-            <VBox spacing="20.0" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 12, 0, 0, 5);" prefWidth="500.0">
-                <padding>
-                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                </padding>
+                <VBox spacing="20.0" maxWidth="520.0"
+                      style="-fx-background-color: white; -fx-background-radius: 16;
+                             -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.10), 24, 0, 0, 8);
+                             -fx-padding: 36 40 36 40;">
 
-                <!-- Title -->
-                <Label text="My Profile" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Times New Roman';" />
+                    <!-- Title row -->
+                    <HBox alignment="CENTER_LEFT" spacing="14.0">
+                        <Label text="👤"
+                               style="-fx-font-size: 32px; -fx-background-color: #eff6ff;
+                                      -fx-background-radius: 50; -fx-padding: 10;" />
+                        <VBox spacing="2.0">
+                            <Label text="My Profile"
+                                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
+                                          -fx-font-family: 'Segoe UI';" />
+                            <Label text="Manage your account details"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';" />
+                        </VBox>
+                    </HBox>
 
-                <!-- Username Section -->
-                <VBox spacing="8.0">
-                    <Label text="Username" style="-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-family: 'Times New Roman';" />
-                    <Label fx:id="usernameLabel" text="Loading..." style="-fx-font-size: 14; -fx-text-fill: #555555; -fx-padding: 10; -fx-background-color: #f8f9fa; -fx-border-color: #e0e0e0; -fx-border-radius: 6; -fx-font-family: 'Times New Roman';" />
+                    <Region prefHeight="1.0" maxWidth="Infinity" style="-fx-background-color: #e2e8f0;" />
+
+                    <!-- Info fields -->
+                    <VBox spacing="14.0">
+                        <VBox spacing="6.0">
+                            <Label text="Username"
+                                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748b;
+                                          -fx-font-family: 'Segoe UI';" />
+                            <Label fx:id="usernameLabel" text="Loading…"
+                                   style="-fx-font-size: 15px; -fx-text-fill: #1e293b; -fx-font-family: 'Segoe UI';
+                                          -fx-background-color: #f8fafc; -fx-border-color: #e2e8f0;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 10 14;" />
+                        </VBox>
+                        <VBox spacing="6.0">
+                            <Label text="Email"
+                                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748b;
+                                          -fx-font-family: 'Segoe UI';" />
+                            <Label fx:id="emailLabel" text="Loading…"
+                                   style="-fx-font-size: 15px; -fx-text-fill: #1e293b; -fx-font-family: 'Segoe UI';
+                                          -fx-background-color: #f8fafc; -fx-border-color: #e2e8f0;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 10 14;" />
+                        </VBox>
+                    </VBox>
+
+                    <Region prefHeight="1.0" maxWidth="Infinity" style="-fx-background-color: #e2e8f0;" />
+
+                    <!-- Change Password -->
+                    <Label text="Change Password"
+                           style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
+                                  -fx-font-family: 'Segoe UI';" />
+
+                    <VBox spacing="14.0">
+                        <VBox spacing="6.0">
+                            <Label text="Current Password"
+                                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748b;
+                                          -fx-font-family: 'Segoe UI';" />
+                            <PasswordField fx:id="currentPasswordField" prefHeight="42.0"
+                                           promptText="Enter current password"
+                                           style="-fx-background-radius: 8; -fx-font-size: 14px; -fx-font-family: 'Segoe UI';
+                                                  -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1.5;
+                                                  -fx-background-color: #f8fafc; -fx-padding: 0 12;" />
+                        </VBox>
+                        <VBox spacing="6.0">
+                            <Label text="New Password"
+                                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748b;
+                                          -fx-font-family: 'Segoe UI';" />
+                            <PasswordField fx:id="newPasswordField" prefHeight="42.0"
+                                           promptText="Enter new password"
+                                           style="-fx-background-radius: 8; -fx-font-size: 14px; -fx-font-family: 'Segoe UI';
+                                                  -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1.5;
+                                                  -fx-background-color: #f8fafc; -fx-padding: 0 12;" />
+                        </VBox>
+                        <VBox spacing="6.0">
+                            <Label text="Confirm New Password"
+                                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748b;
+                                          -fx-font-family: 'Segoe UI';" />
+                            <PasswordField fx:id="confirmPasswordField" prefHeight="42.0"
+                                           promptText="Repeat new password"
+                                           style="-fx-background-radius: 8; -fx-font-size: 14px; -fx-font-family: 'Segoe UI';
+                                                  -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1.5;
+                                                  -fx-background-color: #f8fafc; -fx-padding: 0 12;" />
+                        </VBox>
+                    </VBox>
+
+                    <Label fx:id="messageLabel" text="" wrapText="true"
+                           style="-fx-text-fill: #dc2626; -fx-font-size: 13px; -fx-font-family: 'Segoe UI';" />
+
+                    <!-- Action Buttons -->
+                    <HBox spacing="12.0" alignment="CENTER_RIGHT">
+                        <Button onAction="#handleChangePassword" prefWidth="170.0" prefHeight="42.0"
+                                text="Save Password"
+                                style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;
+                                       -fx-font-size: 14px; -fx-background-radius: 9; -fx-cursor: hand;
+                                       -fx-font-family: 'Segoe UI';" />
+                        <Button onAction="#handleLogout" prefWidth="120.0" prefHeight="42.0"
+                                text="Logout"
+                                style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold;
+                                       -fx-font-size: 14px; -fx-background-radius: 9; -fx-cursor: hand;
+                                       -fx-font-family: 'Segoe UI';" />
+                    </HBox>
                 </VBox>
-
-                <!-- Email Section -->
-                <VBox spacing="8.0">
-                    <Label text="Email" style="-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-family: 'Times New Roman';" />
-                    <Label fx:id="emailLabel" text="Loading..." style="-fx-font-size: 14; -fx-text-fill: #555555; -fx-padding: 10; -fx-background-color: #f8f9fa; -fx-border-color: #e0e0e0; -fx-border-radius: 6; -fx-font-family: 'Times New Roman';" />
-                </VBox>
-
-                <!-- Separator -->
-                <Label style="-fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0; -fx-padding: 0;" />
-
-                <!-- Change Password Section -->
-                <Label text="Change Password" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-family: 'Times New Roman';" />
-
-                <VBox spacing="8.0">
-                    <Label text="Current Password" style="-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-family: 'Times New Roman';" />
-                    <PasswordField fx:id="currentPasswordField" promptText="Enter your current password" style="-fx-padding: 10; -fx-font-size: 14; -fx-background-radius: 6; -fx-font-family: 'Times New Roman';" />
-                </VBox>
-
-                <VBox spacing="8.0">
-                    <Label text="New Password" style="-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-family: 'Times New Roman';" />
-                    <PasswordField fx:id="newPasswordField" promptText="Enter new password" style="-fx-padding: 10; -fx-font-size: 14; -fx-background-radius: 6; -fx-font-family: 'Times New Roman';" />
-                </VBox>
-
-                <VBox spacing="8.0">
-                    <Label text="Confirm New Password" style="-fx-font-weight: bold; -fx-text-fill: #34495e; -fx-font-family: 'Times New Roman';" />
-                    <PasswordField fx:id="confirmPasswordField" promptText="Confirm new password" style="-fx-padding: 10; -fx-font-size: 14; -fx-background-radius: 6; -fx-font-family: 'Times New Roman';" />
-                </VBox>
-
-                <!-- Error/Success Message -->
-                <Label fx:id="messageLabel" text="" style="-fx-text-fill: #d32f2f; -fx-font-size: 12; -fx-font-family: 'Times New Roman';" />
-
-                <!-- Buttons -->
-                <HBox spacing="10.0" alignment="CENTER">
-                    <Button onAction="#handleChangePassword" prefWidth="150.0" prefHeight="40.0" text="Change Password" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-family: 'Times New Roman';" />
-                    <Button onAction="#handleLogout" prefWidth="150.0" prefHeight="40.0" text="Logout" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-family: 'Times New Roman';" />
-                </HBox>
             </VBox>
-        </VBox>
         </ScrollPane>
     </center>
 </BorderPane>
