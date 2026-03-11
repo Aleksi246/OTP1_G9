@@ -932,10 +932,15 @@ public class ClassController {
 
         runAsync(() -> {
             try {
+                JsonObject unenrollData = new JsonObject();
+                unenrollData.addProperty("userId", userId);
+                unenrollData.addProperty("classId", classId);
+
                 HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI("http://localhost:7700/api/participants/unenroll?userId=" + userId + "&classId=" + classId))
+                        .uri(new URI("http://localhost:7700/api/participants/unenroll"))
                         .header("Authorization", "Bearer " + token)
-                        .DELETE()
+                        .header("Content-Type", "application/json")
+                        .method("DELETE", HttpRequest.BodyPublishers.ofString(unenrollData.toString()))
                         .build();
 
                 HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
