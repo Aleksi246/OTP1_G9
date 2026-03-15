@@ -7,7 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class DatabaseInitializer {
-    private static final String URL = "jdbc:mariadb://platform-db:3306";
+    private static final String URL = System.getenv().getOrDefault(
+    "DB_URL",
+    "jdbc:mariadb://localhost:3306/otptestdb"
+);
     private static final String USER = "otptestuser";
     private static final String PASS = "testpass";
 

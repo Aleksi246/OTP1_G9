@@ -27,8 +27,7 @@ services:
     depends_on:
       - db
     environment:
-      DB_HOST: db
-      DB_PORT: 3306
+      DB_URL: jdbc:mariadb://platform-db:3306/otptestdb
       # make sure your DB_USER name is correct mine is root
       DB_USER: otptestuser
       # make sure your DB_PASSWORD is correct mine is root
