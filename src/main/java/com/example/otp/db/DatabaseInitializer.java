@@ -7,9 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class DatabaseInitializer {
-    private static final String URL = "jdbc:mariadb://localhost:3306";
-    private static final String USER = "root";
-    private static final String PASS = "";
+    private static final String URL = "jdbc:mariadb://platform-db:3306";
+    private static final String USER = "otptestuser";
+    private static final String PASS = "testpass";
 
     /**
      * Initialize the database with schema (idempotent, safe for production).

@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Database {
-    private static final String URL = "jdbc:mariadb://localhost:3306/otptestdb";
+    private static final String URL = "jdbc:mariadb://platform-db:3306/otptestdb";
     private static final String USER = "otptestuser";
     private static final String PASS = "testpass";
 

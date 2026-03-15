@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:11
+    container_name: platform-db
+    restart: always
+    environment:
+      # make sure your DB_PASSWORD is correct mine is root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: otptestdb
+      MYSQL_USER: otptestuser       # dedicated DB user for your app
+      MYSQL_PASSWORD: testpass   # password for the app user
+      # Make sure your 3307 port is available
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  app:
+    # image is my own account for the exercise you have to change to your account
+    #IMPORTANT docker build -t yourname/sum-product-fx .
+    # docker push yourname/sum-product-fx: last
+    # then you can change the image in the following statment
+    image: aleksi246/otp:latest
+    container_name: otp
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      # make sure your DB_USER name is correct mine is root
+      DB_USER: otptestuser
+      # make sure your DB_PASSWORD is correct mine is root
+      DB_PASSWORD: testpass
+      DISPLAY: host.docker.internal:0
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+#    network_mode: bridge # it cancels network of docker -> docker cannot find host db.
+volumes:
+  db_data:
+
+#  Then execute docker compose up --build

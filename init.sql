@@ -4,8 +4,8 @@
 CREATE DATABASE IF NOT EXISTS otptestdb;
 USE otptestdb;
 
-CREATE USER IF NOT EXISTS 'otptestuser'@'localhost' IDENTIFIED BY 'testpass';
-GRANT ALL PRIVILEGES ON otptestdb.* TO 'otptestuser'@'localhost';
+CREATE USER IF NOT EXISTS 'otptestuser'@'%' IDENTIFIED BY 'testpass';
+GRANT ALL PRIVILEGES ON otptestdb.* TO 'otptestuser'@'%';
 FLUSH PRIVILEGES;
 
 CREATE TABLE IF NOT EXISTS users (
