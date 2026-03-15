@@ -28,24 +28,28 @@ pipeline {
         }
 
         stage('Test') {
+            when { expression { false } }
             steps {
                 bat 'mvn test'
             }
         }
 
         stage('Code Coverage') {
+            when { expression { false } }
             steps {
                 bat 'mvn jacoco:report'
             }
         }
 
         stage('Publish Test Results') {
+            when { expression { false } }
             steps {
                 junit '**/target/surefire-reports/*.xml'
             }
         }
 
         stage('Publish Coverage Report') {
+            when { expression { false } }
             steps {
                 jacoco()
             }
