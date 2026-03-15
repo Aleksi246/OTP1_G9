@@ -2,8 +2,15 @@ pipeline {
     agent any
 
     tools {
-        maven "Apache Maven 3.8.7"  // Make sure Maven is configured in Jenkins Global Tool Configuration
+        maven "Maven"  // Make sure Maven is configured in Jenkins Global Tool Configuration
         jdk "JDK21"    // Make sure JDK is configured
+    }
+
+    environment {
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;${env.PATH}"
+        DOCKERHUB_CREDENTIALS_ID = 'dockerhub-creds'
+        DOCKERHUB_REPO = 'aleksi246/otp'
+        DOCKER_IMAGE_TAG = 'latest'
     }
 
     stages {
@@ -16,19 +23,19 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean install'
+                bat 'mvn clean package -DskipTests'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'mvn test'
+                bat 'mvn test'
             }
         }
 
         stage('Code Coverage') {
             steps {
-                sh 'mvn jacoco:report'
+                bat 'mvn jacoco:report'
             }
         }
 
@@ -41,6 +48,23 @@ pipeline {
         stage('Publish Coverage Report') {
             steps {
                 jacoco()
+            }
+        }
+
+        stage('build docker image') {
+            steps{
+                script{
+                    docker.build("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}")
+                }
+            }
+        }
+        stage('push docker image'){
+            steps{
+                script{
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS_ID){
+                    docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}").push()
+                    }
+                }
             }
         }
     }
