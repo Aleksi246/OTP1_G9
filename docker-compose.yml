@@ -22,7 +22,7 @@ services:
     #IMPORTANT docker build -t yourname/sum-product-fx .
     # docker push yourname/sum-product-fx: last
     # then you can change the image in the following statment
-    image: aleksi246/otp:latest
+    image: elkuuz/otp:latest
     container_name: otp
     depends_on:
       - db
