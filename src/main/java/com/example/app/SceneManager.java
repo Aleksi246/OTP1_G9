@@ -88,7 +88,8 @@ public class SceneManager {
             loader.setCharset(StandardCharsets.UTF_8);
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
-            scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
+            // Keep landing page layout consistent across locales.
+            scene.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
             primaryStage.setTitle(LocaleManager.getBundle().getString("app.title") + " - Main");
             primaryStage.setScene(scene);
             primaryStage.show();
