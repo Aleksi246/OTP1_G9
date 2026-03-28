@@ -38,7 +38,7 @@
 
                     <!-- Title row -->
                     <HBox alignment="CENTER_LEFT" spacing="14.0">
-                        <Label text="👤"
+                        <Label text=""
                                style="-fx-font-size: 32px; -fx-background-color: #eff6ff;
                                       -fx-background-radius: 50; -fx-padding: 10;" />
                         <VBox spacing="2.0">

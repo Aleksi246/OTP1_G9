@@ -175,7 +175,7 @@ public class RegisterController {
             passwordField.setVisible(false);
             passwordField.setManaged(false);
 
-            toggleButton.setText("🙈");
+            toggleButton.setText("Hide");
             isPasswordVisible = true;
 
             // Transfer focus to the visible field so the cursor doesn't disappear
@@ -188,7 +188,7 @@ public class RegisterController {
             passwordTextField.setVisible(false);
             passwordTextField.setManaged(false);
 
-            toggleButton.setText("👁");
+            toggleButton.setText("Show");
             isPasswordVisible = false;
 
             passwordField.requestFocus();

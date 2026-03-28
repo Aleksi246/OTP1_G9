@@ -11,12 +11,12 @@ Now using **environment-aware initialization** with two SQL strategies:
 - **Does NOT drop** existing data
 - **Idempotent**: Safe to run every startup, production-ready
 - Runs by default when app starts
-- ✅ Recommended for production and CI/CD pipelines
+- Recommended for production and CI/CD pipelines
 
 ### 2. **Development-Only: `init-dev.sql` (OPTIONAL)**
 - Contains `DROP DATABASE IF EXISTS` 
 - **Destroys and recreates** all data from scratch
-- ⚠️ Use ONLY in development/testing
+- Use ONLY in development/testing
 - Activated via environment variable
 
 ---
@@ -81,22 +81,22 @@ APP_INIT_FILE=/path/to/custom.sql java -jar app.jar
 
 | Environment | Variable | File | Behavior |
 |---|---|---|---|
-| **Production** | (unset) | `init.sql` | Create schema only, preserve data ✅ |
-| **Development** | `APP_RESET_DB=true` | `init-dev.sql` | Fresh start every time 🔄 |
-| **CI/CD Testing** | (unset) | `init.sql` | Reproducible without data loss ✅ |
-| **Custom** | `APP_INIT_FILE=/path` | Custom | Use any SQL file 🔧 |
+| **Production** | (unset) | `init.sql` | Create schema only, preserve data |
+| **Development** | `APP_RESET_DB=true` | `init-dev.sql` | Fresh start every time |
+| **CI/CD Testing** | (unset) | `init.sql` | Reproducible without data loss |
+| **Custom** | `APP_INIT_FILE=/path` | Custom | Use any SQL file |
 
 ---
 
 ## Migration Notes
 
 **Before this change:**
-- ❌ Destructive reset on every startup
-- ❌ Not safe for production
-- ❌ Lost all data when app restarted
+- Destructive reset on every startup
+- Not safe for production
+- Lost all data when app restarted
 
 **After this change:**
-- ✅ Safe idempotent init by default
-- ✅ Production-ready
-- ✅ Optional destructive reset for dev
+- Safe idempotent init by default
+- Production-ready
+- Optional destructive reset for dev
 

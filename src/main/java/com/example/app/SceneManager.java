@@ -5,6 +5,7 @@ import javafx.geometry.NodeOrientation;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,6 +85,7 @@ public class SceneManager {
                 addToHistory("main");
             }
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/main.fxml"));
+            loader.setCharset(StandardCharsets.UTF_8);
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
             scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
@@ -108,6 +110,7 @@ public class SceneManager {
                 addToHistory("login");
             }
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/login.fxml"));
+            loader.setCharset(StandardCharsets.UTF_8);
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
             scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
@@ -131,6 +134,7 @@ public class SceneManager {
                 addToHistory("register");
             }
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/register.fxml"));
+            loader.setCharset(StandardCharsets.UTF_8);
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
             scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
@@ -155,6 +159,7 @@ public class SceneManager {
                 addToHistory("profile");
             }
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/profile.fxml"));
+            loader.setCharset(StandardCharsets.UTF_8);
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
             scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
@@ -178,6 +183,7 @@ public class SceneManager {
                 addToHistory("home");
             }
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/home.fxml"));
+            loader.setCharset(StandardCharsets.UTF_8);
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
             scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
@@ -196,6 +202,7 @@ public class SceneManager {
             addToHistory("class");
             ClassContextHolder.setClassId(classId);
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/class.fxml"));
+            loader.setCharset(StandardCharsets.UTF_8);
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
             scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);

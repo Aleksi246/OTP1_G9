@@ -21,6 +21,9 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
+        // Force UTF-8 for frontend resource loading
+        System.setProperty("file.encoding", "UTF-8");
+
         // Initialize database before starting the server
         DatabaseInitializer.initializeDatabase();
 
