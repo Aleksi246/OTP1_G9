@@ -34,7 +34,7 @@
                     <Label style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;"
                            text="%home.subtitle" />
                 </VBox>
-                <MenuButton mnemonicParsing="false" prefHeight="40.0" prefWidth="160.0"
+                  <MenuButton mnemonicParsing="false" prefHeight="40.0" prefWidth="210.0"
                             text="%home.manageClasses" textFill="WHITE"
                             style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;
                                    -fx-background-radius: 9; -fx-cursor: hand; -fx-font-size: 13px;

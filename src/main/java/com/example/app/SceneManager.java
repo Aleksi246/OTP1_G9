@@ -119,8 +119,7 @@ public class SceneManager {
             loader.setCharset(StandardCharsets.UTF_8);
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
-            // Keep landing page layout consistent across locales.
-            scene.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+            scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
             applyScene(scene, LocaleManager.getBundle().getString("app.title") + " - Main");
         } catch (Exception e) {
             System.err.println("Error loading main scene: " + e.getMessage());
