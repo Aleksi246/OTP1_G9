@@ -99,14 +99,14 @@
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
       <version>21.0.6</version>
-      <classifier>linux</classifier>
+      <classifier>win</classifier>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
       <version>21.0.6</version>
-      <classifier>linux</classifier>
+      <classifier>win</classifier>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -148,7 +148,7 @@
   </dependencies>
   <properties>
     <maven.compiler.release>21</maven.compiler.release>
-    <javafx.platform>linux</javafx.platform>
+    <javafx.platform>win</javafx.platform>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <javafx.version>21.0.6</javafx.version>
     <javafx.plugin.version>0.0.8</javafx.plugin.version>
