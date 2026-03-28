@@ -15,15 +15,15 @@
     <children>
         <HBox alignment="CENTER_LEFT" onMouseClicked="#handleLearningPlatformClick" spacing="12.0" style="-fx-cursor: hand;">
             <VBox alignment="CENTER_LEFT" spacing="0.0">
-                <Label style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white; -fx-font-family: 'Segoe UI';" text="%topbar.title" />
-                <Label style="-fx-font-size: 10px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';" text="%topbar.subtitle" />
+                <Label style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" text="%topbar.title" />
+                <Label style="-fx-font-size: 10px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" text="%topbar.subtitle" />
             </VBox>
         </HBox>
 
         <Region HBox.hgrow="ALWAYS" />
 
-        <ChoiceBox fx:id="languageChoiceBox" onAction="#handleLanguageChange" prefHeight="38.0" prefWidth="120.0" style="-fx-background-radius: 8; -fx-font-family: 'Segoe UI'; -fx-cursor: hand;" />
+        <ChoiceBox fx:id="languageChoiceBox" onAction="#handleLanguageChange" prefHeight="38.0" prefWidth="120.0" style="-fx-background-radius: 8; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif; -fx-cursor: hand;" />
 
-        <Button fx:id="profileButton" onAction="#handleSwitchToProfile" prefHeight="38.0" prefWidth="130.0" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;                        -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;                        -fx-font-family: 'Segoe UI';                        -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.4), 8, 0, 0, 2);" text="%topbar.login" />
+        <Button fx:id="profileButton" onAction="#handleSwitchToProfile" prefHeight="38.0" prefWidth="130.0" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;                        -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;                        -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;                        -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.4), 8, 0, 0, 2);" text="%topbar.login" />
     </children>
 </HBox>

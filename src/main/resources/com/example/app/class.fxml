@@ -30,19 +30,19 @@
                             text="%class.back"
                             style="-fx-background-color: #e2e8f0; -fx-text-fill: #334155; -fx-font-weight: bold;
                                    -fx-padding: 9 16; -fx-background-radius: 8; -fx-cursor: hand;
-                                   -fx-font-size: 13px; -fx-font-family: 'Segoe UI';" />
+                                   -fx-font-size: 13px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
                     <Button fx:id="joinButton" onAction="#handleJoinClass"
                             text="%class.joinClass"
                             style="-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-weight: bold;
                                    -fx-padding: 9 16; -fx-background-radius: 8; -fx-cursor: hand;
-                                   -fx-font-size: 13px; -fx-font-family: 'Segoe UI';
+                                   -fx-font-size: 13px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;
                                    -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.30), 6, 0, 0, 2);" />
                     <Region HBox.hgrow="ALWAYS" />
                     <Button onAction="#handleRefreshMaterials"
                             text="%class.refresh"
                             style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;
                                    -fx-padding: 9 16; -fx-background-radius: 8; -fx-cursor: hand;
-                                   -fx-font-size: 13px; -fx-font-family: 'Segoe UI';" />
+                                   -fx-font-size: 13px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
                 </HBox>
 
                 <!-- Class Info Card -->
@@ -54,27 +54,27 @@
                         <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                             <Label fx:id="classNameLabel"
                                    style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
-                                          -fx-font-family: 'Segoe UI';"
+                                          -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;"
                                    text="%class.namePlaceholder" />
                             <HBox spacing="12.0" alignment="CENTER_LEFT">
                                 <Label fx:id="classIdLabel"
-                                       style="-fx-font-size: 12px; -fx-text-fill: white; -fx-font-family: 'Segoe UI';
+                                       style="-fx-font-size: 12px; -fx-text-fill: white; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;
                                               -fx-background-color: #3b82f6; -fx-background-radius: 20;
                                               -fx-padding: 3 10; -fx-font-weight: bold;"
                                        text="%class.idPlaceholder" />
                                 <Label fx:id="topicLabel"
-                                       style="-fx-font-size: 14px; -fx-text-fill: #475569; -fx-font-family: 'Segoe UI';"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #475569; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;"
                                        text="%class.topicPlaceholder" />
                             </HBox>
                             <Label fx:id="creatorLabel"
-                                   style="-fx-font-size: 13px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;"
                                    text="%class.creatorPlaceholder" />
                         </VBox>
                         <MenuButton fx:id="classActionsMenu" mnemonicParsing="false"
                                     text="%class.actions" textFill="WHITE"
                                     style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-font-weight: bold;
                                            -fx-padding: 9 16; -fx-background-radius: 8; -fx-cursor: hand;
-                                           -fx-font-size: 13px; -fx-font-family: 'Segoe UI';">
+                                           -fx-font-size: 13px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;">
                             <items>
                                 <MenuItem fx:id="deleteClassMenuItem" onAction="#handleDeleteClass" text="%class.deleteClass" />
                                 <MenuItem fx:id="leaveClassMenuItem" onAction="#handleLeaveClass" text="%class.leaveClass" />
@@ -89,9 +89,9 @@
                              -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.09), 18, 0, 0, 5);
                              -fx-padding: 24 30 24 30;">
                     <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
-                                  -fx-font-family: 'Segoe UI';"
+                                  -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;"
                            text="%class.uploadTitle" />
-                    <Label style="-fx-font-size: 13px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';"
+                    <Label style="-fx-font-size: 13px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;"
                            text="%class.uploadSubtitle" />
 
                     <Region prefHeight="1.0" maxWidth="Infinity" style="-fx-background-color: #f1f5f9;" />
@@ -101,26 +101,26 @@
                                 text="%class.chooseFile"
                                 style="-fx-background-color: #f1f5f9; -fx-text-fill: #334155; -fx-font-weight: bold;
                                        -fx-padding: 9 16; -fx-background-radius: 8; -fx-cursor: hand;
-                                       -fx-font-size: 13px; -fx-font-family: 'Segoe UI';
+                                       -fx-font-size: 13px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;
                                        -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1.5;" />
                         <Label fx:id="selectedFileLabel"
-                               style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI';"
+                               style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;"
                                text="%class.noFileSelected" />
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="12.0">
                         <ComboBox fx:id="materialTypeCombo" prefWidth="200.0" prefHeight="38.0"
                                   promptText="%class.materialType.prompt"
-                                  style="-fx-font-size: 13px; -fx-font-family: 'Segoe UI';
+                                  style="-fx-font-size: 13px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;
                                          -fx-background-radius: 8; -fx-border-color: #cbd5e1;
                                          -fx-border-radius: 8; -fx-border-width: 1.5;" />
                         <Button fx:id="uploadButton" onAction="#handleUploadMaterial"
                                 text="%class.upload"
                                 style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;
                                        -fx-padding: 9 20; -fx-background-radius: 8; -fx-cursor: hand;
-                                       -fx-font-size: 13px; -fx-font-family: 'Segoe UI';" />
+                                       -fx-font-size: 13px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
                     </HBox>
                     <Label fx:id="uploadProgressLabel" managed="false" visible="false"
-                           style="-fx-font-size: 12px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI';"
+                           style="-fx-font-size: 12px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;"
                            text="%class.uploading" />
                     <ProgressBar fx:id="uploadProgressBar" managed="false" visible="false"
                                  prefWidth="320.0" prefHeight="8.0" progress="-1.0"
@@ -133,10 +133,10 @@
                              -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.09), 18, 0, 0, 5);
                              -fx-padding: 24 30 24 30;">
                     <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
-                                  -fx-font-family: 'Segoe UI';"
+                                  -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;"
                            text="%class.materialsTitle" />
                     <Label fx:id="materialsStatusLabel"
-                           style="-fx-font-size: 13px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';"
+                           style="-fx-font-size: 13px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;"
                            text="%class.loadingFiles" />
                     <VBox fx:id="materialsContainer" spacing="10.0" />
                 </VBox>

@@ -21,11 +21,11 @@
     <VBox spacing="4.0">
         <Label text="%review.title"
                style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
-                      -fx-font-family: 'Segoe UI';" />
-        <Label text="%review.file" style="-fx-font-size: 12px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';" />
+                      -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
+        <Label text="%review.file" style="-fx-font-size: 12px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
         <Label fx:id="materialNameLabel" wrapText="true"
                style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #334155;
-                      -fx-font-family: 'Segoe UI';" />
+                      -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
     </VBox>
 
     <Region prefHeight="1.0" maxWidth="Infinity" style="-fx-background-color: #e2e8f0;" />
@@ -34,9 +34,9 @@
     <VBox spacing="6.0">
         <Label text="%review.rating"
                style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #334155;
-                      -fx-font-family: 'Segoe UI';" />
+                      -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
         <ComboBox fx:id="ratingCombo" prefWidth="140.0" prefHeight="38.0"
-                  style="-fx-font-size: 13px; -fx-font-family: 'Segoe UI';
+                  style="-fx-font-size: 13px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;
                          -fx-background-radius: 8; -fx-border-color: #cbd5e1;
                          -fx-border-radius: 8; -fx-border-width: 1.5;" />
     </VBox>
@@ -45,17 +45,17 @@
     <VBox spacing="6.0" VBox.vgrow="ALWAYS">
         <Label text="%review.comment"
                style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #334155;
-                      -fx-font-family: 'Segoe UI';" />
+                      -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
         <TextArea fx:id="commentTextArea" prefHeight="120.0" prefWidth="Infinity"
                   promptText="%review.comment.prompt" wrapText="true"
-                  style="-fx-font-size: 13px; -fx-font-family: 'Segoe UI';
+                  style="-fx-font-size: 13px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;
                          -fx-background-radius: 8; -fx-border-color: #cbd5e1;
                          -fx-border-radius: 8; -fx-border-width: 1.5;
                          -fx-background-color: #f8fafc; -fx-padding: 8 12;" />
     </VBox>
 
     <Label fx:id="validationLabel" wrapText="true"
-           style="-fx-text-fill: #dc2626; -fx-font-size: 12px; -fx-font-family: 'Segoe UI';" />
+           style="-fx-text-fill: #dc2626; -fx-font-size: 12px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
 
     <!-- Buttons -->
     <HBox alignment="CENTER_RIGHT" spacing="10.0">
@@ -63,12 +63,12 @@
                 text="%review.cancel"
                 style="-fx-background-color: #e2e8f0; -fx-text-fill: #334155; -fx-font-weight: bold;
                        -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;
-                       -fx-font-family: 'Segoe UI';" />
+                       -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
         <Button mnemonicParsing="false" onAction="#handleSubmit" prefHeight="38.0" prefWidth="140.0"
                 text="%review.submit"
                 style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;
                        -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;
-                       -fx-font-family: 'Segoe UI';" />
+                       -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
     </HBox>
 </VBox>
 

@@ -27,7 +27,7 @@
                             text="%profile.back"
                             style="-fx-background-color: #e2e8f0; -fx-text-fill: #334155; -fx-font-weight: bold;
                                    -fx-padding: 9 16; -fx-background-radius: 8; -fx-cursor: hand;
-                                   -fx-font-size: 13px; -fx-font-family: 'Segoe UI';" />
+                                   -fx-font-size: 13px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
                 </HBox>
 
                 <!-- Profile Card -->
@@ -44,9 +44,9 @@
                         <VBox spacing="2.0">
                             <Label text="%profile.title"
                                    style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
-                                          -fx-font-family: 'Segoe UI';" />
+                                          -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
                             <Label text="%profile.subtitle"
-                                   style="-fx-font-size: 13px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';" />
+                                   style="-fx-font-size: 13px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
                         </VBox>
                     </HBox>
 
@@ -57,9 +57,9 @@
                         <VBox spacing="6.0">
                             <Label text="%profile.username"
                                    style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748b;
-                                          -fx-font-family: 'Segoe UI';" />
+                                          -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
                             <Label fx:id="usernameLabel" text="%profile.loading"
-                                   style="-fx-font-size: 15px; -fx-text-fill: #1e293b; -fx-font-family: 'Segoe UI';
+                                   style="-fx-font-size: 15px; -fx-text-fill: #1e293b; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;
                                           -fx-background-color: #f8fafc; -fx-border-color: #e2e8f0;
                                           -fx-border-radius: 8; -fx-background-radius: 8;
                                           -fx-padding: 10 14;" />
@@ -67,9 +67,9 @@
                         <VBox spacing="6.0">
                             <Label text="%profile.email"
                                    style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748b;
-                                          -fx-font-family: 'Segoe UI';" />
+                                          -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
                             <Label fx:id="emailLabel" text="%profile.loading"
-                                   style="-fx-font-size: 15px; -fx-text-fill: #1e293b; -fx-font-family: 'Segoe UI';
+                                   style="-fx-font-size: 15px; -fx-text-fill: #1e293b; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;
                                           -fx-background-color: #f8fafc; -fx-border-color: #e2e8f0;
                                           -fx-border-radius: 8; -fx-background-radius: 8;
                                           -fx-padding: 10 14;" />
@@ -81,43 +81,43 @@
                     <!-- Change Password -->
                     <Label text="%profile.changePassword"
                            style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
-                                  -fx-font-family: 'Segoe UI';" />
+                                  -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
 
                     <VBox spacing="14.0">
                         <VBox spacing="6.0">
                             <Label text="%profile.currentPassword"
                                    style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748b;
-                                          -fx-font-family: 'Segoe UI';" />
+                                          -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
                             <PasswordField fx:id="currentPasswordField" prefHeight="42.0"
                                            promptText="%profile.currentPassword.prompt"
-                                           style="-fx-background-radius: 8; -fx-font-size: 14px; -fx-font-family: 'Segoe UI';
+                                           style="-fx-background-radius: 8; -fx-font-size: 14px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;
                                                   -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1.5;
                                                   -fx-background-color: #f8fafc; -fx-padding: 0 12;" />
                         </VBox>
                         <VBox spacing="6.0">
                             <Label text="%profile.newPassword"
                                    style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748b;
-                                          -fx-font-family: 'Segoe UI';" />
+                                          -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
                             <PasswordField fx:id="newPasswordField" prefHeight="42.0"
                                            promptText="%profile.newPassword.prompt"
-                                           style="-fx-background-radius: 8; -fx-font-size: 14px; -fx-font-family: 'Segoe UI';
+                                           style="-fx-background-radius: 8; -fx-font-size: 14px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;
                                                   -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1.5;
                                                   -fx-background-color: #f8fafc; -fx-padding: 0 12;" />
                         </VBox>
                         <VBox spacing="6.0">
                             <Label text="%profile.confirmNewPassword"
                                    style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #64748b;
-                                          -fx-font-family: 'Segoe UI';" />
+                                          -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
                             <PasswordField fx:id="confirmPasswordField" prefHeight="42.0"
                                            promptText="%profile.confirmNewPassword.prompt"
-                                           style="-fx-background-radius: 8; -fx-font-size: 14px; -fx-font-family: 'Segoe UI';
+                                           style="-fx-background-radius: 8; -fx-font-size: 14px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;
                                                   -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1.5;
                                                   -fx-background-color: #f8fafc; -fx-padding: 0 12;" />
                         </VBox>
                     </VBox>
 
                     <Label fx:id="messageLabel" text="" wrapText="true"
-                           style="-fx-text-fill: #dc2626; -fx-font-size: 13px; -fx-font-family: 'Segoe UI';" />
+                           style="-fx-text-fill: #dc2626; -fx-font-size: 13px; -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
 
                     <!-- Action Buttons -->
                     <HBox spacing="12.0" alignment="CENTER_RIGHT">
@@ -125,12 +125,12 @@
                                 text="%profile.savePassword"
                                 style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;
                                        -fx-font-size: 14px; -fx-background-radius: 9; -fx-cursor: hand;
-                                       -fx-font-family: 'Segoe UI';" />
+                                       -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
                         <Button onAction="#handleLogout" prefWidth="120.0" prefHeight="42.0"
                                 text="%profile.logout"
                                 style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold;
                                        -fx-font-size: 14px; -fx-background-radius: 9; -fx-cursor: hand;
-                                       -fx-font-family: 'Segoe UI';" />
+                                       -fx-font-family: 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', 'Noto Color Emoji', sans-serif;" />
                     </HBox>
                 </VBox>
             </VBox>
