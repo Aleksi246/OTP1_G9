@@ -10,17 +10,10 @@ public class ReviewDialogController {
 
     private static final int COMMENT_MAX_LENGTH = 500;
 
-    @FXML
-    private Label materialNameLabel;
-
-    @FXML
-    private ComboBox<Integer> ratingCombo;
-
-    @FXML
-    private TextArea commentTextArea;
-
-    @FXML
-    private Label validationLabel;
+    @FXML private Label materialNameLabel;
+    @FXML private ComboBox<Integer> ratingCombo;
+    @FXML private TextArea commentTextArea;
+    @FXML private Label validationLabel;
 
     private boolean submitted;
     private Integer selectedRating;
@@ -37,52 +30,29 @@ public class ReviewDialogController {
         materialNameLabel.setText(name == null || name.isBlank() ? "Unnamed file" : name);
     }
 
-    public boolean isSubmitted() {
-        return submitted;
-    }
-
-    public Integer getSelectedRating() {
-        return selectedRating;
-    }
-
-    public String getComment() {
-        return comment;
-    }
+    public boolean isSubmitted() { return submitted; }
+    public Integer getSelectedRating() { return selectedRating; }
+    public String getComment() { return comment; }
 
     @FXML
     private void handleSubmit() {
         Integer rating = ratingCombo.getValue();
-        String rawComment = commentTextArea.getText();
-        String trimmedComment = rawComment == null ? "" : rawComment.trim();
+        String trimmed = commentTextArea.getText() == null ? "" : commentTextArea.getText().trim();
 
-        if (rating == null || rating < 1 || rating > 5) {
-            validationLabel.setText("Choose a rating between 1 and 5.");
-            return;
-        }
-        if (trimmedComment.isBlank()) {
-            validationLabel.setText("Please add a comment.");
-            return;
-        }
-        if (trimmedComment.length() > COMMENT_MAX_LENGTH) {
-            validationLabel.setText("Comment must be max " + COMMENT_MAX_LENGTH + " characters.");
-            return;
-        }
+        if (rating == null || rating < 1 || rating > 5) { validationLabel.setText("Choose a rating between 1 and 5."); return; }
+        if (trimmed.isBlank()) { validationLabel.setText("Please add a comment."); return; }
+        if (trimmed.length() > COMMENT_MAX_LENGTH) { validationLabel.setText("Comment must be max " + COMMENT_MAX_LENGTH + " characters."); return; }
 
         this.selectedRating = rating;
-        this.comment = trimmedComment;
+        this.comment = trimmed;
         this.submitted = true;
-        closeDialog();
+        ((Stage) commentTextArea.getScene().getWindow()).close();
     }
 
     @FXML
     private void handleCancel() {
         this.submitted = false;
-        closeDialog();
-    }
-
-    private void closeDialog() {
-        Stage stage = (Stage) commentTextArea.getScene().getWindow();
-        stage.close();
+        ((Stage) commentTextArea.getScene().getWindow()).close();
     }
 }
 

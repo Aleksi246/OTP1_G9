@@ -1,5 +1,6 @@
 package com.example.app;
 
+import com.google.gson.JsonObject;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -13,114 +14,67 @@ import java.net.http.HttpResponse;
 
 public class ProfileController {
 
-    @FXML
-    private Label usernameLabel;
-    @FXML
-    private Label emailLabel;
-    @FXML
-    private PasswordField currentPasswordField;
-    @FXML
-    private PasswordField newPasswordField;
-    @FXML
-    private PasswordField confirmPasswordField;
-    @FXML
-    private Label messageLabel;
+    @FXML private Label usernameLabel;
+    @FXML private Label emailLabel;
+    @FXML private PasswordField currentPasswordField;
+    @FXML private PasswordField newPasswordField;
+    @FXML private PasswordField confirmPasswordField;
+    @FXML private Label messageLabel;
 
     private static final String API_URL = "http://localhost:7700";
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
     @FXML
     public void initialize() {
-        loadUserProfile();
-    }
-
-    private void loadUserProfile() {
-        String username = SessionManager.getUsername();
-        String email = SessionManager.getEmail();
-
-        if (username != null) {
-            usernameLabel.setText(username);
-        } else {
-            usernameLabel.setText(LocaleManager.getBundle().getString("profile.unknown"));
-        }
-
-        if (email != null) {
-            emailLabel.setText(email);
-        } else {
-            emailLabel.setText(LocaleManager.getBundle().getString("profile.unknown"));
-        }
+        var unknown = LocaleManager.getBundle().getString("profile.unknown");
+        usernameLabel.setText(SessionManager.getUsername() != null ? SessionManager.getUsername() : unknown);
+        emailLabel.setText(SessionManager.getEmail() != null ? SessionManager.getEmail() : unknown);
     }
 
     @FXML
     public void handleChangePassword() {
-        String currentPassword = currentPasswordField.getText();
-        String newPassword = newPasswordField.getText();
-        String confirmPassword = confirmPasswordField.getText();
+        String current = currentPasswordField.getText();
+        String newPass = newPasswordField.getText();
+        String confirm = confirmPasswordField.getText();
+        var bundle = LocaleManager.getBundle();
 
-        // Validation
-        if (currentPassword.isEmpty()) {
-            showError(LocaleManager.getBundle().getString("profile.error.currentPasswordRequired"));
-            return;
-        }
+        if (current.isEmpty()) { showMessage(bundle.getString("profile.error.currentPasswordRequired"), true); return; }
+        if (newPass.isEmpty()) { showMessage(bundle.getString("profile.error.newPasswordRequired"), true); return; }
+        if (confirm.isEmpty()) { showMessage(bundle.getString("profile.error.confirmPasswordRequired"), true); return; }
+        if (!newPass.equals(confirm)) { showMessage(bundle.getString("profile.error.passwordMismatch"), true); return; }
+        if (newPass.equals(current)) { showMessage(bundle.getString("profile.error.passwordDifferent"), true); return; }
+        if (newPass.length() < 6) { showMessage(bundle.getString("profile.error.passwordMinLength"), true); return; }
 
-        if (newPassword.isEmpty()) {
-            showError(LocaleManager.getBundle().getString("profile.error.newPasswordRequired"));
-            return;
-        }
-
-        if (confirmPassword.isEmpty()) {
-            showError(LocaleManager.getBundle().getString("profile.error.confirmPasswordRequired"));
-            return;
-        }
-
-        if (!newPassword.equals(confirmPassword)) {
-            showError(LocaleManager.getBundle().getString("profile.error.passwordMismatch"));
-            return;
-        }
-
-        if (newPassword.equals(currentPassword)) {
-            showError(LocaleManager.getBundle().getString("profile.error.passwordDifferent"));
-            return;
-        }
-
-        if (newPassword.length() < 6) {
-            showError(LocaleManager.getBundle().getString("profile.error.passwordMinLength"));
-            return;
-        }
-
-        // Send password change request
-        changePassword(currentPassword, newPassword);
+        changePassword(current, newPass);
     }
 
     private void changePassword(String currentPassword, String newPassword) {
         try {
-            String json = "{\"currentPassword\":\"" + escapeJson(currentPassword) +
-                         "\",\"newPassword\":\"" + escapeJson(newPassword) + "\"}";
+            JsonObject data = new JsonObject();
+            data.addProperty("currentPassword", currentPassword);
+            data.addProperty("newPassword", newPassword);
 
-            String token = SessionManager.getToken();
+            HttpResponse<String> response = httpClient.send(
+                    HttpRequest.newBuilder()
+                            .uri(URI.create(API_URL + "/api/auth/change-password"))
+                            .header("Content-Type", "application/json")
+                            .header("Authorization", "Bearer " + SessionManager.getToken())
+                            .PUT(HttpRequest.BodyPublishers.ofString(data.toString())).build(),
+                    HttpResponse.BodyHandlers.ofString());
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(API_URL + "/api/auth/change-password"))
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", "Bearer " + token)
-                    .PUT(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
+            var bundle = LocaleManager.getBundle();
             if (response.statusCode() == 200) {
-                showSuccess(LocaleManager.getBundle().getString("profile.success.passwordChanged"));
-                // Clear the password fields
+                showMessage(bundle.getString("profile.success.passwordChanged"), false);
                 currentPasswordField.clear();
                 newPasswordField.clear();
                 confirmPasswordField.clear();
             } else if (response.statusCode() == 401) {
-                showError(LocaleManager.getBundle().getString("profile.error.currentPasswordIncorrect"));
+                showMessage(bundle.getString("profile.error.currentPasswordIncorrect"), true);
             } else {
-                showError(MessageFormat.format(LocaleManager.getBundle().getString("profile.error.passwordChangeFailed"), response.statusCode()));
+                showMessage(MessageFormat.format(bundle.getString("profile.error.passwordChangeFailed"), response.statusCode()), true);
             }
         } catch (IOException | InterruptedException ex) {
-            showError(MessageFormat.format(LocaleManager.getBundle().getString("profile.error.connection"), ex.getMessage()));
+            showMessage(MessageFormat.format(LocaleManager.getBundle().getString("profile.error.connection"), ex.getMessage()), true);
         }
     }
 
@@ -135,17 +89,8 @@ public class ProfileController {
         SceneManager.loadHome();
     }
 
-    private void showError(String message) {
+    private void showMessage(String message, boolean isError) {
         messageLabel.setText(message);
-        messageLabel.setStyle("-fx-text-fill: #d32f2f;");
-    }
-
-    private void showSuccess(String message) {
-        messageLabel.setText(message);
-        messageLabel.setStyle("-fx-text-fill: #2e7d32;");
-    }
-
-    private String escapeJson(String str) {
-        return str.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
+        messageLabel.setStyle(isError ? "-fx-text-fill: #d32f2f;" : "-fx-text-fill: #2e7d32;");
     }
 }

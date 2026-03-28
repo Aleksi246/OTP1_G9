@@ -4,21 +4,17 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Alert;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import com.google.gson.JsonArray;
@@ -28,63 +24,40 @@ import com.google.gson.JsonParser;
 
 public class HomeController {
 
-    @FXML
-    private Label welcomeLabel;
+    @FXML private Label welcomeLabel;
+    @FXML private FlowPane classesContainer;
+    @FXML private Label loadingLabel;
 
-    @FXML
-    private FlowPane classesContainer;
-
-    @FXML
-    private ScrollPane scrollPane;
-
-    @FXML
-    private Label loadingLabel;
+    private final HttpClient httpClient = HttpClient.newHttpClient();
 
     @FXML
     private void initialize() {
-        // Check if user is logged in
         if (!SessionManager.isLoggedIn()) {
-            // Redirect to login if not logged in
-            Platform.runLater(() -> SceneManager.loadLogin());
+            Platform.runLater(SceneManager::loadLogin);
             return;
         }
-
-        // Set welcome message
-        String username = SessionManager.getUsername();
-        welcomeLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("home.welcome"), username));
-
-        // Load user's classes
+        welcomeLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("home.welcome"), SessionManager.getUsername()));
         loadUserClasses();
     }
 
     private void loadUserClasses() {
-        new Thread(() -> {
+        runAsync(() -> {
             try {
                 String token = SessionManager.getToken();
                 String email = SessionManager.getEmail();
-
                 if (token == null || email == null) {
-                    Platform.runLater(() -> {
-                        loadingLabel.setText(LocaleManager.getBundle().getString("home.error.notAuthenticated"));
-                    });
+                    Platform.runLater(() -> loadingLabel.setText(LocaleManager.getBundle().getString("home.error.notAuthenticated")));
                     return;
                 }
 
-                // Fetch user ID first
                 Integer userId = fetchUserId(email, token);
                 if (userId == null) {
-                    Platform.runLater(() -> {
-                        loadingLabel.setText(LocaleManager.getBundle().getString("home.error.fetchUser"));
-                    });
+                    Platform.runLater(() -> loadingLabel.setText(LocaleManager.getBundle().getString("home.error.fetchUser")));
                     return;
                 }
-
-                // Store userId in SessionManager for future use
                 SessionManager.setUserId(userId);
 
-                // Fetch classes for this user
                 List<Integer> classIds = fetchUserClasses(userId, token);
-
                 Platform.runLater(() -> {
                     if (classIds.isEmpty()) {
                         loadingLabel.setText(LocaleManager.getBundle().getString("home.noClasses"));
@@ -94,143 +67,84 @@ public class HomeController {
                         displayClasses(classIds, token);
                     }
                 });
-
             } catch (Exception e) {
-                Platform.runLater(() -> {
-                    loadingLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("home.error.loadingClasses"), e.getMessage()));
-                    e.printStackTrace();
-                });
+                Platform.runLater(() -> loadingLabel.setText(
+                        MessageFormat.format(LocaleManager.getBundle().getString("home.error.loadingClasses"), e.getMessage())));
             }
-        }).start();
+        });
     }
 
     private Integer fetchUserId(String email, String token) {
         try {
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:7700/api/users/by-email/" + email))
-                    .header("Authorization", "Bearer " + token)
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
+            HttpResponse<String> response = httpClient.send(
+                    HttpRequest.newBuilder()
+                            .uri(new URI("http://localhost:7700/api/users/by-email/" + email))
+                            .header("Authorization", "Bearer " + token).GET().build(),
+                    HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                JsonElement element = JsonParser.parseString(response.body());
-                if (element.isJsonObject()) {
-                    return element.getAsJsonObject().get("userId").getAsInt();
-                }
+                return JsonParser.parseString(response.body()).getAsJsonObject().get("userId").getAsInt();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
         return null;
     }
 
     private List<Integer> fetchUserClasses(Integer userId, String token) {
-        List<Integer> classIds = new java.util.ArrayList<>();
+        List<Integer> classIds = new ArrayList<>();
         try {
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:7700/api/participants/user/" + userId))
-                    .header("Authorization", "Bearer " + token)
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
+            HttpResponse<String> response = httpClient.send(
+                    HttpRequest.newBuilder()
+                            .uri(new URI("http://localhost:7700/api/participants/user/" + userId))
+                            .header("Authorization", "Bearer " + token).GET().build(),
+                    HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                JsonArray array = JsonParser.parseString(response.body()).getAsJsonArray();
-                for (JsonElement element : array) {
-                    classIds.add(element.getAsInt());
+                for (JsonElement el : JsonParser.parseString(response.body()).getAsJsonArray()) {
+                    classIds.add(el.getAsInt());
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
         return classIds;
     }
 
     private void displayClasses(List<Integer> classIds, String token) {
         classesContainer.getChildren().clear();
-
         for (Integer classId : classIds) {
             try {
-                HttpClient client = HttpClient.newHttpClient();
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI("http://localhost:7700/api/courses/" + classId))
-                        .header("Authorization", "Bearer " + token)
-                        .GET()
-                        .build();
-
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
+                HttpResponse<String> response = httpClient.send(
+                        HttpRequest.newBuilder()
+                                .uri(new URI("http://localhost:7700/api/courses/" + classId))
+                                .header("Authorization", "Bearer " + token).GET().build(),
+                        HttpResponse.BodyHandlers.ofString());
                 if (response.statusCode() == 200) {
-                    var courseJson = JsonParser.parseString(response.body()).getAsJsonObject();
-                    String className = courseJson.get("className").getAsString();
-String topic = courseJson.has("topic") ? courseJson.get("topic").getAsString() : LocaleManager.getBundle().getString("home.noTopic");
-
-                    Platform.runLater(() -> {
-                        VBox classCard = createClassCard(className, topic, classId);
-                        classesContainer.getChildren().add(classCard);
-                    });
+                    var course = JsonParser.parseString(response.body()).getAsJsonObject();
+                    String name = course.get("className").getAsString();
+                    String topic = course.has("topic") ? course.get("topic").getAsString() : LocaleManager.getBundle().getString("home.noTopic");
+                    Platform.runLater(() -> classesContainer.getChildren().add(createClassCard(name, topic, classId)));
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception e) { e.printStackTrace(); }
         }
     }
 
     private VBox createClassCard(String className, String topic, Integer classId) {
-        VBox card = new VBox();
-        card.setPrefWidth(300);
-        card.setMinHeight(240);
-        card.setMaxHeight(360);
-        card.setSpacing(0);
-
-        // Generate a unique accent color per class
         String[] colors = {"#3b82f6", "#8b5cf6", "#06b6d4", "#f59e0b", "#10b981", "#ef4444", "#6366f1", "#f97316"};
-        String accentColor = colors[Math.abs(classId % colors.length)];
+        String accent = colors[Math.abs(classId % colors.length)];
 
-        // ── Colored top bar (accent stripe) ──────────────────
         VBox headerBox = new VBox();
         headerBox.setPrefHeight(90);
         headerBox.setAlignment(Pos.BOTTOM_LEFT);
         headerBox.setSpacing(4);
-        headerBox.setStyle(
-                "-fx-background-color: " + accentColor + ";" +
-                "-fx-background-radius: 14 14 0 0;" +
-                "-fx-padding: 16 18 14 18;"
-        );
+        headerBox.setStyle("-fx-background-color: " + accent + "; -fx-background-radius: 14 14 0 0; -fx-padding: 16 18 14 18;");
 
-        Label classNameLabel = new Label(className);
-        classNameLabel.setStyle(
-                "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;" +
-                "-fx-font-family: 'Segoe UI';"
-        );
-        classNameLabel.setWrapText(true);
-        classNameLabel.setMaxWidth(264);
+        Label nameLabel = new Label(className);
+        nameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white; -fx-font-family: 'Segoe UI';");
+        nameLabel.setWrapText(true);
+        nameLabel.setMaxWidth(264);
 
         Label idBadge = new Label("ID " + classId);
-        idBadge.setStyle(
-                "-fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.75);" +
-                "-fx-font-family: 'Segoe UI'; -fx-font-weight: bold;"
-        );
+        idBadge.setStyle("-fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.75); -fx-font-family: 'Segoe UI'; -fx-font-weight: bold;");
+        headerBox.getChildren().addAll(nameLabel, idBadge);
 
-        headerBox.getChildren().addAll(classNameLabel, idBadge);
-
-        // ── White content area ────────────────────────────────
-        VBox contentBox = new VBox();
-        contentBox.setStyle("-fx-background-color: white; -fx-background-radius: 0 0 14 14; -fx-padding: 16 18 18 18;");
-        contentBox.setSpacing(10);
-        VBox.setVgrow(contentBox, Priority.ALWAYS);
-
-        Label topicLabel = new Label(topic == null || topic.isEmpty()
-                ? LocaleManager.getBundle().getString("home.noTopic")
-                : topic);
-        topicLabel.setStyle(
-                "-fx-font-size: 13px; -fx-text-fill: #475569; -fx-font-family: 'Segoe UI';"
-        );
+        Label topicLabel = new Label(topic == null || topic.isEmpty() ? LocaleManager.getBundle().getString("home.noTopic") : topic);
+        topicLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #475569; -fx-font-family: 'Segoe UI';");
         topicLabel.setWrapText(true);
         topicLabel.setMaxWidth(264);
 
@@ -240,36 +154,23 @@ String topic = courseJson.has("topic") ? courseJson.get("topic").getAsString() :
         Button viewButton = new Button(LocaleManager.getBundle().getString("home.openClass"));
         viewButton.setPrefWidth(264);
         viewButton.setPrefHeight(38);
-        viewButton.setStyle(
-                "-fx-background-color: " + accentColor + ";" +
-                "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;" +
-                "-fx-background-radius: 8; -fx-cursor: hand; -fx-font-family: 'Segoe UI';"
-        );
+        viewButton.setStyle("-fx-background-color: " + accent + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-family: 'Segoe UI';");
         viewButton.setOnAction(e -> SceneManager.loadClass(classId));
 
-        contentBox.getChildren().addAll(topicLabel, spacer, viewButton);
+        VBox contentBox = new VBox(10, topicLabel, spacer, viewButton);
+        contentBox.setStyle("-fx-background-color: white; -fx-background-radius: 0 0 14 14; -fx-padding: 16 18 18 18;");
+        VBox.setVgrow(contentBox, Priority.ALWAYS);
 
-        card.getChildren().addAll(headerBox, contentBox);
-        card.setStyle(
-                "-fx-background-color: white;" +
-                "-fx-background-radius: 14;" +
-                "-fx-effect: dropshadow(gaussian, rgba(15,23,42,0.09), 16, 0, 0, 4);" +
-                "-fx-cursor: hand;"
-        );
+        String cardStyle = "-fx-background-color: white; -fx-background-radius: 14; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.09), 16, 0, 0, 4); -fx-cursor: hand;";
+        String hoverStyle = "-fx-background-color: white; -fx-background-radius: 14; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.16), 22, 0, 0, 8); -fx-cursor: hand;";
 
-        card.setOnMouseEntered(e -> card.setStyle(
-                "-fx-background-color: white;" +
-                "-fx-background-radius: 14;" +
-                "-fx-effect: dropshadow(gaussian, rgba(15,23,42,0.16), 22, 0, 0, 8);" +
-                "-fx-cursor: hand;"
-        ));
-        card.setOnMouseExited(e -> card.setStyle(
-                "-fx-background-color: white;" +
-                "-fx-background-radius: 14;" +
-                "-fx-effect: dropshadow(gaussian, rgba(15,23,42,0.09), 16, 0, 0, 4);" +
-                "-fx-cursor: hand;"
-        ));
-
+        VBox card = new VBox(0, headerBox, contentBox);
+        card.setPrefWidth(300);
+        card.setMinHeight(240);
+        card.setMaxHeight(360);
+        card.setStyle(cardStyle);
+        card.setOnMouseEntered(e -> card.setStyle(hoverStyle));
+        card.setOnMouseExited(e -> card.setStyle(cardStyle));
         return card;
     }
 
@@ -282,24 +183,17 @@ String topic = courseJson.has("topic") ? courseJson.get("topic").getAsString() :
         TextField classIdField = new TextField();
         classIdField.setPromptText(LocaleManager.getBundle().getString("home.joinClass.prompt"));
 
-        VBox content = new VBox(10);
+        VBox content = new VBox(10, classIdField);
         content.setPadding(new Insets(20));
-        content.getChildren().add(classIdField);
-
         dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().getButtonTypes().addAll(
-                javafx.scene.control.ButtonType.OK,
-                javafx.scene.control.ButtonType.CANCEL
-        );
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent() && !classIdField.getText().isEmpty()) {
+        dialog.showAndWait();
+        if (!classIdField.getText().isEmpty()) {
             try {
-                Integer classId = Integer.parseInt(classIdField.getText());
-                // Navigate to class view
-                SceneManager.loadClass(classId);
+                SceneManager.loadClass(Integer.parseInt(classIdField.getText()));
             } catch (NumberFormatException e) {
-                showError(LocaleManager.getBundle().getString("home.error.title"),
+                showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("home.error.title"),
                         LocaleManager.getBundle().getString("home.invalidInput"));
             }
         }
@@ -313,84 +207,65 @@ String topic = courseJson.has("topic") ? courseJson.get("topic").getAsString() :
 
         TextField classNameField = new TextField();
         classNameField.setPromptText(LocaleManager.getBundle().getString("home.createClass.namePrompt"));
-
         TextField topicField = new TextField();
         topicField.setPromptText(LocaleManager.getBundle().getString("home.createClass.topicPrompt"));
 
-        VBox content = new VBox(10);
+        VBox content = new VBox(10,
+                new Label(LocaleManager.getBundle().getString("home.createClass.nameLabel")), classNameField,
+                new Label(LocaleManager.getBundle().getString("home.createClass.topicLabel")), topicField);
         content.setPadding(new Insets(20));
-        content.getChildren().addAll(
-                new Label(LocaleManager.getBundle().getString("home.createClass.nameLabel")),
-                classNameField,
-                new Label(LocaleManager.getBundle().getString("home.createClass.topicLabel")),
-                topicField
-        );
-
         dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().getButtonTypes().addAll(
-                javafx.scene.control.ButtonType.OK,
-                javafx.scene.control.ButtonType.CANCEL
-        );
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent() && !classNameField.getText().isEmpty()) {
+        dialog.showAndWait();
+        if (!classNameField.getText().isEmpty()) {
             createClassOnServer(classNameField.getText(), topicField.getText());
         }
     }
 
     private void createClassOnServer(String className, String topic) {
-        new Thread(() -> {
+        runAsync(() -> {
             try {
-                String token = SessionManager.getToken();
+                JsonObject data = new JsonObject();
+                data.addProperty("className", className);
+                data.addProperty("topic", topic);
 
-                JsonObject courseData = new JsonObject();
-                courseData.addProperty("className", className);
-                courseData.addProperty("topic", topic);
-
-                HttpClient client = HttpClient.newHttpClient();
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI("http://localhost:7700/api/courses"))
-                        .header("Authorization", "Bearer " + token)
-                        .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString(courseData.toString()))
-                        .build();
-
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                HttpResponse<String> response = httpClient.send(
+                        HttpRequest.newBuilder()
+                                .uri(new URI("http://localhost:7700/api/courses"))
+                                .header("Authorization", "Bearer " + SessionManager.getToken())
+                                .header("Content-Type", "application/json")
+                                .POST(HttpRequest.BodyPublishers.ofString(data.toString())).build(),
+                        HttpResponse.BodyHandlers.ofString());
 
                 Platform.runLater(() -> {
                     if (response.statusCode() == 201 || response.statusCode() == 200) {
-                        showSuccess(LocaleManager.getBundle().getString("home.success.title"),
+                        showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString("home.success.title"),
                                 LocaleManager.getBundle().getString("home.createClass.success"));
-                        // Reload classes
                         loadUserClasses();
                     } else {
-                        showError(LocaleManager.getBundle().getString("home.error.title"),
+                        showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("home.error.title"),
                                 MessageFormat.format(LocaleManager.getBundle().getString("home.error.createClass"), response.statusCode()));
                     }
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> {
-                    showError(LocaleManager.getBundle().getString("home.error.title"),
-                            MessageFormat.format(LocaleManager.getBundle().getString("home.error.createClassException"), e.getMessage()));
-                    e.printStackTrace();
-                });
+                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("home.error.title"),
+                        MessageFormat.format(LocaleManager.getBundle().getString("home.error.createClassException"), e.getMessage())));
             }
-        }).start();
+        });
     }
 
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
-    private void showSuccess(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private void runAsync(Runnable task) {
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        t.start();
     }
 }

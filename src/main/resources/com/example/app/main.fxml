@@ -33,17 +33,17 @@
                         <VBox alignment="TOP_CENTER" prefWidth="300.0" spacing="12.0" style="-fx-background-color: white; -fx-background-radius: 14;                                      -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 14, 0, 0, 4);                                      -fx-padding: 28 24 28 24;">
                             <Label style="-fx-font-size: 32px; -fx-font-family: 'Segoe UI Emoji', 'Noto Color Emoji', 'EmojiOne', sans-serif;" text="" />
                             <Label maxWidth="252.0" prefWidth="252.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;                                           -fx-font-family: 'Segoe UI', sans-serif;" text="%main.cards.library.title" textAlignment="CENTER" wrapText="true" />
-                            <Label fx:id="libraryDescLabel" maxWidth="252.0" prefWidth="252.0" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI', sans-serif;" text="%main.cards.library.desc" textAlignment="CENTER" wrapText="true" />
+                            <Label maxWidth="252.0" prefWidth="252.0" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI', sans-serif;" text="%main.cards.library.desc" textAlignment="CENTER" wrapText="true" />
                         </VBox>
                         <VBox alignment="TOP_CENTER" prefWidth="300.0" spacing="12.0" style="-fx-background-color: white; -fx-background-radius: 14;                                      -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 14, 0, 0, 4);                                      -fx-padding: 28 24 28 24;">
                             <Label style="-fx-font-size: 32px; -fx-font-family: 'Segoe UI Emoji', 'Noto Color Emoji', 'EmojiOne', sans-serif;" text="" />
                             <Label maxWidth="252.0" prefWidth="252.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;                                           -fx-font-family: 'Segoe UI', sans-serif;" text="%main.cards.instructors.title" textAlignment="CENTER" wrapText="true" />
-                            <Label fx:id="instructorsDescLabel" maxWidth="252.0" prefWidth="252.0" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI', sans-serif;" text="%main.cards.instructors.desc" textAlignment="CENTER" wrapText="true" />
+                            <Label maxWidth="252.0" prefWidth="252.0" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI', sans-serif;" text="%main.cards.instructors.desc" textAlignment="CENTER" wrapText="true" />
                         </VBox>
                         <VBox alignment="TOP_CENTER" prefWidth="300.0" spacing="12.0" style="-fx-background-color: white; -fx-background-radius: 14;                                      -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 14, 0, 0, 4);                                      -fx-padding: 28 24 28 24;">
                             <Label style="-fx-font-size: 32px; -fx-font-family: 'Segoe UI Emoji', 'Noto Color Emoji', 'EmojiOne', sans-serif;" text="" />
                             <Label maxWidth="252.0" prefWidth="252.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;                                           -fx-font-family: 'Segoe UI', sans-serif;" text="%main.cards.reviews.title" textAlignment="CENTER" wrapText="true" />
-                            <Label fx:id="reviewsDescLabel" maxWidth="252.0" prefWidth="252.0" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI', sans-serif;" text="%main.cards.reviews.desc" textAlignment="CENTER" wrapText="true" />
+                            <Label maxWidth="252.0" prefWidth="252.0" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI', sans-serif;" text="%main.cards.reviews.desc" textAlignment="CENTER" wrapText="true" />
                         </VBox>
                     </HBox>
                 </VBox>

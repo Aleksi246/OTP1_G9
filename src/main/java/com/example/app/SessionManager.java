@@ -1,8 +1,5 @@
 package com.example.app;
 
-/**
- * Manages the current user session
- */
 public class SessionManager {
     private static String currentUsername;
     private static String currentEmail;

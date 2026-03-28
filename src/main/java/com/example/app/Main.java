@@ -1,4 +1,3 @@
-// src/main/java/com/example/app/Main.java
 package com.example.app;
 
 import com.example.otp.controllers.*;
@@ -21,45 +20,33 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        // Force UTF-8 for frontend resource loading
         System.setProperty("file.encoding", "UTF-8");
-
-        // Initialize database before starting the server
         DatabaseInitializer.initializeDatabase();
 
-        // Start Javalin server in another thread to avoid blocking JavaFX application
         new Thread(() -> {
-
-            // Initialize controllers
             UserController userController = new UserController();
             CourseController courseController = new CourseController();
             MaterialController materialController = new MaterialController();
             ReviewController reviewController = new ReviewController();
             ParticipantController participantController = new ParticipantController();
 
-            // Start Javalin server
             Javalin app = Javalin.create(config -> {
-                config.bundledPlugins.enableCors(cors -> {
-                    cors.addRule(it -> {
-                        it.anyHost();
-                    });
-                });
+                config.bundledPlugins.enableCors(cors -> cors.addRule(it -> it.anyHost()));
             }).start(7700);
 
-            // Authentication middleware - only for protected routes
-            app.before("/api/users", ctx -> checkAuth(ctx));
-            app.before("/api/users/{id}", ctx -> checkAuth(ctx));
-            app.before("/api/courses", ctx -> checkAuth(ctx));
-            app.before("/api/courses/{id}", ctx -> checkAuth(ctx));
-            app.before("/api/materials", ctx -> checkAuth(ctx));
-            app.before("/api/materials/{id}", ctx -> checkAuth(ctx));
-            app.before("/api/materials/{id}/download", ctx -> checkAuth(ctx));
-            app.before("/api/participants/unenroll", ctx -> checkAuth(ctx));
-            app.before("/api/participants/class/{classId}", ctx -> checkAuth(ctx));
-            app.before("/api/participants/user/{userId}", ctx -> checkAuth(ctx));
-            app.before("/api/auth/change-password", ctx -> checkAuth(ctx));
+            // Auth middleware for protected routes
+            String[] protectedPaths = {
+                "/api/users", "/api/users/{id}",
+                "/api/courses", "/api/courses/{id}",
+                "/api/materials", "/api/materials/{id}", "/api/materials/{id}/download",
+                "/api/participants/unenroll", "/api/participants/class/{classId}", "/api/participants/user/{userId}",
+                "/api/auth/change-password"
+            };
+            for (String path : protectedPaths) {
+                app.before(path, ctx -> checkAuth(ctx));
+            }
 
-
+            // Auth routes
             app.post("/api/auth/register", userController::register);
             app.post("/api/auth/login", userController::login);
             app.put("/api/auth/change-password", userController::changePassword);
@@ -96,8 +83,6 @@ public class Main extends Application {
             app.delete("/api/participants/unenroll", participantController::unenrollUser);
             app.get("/api/participants/class/{classId}", participantController::getUsersByClass);
             app.get("/api/participants/user/{userId}", participantController::getClassesByUser);
-
-            System.out.println("Server started on port 7700");
         }).start();
 
         launch(args);
@@ -108,8 +93,7 @@ public class Main extends Application {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new UnauthorizedResponse("Missing or invalid token");
         }
-        String token = authHeader.substring(7);
-        String email = JWTUtil.validateToken(token);
+        String email = JWTUtil.validateToken(authHeader.substring(7));
         if (email == null) {
             throw new UnauthorizedResponse("Invalid token");
         }
