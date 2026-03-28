@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -40,7 +41,7 @@ public class LoginController {
         String password = passwordField.getText().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            showError("Username and password required");
+            showError(LocaleManager.getBundle().getString("login.error.required"));
             return;
         }
 
@@ -53,7 +54,7 @@ public class LoginController {
         String password = passwordField.getText().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            showError("Username and password required");
+            showError(LocaleManager.getBundle().getString("login.error.required"));
             return;
         }
 
@@ -81,7 +82,7 @@ public class LoginController {
                 String responseBody = response.body();
                 String token = extractToken(responseBody);
                 if (token != null) {
-                    errorLabel.setText("Login successful!");
+                    errorLabel.setText(LocaleManager.getBundle().getString("login.success.login"));
                     String userType = JWTHelper.getUserTypeFromToken(token);
                     String email = extractJsonField(responseBody, "email");
                     if (email == null || email.isBlank()) {
@@ -95,13 +96,13 @@ public class LoginController {
                     SessionManager.setSession(username, email, token, userType);
                     SceneManager.loadHome();
                 } else {
-                    showError("Failed to extract token from response");
+                    showError(LocaleManager.getBundle().getString("login.error.token"));
                 }
             } else {
-                showError("Login failed: " + response.statusCode());
+                showError(MessageFormat.format(LocaleManager.getBundle().getString("login.error.failed"), response.statusCode()));
             }
         } catch (IOException | InterruptedException ex) {
-            showError("Connection error: " + ex.getMessage());
+            showError(MessageFormat.format(LocaleManager.getBundle().getString("login.error.connection"), ex.getMessage()));
         }
     }
 
@@ -119,14 +120,14 @@ public class LoginController {
             if (response.statusCode() == 201) {
                 usernameField.setText("");
                 passwordField.setText("");
-                errorLabel.setText("Registration successful! Please log in.");
+                errorLabel.setText(LocaleManager.getBundle().getString("login.success.registration"));
             } else if (response.statusCode() == 409) {
-                showError("Username already exists");
+                showError(LocaleManager.getBundle().getString("login.error.username.exists"));
             } else {
-                showError("Registration failed: " + response.statusCode());
+                showError(MessageFormat.format(LocaleManager.getBundle().getString("login.error.registration.failed"), response.statusCode()));
             }
         } catch (IOException | InterruptedException ex) {
-            showError("Connection error: " + ex.getMessage());
+            showError(MessageFormat.format(LocaleManager.getBundle().getString("login.error.connection"), ex.getMessage()));
         }
     }
 

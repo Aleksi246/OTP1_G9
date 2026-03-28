@@ -121,7 +121,8 @@ public class ClassController {
         setUploadProgressVisible(false, "");
 
         if (classId == null) {
-            showError("Error", "Class ID not provided");
+            showError(LocaleManager.getBundle().getString("class.error.title"),
+                    LocaleManager.getBundle().getString("class.error.missingId"));
             return;
         }
 
@@ -178,7 +179,8 @@ public class ClassController {
 
                 loadMaterials();
             } catch (Exception e) {
-                Platform.runLater(() -> showError("Error", "Failed to load class: " + e.getMessage()));
+                Platform.runLater(() -> showError(LocaleManager.getBundle().getString("class.error.title"),
+                        MessageFormat.format(LocaleManager.getBundle().getString("class.error.failedLoad"), e.getMessage())));
             }
         });
     }
@@ -438,7 +440,8 @@ public class ClassController {
 
             dialogStage.showAndWait();
         } catch (Exception e) {
-            showError("Reviews", "Could not open reviews: " + e.getMessage());
+            showError(LocaleManager.getBundle().getString("class.error.reviews.title"),
+                    MessageFormat.format(LocaleManager.getBundle().getString("class.error.openReviews"), e.getMessage()));
         }
     }
 
@@ -480,7 +483,7 @@ public class ClassController {
                     : MessageFormat.format(LocaleManager.getBundle().getString("class.reviewCount"), lines.size());
             return new ReviewsFetchResult(status, lines);
         } catch (Exception e) {
-            return new ReviewsFetchResult("Review list API unavailable. Connect backend GET /api/reviews/material/{fileId}.", new ArrayList<>());
+            return new ReviewsFetchResult(LocaleManager.getBundle().getString("class.error.reviewListUnavailable"), new ArrayList<>());
         }
     }
 
@@ -491,7 +494,8 @@ public class ClassController {
                                   Button reviewButton,
                                   Label rowStatusLabel) {
         if (isCreator) {
-            showError("Forbidden", "Creators cannot review class materials.");
+            showError(LocaleManager.getBundle().getString("class.error.title"),
+                    LocaleManager.getBundle().getString("class.error.forbiddenReview"));
             return;
         }
         if (fileId == null) {
@@ -526,7 +530,8 @@ public class ClassController {
                 );
             }
         } catch (Exception e) {
-            showError("Review", "Could not open review form: " + e.getMessage());
+            showError(LocaleManager.getBundle().getString("class.error.review.title"),
+                    MessageFormat.format(LocaleManager.getBundle().getString("class.error.openReviewForm"), e.getMessage()));
         }
     }
 
@@ -538,17 +543,20 @@ public class ClassController {
                                     Button reviewButton,
                                     Label rowStatusLabel) {
         if (isCreator) {
-            showError("Forbidden", "Creators cannot review class materials.");
+            showError(LocaleManager.getBundle().getString("class.error.title"),
+                    LocaleManager.getBundle().getString("class.error.forbiddenReview"));
             return;
         }
 
         String trimmedComment = comment == null ? "" : comment.trim();
         if (rating == null || rating < 1 || rating > 5) {
-            showError("Invalid review", "Rating must be between 1 and 5.");
+            showError(LocaleManager.getBundle().getString("class.error.review.title"),
+                    LocaleManager.getBundle().getString("class.error.invalidRating"));
             return;
         }
         if (trimmedComment.isBlank() || trimmedComment.length() > REVIEW_COMMENT_MAX_LENGTH) {
-            showError("Invalid review", "Comment must be between 1 and " + REVIEW_COMMENT_MAX_LENGTH + " characters.");
+            showError(LocaleManager.getBundle().getString("class.error.review.title"),
+                    MessageFormat.format(LocaleManager.getBundle().getString("class.error.invalidComment"), REVIEW_COMMENT_MAX_LENGTH));
             return;
         }
 
@@ -557,7 +565,7 @@ public class ClassController {
         if (deleteButton != null && deleteButton.isManaged()) {
             deleteButton.setDisable(true);
         }
-        rowStatusLabel.setText("Submitting review...");
+        rowStatusLabel.setText(LocaleManager.getBundle().getString("class.status.submittingReview"));
         rowStatusLabel.setVisible(true);
         rowStatusLabel.setManaged(true);
 
@@ -575,9 +583,10 @@ public class ClassController {
                 rowStatusLabel.setManaged(true);
 
                 if (result.success) {
-                    showSuccess("Review submitted", "Thanks! Your review was submitted.");
+                    showSuccess(LocaleManager.getBundle().getString("home.success.title"),
+                            LocaleManager.getBundle().getString("class.success.reviewSubmitted"));
                 } else {
-                    showError("Review failed", result.message);
+                    showError(LocaleManager.getBundle().getString("class.error.reviewFailed"), result.message);
                 }
             });
         });
@@ -631,13 +640,16 @@ public class ClassController {
                         isEnrolled = true;
                         updateAccessUi();
                         loadMaterials();
-                        showSuccess("Success", "You have successfully joined the class!");
+                        showSuccess(LocaleManager.getBundle().getString("home.success.title"),
+                                LocaleManager.getBundle().getString("class.success.joined"));
                     } else {
-                        showError("Error", "Failed to join class: " + response.statusCode());
+                        showError(LocaleManager.getBundle().getString("class.error.title"),
+                                MessageFormat.format(LocaleManager.getBundle().getString("class.error.joinFailed"), response.statusCode()));
                     }
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> showError("Error", "Failed to join class: " + e.getMessage()));
+                Platform.runLater(() -> showError(LocaleManager.getBundle().getString("class.error.title"),
+                        MessageFormat.format(LocaleManager.getBundle().getString("class.error.joinFailed"), e.getMessage())));
             }
         });
     }
@@ -645,12 +657,13 @@ public class ClassController {
     @FXML
     private void handleChooseFile() {
         if (!isCreator) {
-            showError("Forbidden", "Only the class creator can upload materials.");
+            showError(LocaleManager.getBundle().getString("class.error.title"),
+                    LocaleManager.getBundle().getString("class.error.onlyCreatorUpload"));
             return;
         }
 
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("Select Material File");
+        chooser.setTitle(LocaleManager.getBundle().getString("class.dialog.selectMaterialFile"));
         File file = chooser.showOpenDialog(classNameLabel.getScene().getWindow());
         if (file != null) {
             selectedFile = file;
@@ -661,22 +674,25 @@ public class ClassController {
     @FXML
     private void handleUploadMaterial() {
         if (!isCreator) {
-            showError("Forbidden", "Only the class creator can upload materials.");
+            showError(LocaleManager.getBundle().getString("class.error.title"),
+                    LocaleManager.getBundle().getString("class.error.onlyCreatorUpload"));
             return;
         }
         if (selectedFile == null) {
-            showError("Missing file", "Choose a file before uploading.");
+            showError(LocaleManager.getBundle().getString("class.error.title"),
+                    LocaleManager.getBundle().getString("class.error.missingFile"));
             return;
         }
 
         String materialType = materialTypeCombo.getValue();
         if (materialType == null || materialType.isBlank()) {
-            showError("Missing type", "Select a material type.");
+            showError(LocaleManager.getBundle().getString("class.error.title"),
+                    LocaleManager.getBundle().getString("class.error.missingType"));
             return;
         }
 
         File fileToUpload = selectedFile;
-        setUploadProgressVisible(true, "Uploading " + fileToUpload.getName() + "...");
+        setUploadProgressVisible(true, MessageFormat.format(LocaleManager.getBundle().getString("class.status.uploadingFile"), fileToUpload.getName()));
         uploadButton.setDisable(true);
         runAsync(() -> {
             try {
@@ -697,18 +713,20 @@ public class ClassController {
                     setUploadProgressVisible(false, "");
                     if (response.statusCode() == 201 || response.statusCode() == 200) {
                         selectedFile = null;
-                        selectedFileLabel.setText("No file selected");
-                        showSuccess("Uploaded", "Material uploaded successfully.");
+                        selectedFileLabel.setText(LocaleManager.getBundle().getString("class.noFileSelected"));
+                        showSuccess(LocaleManager.getBundle().getString("home.success.title"),
+                                LocaleManager.getBundle().getString("class.success.uploaded"));
                         loadMaterials();
                     } else {
-                        showError("Upload failed", extractApiMessage(response.body(), "Server responded with " + response.statusCode()));
+                        showError(LocaleManager.getBundle().getString("class.error.uploadFailed"),
+                                extractApiMessage(response.body(), MessageFormat.format(LocaleManager.getBundle().getString("class.error.serverResponse"), response.statusCode())));
                     }
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     uploadButton.setDisable(false);
                     setUploadProgressVisible(false, "");
-                    showError("Upload failed", e.getMessage());
+                    showError(LocaleManager.getBundle().getString("class.error.uploadFailed"), e.getMessage());
                 });
             }
         });
@@ -751,15 +769,16 @@ public class ClassController {
         }
 
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("Save Material");
-        chooser.setInitialFileName(filename == null || filename.isBlank() ? "material" : filename);
+        chooser.setTitle(LocaleManager.getBundle().getString("class.dialog.saveMaterial"));
+        chooser.setInitialFileName(filename == null || filename.isBlank() ? LocaleManager.getBundle().getString("class.unknown") : filename);
 
         File destination = chooser.showSaveDialog(classNameLabel.getScene().getWindow());
         if (destination == null) {
             return;
         }
 
-        setRowActionState(downloadButton, deleteButton, rowStatusLabel, true, "Downloading...");
+        setRowActionState(downloadButton, deleteButton, rowStatusLabel, true,
+                LocaleManager.getBundle().getString("class.status.downloading"));
         runAsync(() -> {
             try {
                 HttpRequest request = HttpRequest.newBuilder()
@@ -774,18 +793,20 @@ public class ClassController {
                     Files.write(destination.toPath(), response.body());
                     Platform.runLater(() -> {
                         setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
-                        showSuccess("Download complete", "Saved to: " + destination.getAbsolutePath());
+                        showSuccess(LocaleManager.getBundle().getString("class.success.downloadComplete"),
+                                MessageFormat.format(LocaleManager.getBundle().getString("class.success.downloadSaved"), destination.getAbsolutePath()));
                     });
                 } else {
                     Platform.runLater(() -> {
                         setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
-                        showError("Download failed", "Server responded with " + response.statusCode());
+                        showError(LocaleManager.getBundle().getString("class.error.downloadFailed"),
+                                MessageFormat.format(LocaleManager.getBundle().getString("class.error.serverResponse"), response.statusCode()));
                     });
                 }
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
-                    showError("Download failed", e.getMessage());
+                    showError(LocaleManager.getBundle().getString("class.error.downloadFailed"), e.getMessage());
                 });
             }
         });
@@ -796,7 +817,8 @@ public class ClassController {
             return;
         }
 
-        setRowActionState(downloadButton, deleteButton, rowStatusLabel, true, "Deleting...");
+        setRowActionState(downloadButton, deleteButton, rowStatusLabel, true,
+                LocaleManager.getBundle().getString("class.status.deleting"));
         runAsync(() -> {
             try {
                 HttpRequest request = HttpRequest.newBuilder()
@@ -810,16 +832,18 @@ public class ClassController {
                 Platform.runLater(() -> {
                     setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
                     if (response.statusCode() == 200) {
-                        showSuccess("Deleted", "Removed: " + filename);
+                        showSuccess(LocaleManager.getBundle().getString("home.success.title"),
+                                MessageFormat.format(LocaleManager.getBundle().getString("class.success.deleted"), filename));
                         loadMaterials();
                     } else {
-                        showError("Delete failed", extractApiMessage(response.body(), "Server responded with " + response.statusCode()));
+                        showError(LocaleManager.getBundle().getString("class.error.deleteFailed"),
+                                extractApiMessage(response.body(), MessageFormat.format(LocaleManager.getBundle().getString("class.error.serverResponse"), response.statusCode())));
                     }
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
-                    showError("Delete failed", e.getMessage());
+                    showError(LocaleManager.getBundle().getString("class.error.deleteFailed"), e.getMessage());
                 });
             }
         });
@@ -882,14 +906,15 @@ public class ClassController {
     @FXML
     private void handleDeleteClass() {
         if (!isCreator) {
-            showError("Error", "Only the class creator can delete this class.");
+            showError(LocaleManager.getBundle().getString("class.error.title"),
+                    LocaleManager.getBundle().getString("class.error.onlyCreatorDelete"));
             return;
         }
 
         Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmDialog.setTitle("Delete Class");
-        confirmDialog.setHeaderText("Are you sure?");
-        confirmDialog.setContentText("Deleting this class will remove it permanently for all users. This action cannot be undone.");
+        confirmDialog.setTitle(LocaleManager.getBundle().getString("class.confirm.delete.title"));
+        confirmDialog.setHeaderText(LocaleManager.getBundle().getString("class.confirm.delete.header"));
+        confirmDialog.setContentText(LocaleManager.getBundle().getString("class.confirm.delete.content"));
 
         if (confirmDialog.showAndWait().isEmpty() || confirmDialog.getResult() != ButtonType.OK) {
             return;
@@ -907,14 +932,17 @@ public class ClassController {
 
                 if (response.statusCode() == 200 || response.statusCode() == 204) {
                     Platform.runLater(() -> {
-                        showSuccess("Success", "Class deleted successfully.");
+                        showSuccess(LocaleManager.getBundle().getString("home.success.title"),
+                                LocaleManager.getBundle().getString("class.success.classDeleted"));
                         SceneManager.loadHome();
                     });
                 } else {
-                    Platform.runLater(() -> showError("Error", "Failed to delete class. Status: " + response.statusCode()));
+                    Platform.runLater(() -> showError(LocaleManager.getBundle().getString("class.error.title"),
+                            MessageFormat.format(LocaleManager.getBundle().getString("class.error.classDeleteFailed"), response.statusCode())));
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> showError("Error", "Failed to delete class: " + e.getMessage()));
+                Platform.runLater(() -> showError(LocaleManager.getBundle().getString("class.error.title"),
+                        MessageFormat.format(LocaleManager.getBundle().getString("class.error.classDeleteFailedDetailed"), e.getMessage())));
             }
         });
     }
@@ -922,15 +950,15 @@ public class ClassController {
     @FXML
     private void handleLeaveClass() {
         if (!isEnrolled || isCreator) {
-            showError("Error", "You are not enrolled in this class or you are the creator.");
+            showError(LocaleManager.getBundle().getString("class.error.title"),
+                    LocaleManager.getBundle().getString("class.error.notEnrolled"));
             return;
         }
 
         Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmDialog.setTitle("Leave Class");
-        confirmDialog.setHeaderText("Are you sure?");
-        confirmDialog.setContentText("You will be removed from this class and lose access to the materials.");
-
+        confirmDialog.setTitle(LocaleManager.getBundle().getString("class.confirm.leave.title"));
+        confirmDialog.setHeaderText(LocaleManager.getBundle().getString("class.confirm.leave.header"));
+        confirmDialog.setContentText(LocaleManager.getBundle().getString("class.confirm.leave.content"));
         if (confirmDialog.showAndWait().isEmpty() || confirmDialog.getResult() != ButtonType.OK) {
             return;
         }
@@ -952,14 +980,17 @@ public class ClassController {
 
                 if (response.statusCode() == 200 || response.statusCode() == 204) {
                     Platform.runLater(() -> {
-                        showSuccess("Success", "You have left the class.");
+                        showSuccess(LocaleManager.getBundle().getString("home.success.title"),
+                                LocaleManager.getBundle().getString("class.success.leftClass"));
                         SceneManager.loadHome();
                     });
                 } else {
-                    Platform.runLater(() -> showError("Error", "Failed to leave class. Status: " + response.statusCode()));
+                    Platform.runLater(() -> showError(LocaleManager.getBundle().getString("class.error.title"),
+                            MessageFormat.format(LocaleManager.getBundle().getString("class.error.leaveFailed"), response.statusCode())));
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> showError("Error", "Failed to leave class: " + e.getMessage()));
+                Platform.runLater(() -> showError(LocaleManager.getBundle().getString("class.error.title"),
+                        MessageFormat.format(LocaleManager.getBundle().getString("class.error.leaveFailedDetailed"), e.getMessage())));
             }
         });
     }

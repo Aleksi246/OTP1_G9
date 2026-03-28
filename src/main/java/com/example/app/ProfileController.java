@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -40,13 +41,13 @@ public class ProfileController {
         if (username != null) {
             usernameLabel.setText(username);
         } else {
-            usernameLabel.setText("Unknown");
+            usernameLabel.setText(LocaleManager.getBundle().getString("profile.unknown"));
         }
 
         if (email != null) {
             emailLabel.setText(email);
         } else {
-            emailLabel.setText("Unknown");
+            emailLabel.setText(LocaleManager.getBundle().getString("profile.unknown"));
         }
     }
 
@@ -58,32 +59,32 @@ public class ProfileController {
 
         // Validation
         if (currentPassword.isEmpty()) {
-            showError("Current password is required");
+            showError(LocaleManager.getBundle().getString("profile.error.currentPasswordRequired"));
             return;
         }
 
         if (newPassword.isEmpty()) {
-            showError("New password is required");
+            showError(LocaleManager.getBundle().getString("profile.error.newPasswordRequired"));
             return;
         }
 
         if (confirmPassword.isEmpty()) {
-            showError("Please confirm your new password");
+            showError(LocaleManager.getBundle().getString("profile.error.confirmPasswordRequired"));
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            showError("New passwords do not match");
+            showError(LocaleManager.getBundle().getString("profile.error.passwordMismatch"));
             return;
         }
 
         if (newPassword.equals(currentPassword)) {
-            showError("New password must be different from current password");
+            showError(LocaleManager.getBundle().getString("profile.error.passwordDifferent"));
             return;
         }
 
         if (newPassword.length() < 6) {
-            showError("New password must be at least 6 characters");
+            showError(LocaleManager.getBundle().getString("profile.error.passwordMinLength"));
             return;
         }
 
@@ -108,18 +109,18 @@ public class ProfileController {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                showSuccess("Password changed successfully!");
+                showSuccess(LocaleManager.getBundle().getString("profile.success.passwordChanged"));
                 // Clear the password fields
                 currentPasswordField.clear();
                 newPasswordField.clear();
                 confirmPasswordField.clear();
             } else if (response.statusCode() == 401) {
-                showError("Current password is incorrect");
+                showError(LocaleManager.getBundle().getString("profile.error.currentPasswordIncorrect"));
             } else {
-                showError("Password change failed: " + response.statusCode());
+                showError(MessageFormat.format(LocaleManager.getBundle().getString("profile.error.passwordChangeFailed"), response.statusCode()));
             }
         } catch (IOException | InterruptedException ex) {
-            showError("Connection error: " + ex.getMessage());
+            showError(MessageFormat.format(LocaleManager.getBundle().getString("profile.error.connection"), ex.getMessage()));
         }
     }
 
