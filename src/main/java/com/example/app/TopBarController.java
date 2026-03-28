@@ -23,7 +23,7 @@ public class TopBarController {
     @FXML
     private void initialize() {
         if (languageChoiceBox != null) {
-            languageChoiceBox.getItems().setAll(Locale.ENGLISH, Locale.FRENCH, new Locale("fa"));
+            languageChoiceBox.getItems().setAll(Locale.ENGLISH, Locale.FRENCH, new Locale("fa"), new Locale("ru"));
             languageChoiceBox.setConverter(new StringConverter<>() {
                 @Override
                 public String toString(Locale locale) {
@@ -32,6 +32,9 @@ public class TopBarController {
                     }
                     if ("fa".equals(locale.getLanguage())) {
                         return "فارسی";
+                    }
+                    if ("ru".equals(locale.getLanguage())) {
+                        return "Русский";
                     }
                     if (Locale.FRENCH.equals(locale)) {
                         return "Français";
@@ -46,6 +49,9 @@ public class TopBarController {
                     }
                     if (string.equals("فارسی")) {
                         return new Locale("fa");
+                    }
+                    if (string.equals("Русский")) {
+                        return new Locale("ru");
                     }
                     if (string.equals("Français")) {
                         return Locale.FRENCH;
