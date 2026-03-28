@@ -25,6 +25,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.ByteArrayOutputStream;
+import java.text.MessageFormat;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -150,13 +151,14 @@ public class ClassController {
                 HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
                 if (response.statusCode() != 200) {
-                    Platform.runLater(() -> showError("Error", "Failed to load class details"));
+                    Platform.runLater(() -> showError(LocaleManager.getBundle().getString("class.error.title"),
+                            LocaleManager.getBundle().getString("class.error.loadDetails")));
                     return;
                 }
 
                 JsonObject courseJson = JsonParser.parseString(response.body()).getAsJsonObject();
-                String className = getStringOrDefault(courseJson, "className", "Unknown class");
-                String topic = getStringOrDefault(courseJson, "topic", "No topic");
+                String className = getStringOrDefault(courseJson, "className", LocaleManager.getBundle().getString("class.unknown"));
+                String topic = getStringOrDefault(courseJson, "topic", LocaleManager.getBundle().getString("class.noTopic"));
                 creatorId = courseJson.has("creatorId") && !courseJson.get("creatorId").isJsonNull()
                         ? courseJson.get("creatorId").getAsInt()
                         : null;
@@ -166,9 +168,10 @@ public class ClassController {
 
                 Platform.runLater(() -> {
                     classNameLabel.setText(className);
-                    classIdLabel.setText("Class ID: " + classId);
-                    topicLabel.setText("Topic: " + topic);
-                    creatorLabel.setText("Created by: User #" + (creatorId == null ? "Unknown" : creatorId));
+                    classIdLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("class.classId"), classId));
+                    topicLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("class.topic"), topic));
+                    creatorLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("class.creator"),
+                            creatorId == null ? LocaleManager.getBundle().getString("class.creatorUnknown") : creatorId));
                     updateAccessUi();
                 });
 
@@ -316,11 +319,11 @@ public class ClassController {
         materialsContainer.getChildren().clear();
 
         if (materials.isEmpty()) {
-            materialsStatusLabel.setText("No files uploaded yet.");
+            materialsStatusLabel.setText(LocaleManager.getBundle().getString("class.noFilesUploadedYet"));
             return;
         }
 
-        materialsStatusLabel.setText(materials.size() + " file(s) available");
+        materialsStatusLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("class.filesAvailable"), materials.size()));
 
         for (JsonObject material : materials) {
             materialsContainer.getChildren().add(createMaterialCard(material));
@@ -333,8 +336,8 @@ public class ClassController {
         String type = getStringOrDefault(material, "materialType", "Other");
         String uploadedAt = getStringOrDefault(material, "uploadedAt", "Unknown date");
         String uploader = material.has("userId") && !material.get("userId").isJsonNull()
-                ? "Uploaded by user #" + material.get("userId").getAsInt()
-                : "Uploader unknown";
+                ? MessageFormat.format(LocaleManager.getBundle().getString("class.uploadedByUser"), material.get("userId").getAsInt())
+                : LocaleManager.getBundle().getString("class.uploaderUnknown");
 
         // File type badge color
         String badgeColor = switch (type.toLowerCase()) {
@@ -370,21 +373,21 @@ public class ClassController {
         String btnBase = "-fx-font-size: 12px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';" +
                          "-fx-padding: 7 14; -fx-background-radius: 7; -fx-cursor: hand;";
 
-        Button downloadButton = new Button("⬇ Download");
+        Button downloadButton = new Button(LocaleManager.getBundle().getString("class.download"));
         downloadButton.setStyle(btnBase + "-fx-background-color: #22c55e; -fx-text-fill: white;");
         downloadButton.setDisable(fileId == null);
 
-        Button viewReviewsButton = new Button("📋 Reviews");
+        Button viewReviewsButton = new Button(LocaleManager.getBundle().getString("class.reviews"));
         viewReviewsButton.setStyle(btnBase + "-fx-background-color: #e2e8f0; -fx-text-fill: #334155;");
         viewReviewsButton.setDisable(fileId == null);
 
-        Button reviewButton = new Button("⭐ Review");
+        Button reviewButton = new Button(LocaleManager.getBundle().getString("class.review"));
         reviewButton.setStyle(btnBase + "-fx-background-color: #3b82f6; -fx-text-fill: white;");
         reviewButton.setDisable(fileId == null || !isEnrolled);
         reviewButton.setVisible(!isCreator);
         reviewButton.setManaged(!isCreator);
 
-        Button deleteButton = new Button("🗑 Delete");
+        Button deleteButton = new Button(LocaleManager.getBundle().getString("class.delete"));
         deleteButton.setStyle(btnBase + "-fx-background-color: #fee2e2; -fx-text-fill: #dc2626;");
         deleteButton.setDisable(fileId == null);
         deleteButton.setVisible(isCreator);
@@ -463,16 +466,18 @@ public class ClassController {
                         ? String.valueOf(review.get("rating").getAsInt())
                         : "-";
                 String reviewer = review.has("userId") && !review.get("userId").isJsonNull()
-                        ? "User #" + review.get("userId").getAsInt()
-                        : "Unknown user";
+                        ? MessageFormat.format(LocaleManager.getBundle().getString("class.reviewer"), review.get("userId").getAsInt())
+                        : LocaleManager.getBundle().getString("class.unknownUser");
                 String comment = getStringOrDefault(review, "comment", getStringOrDefault(review, "review", ""));
                 if (comment.isBlank()) {
-                    comment = "(No comment)";
+                    comment = LocaleManager.getBundle().getString("class.noComment");
                 }
-                lines.add(rating + "/5 - " + reviewer + " - " + comment);
+                lines.add(MessageFormat.format(LocaleManager.getBundle().getString("class.reviewLine"), rating, reviewer, comment));
             }
 
-            String status = lines.isEmpty() ? "No reviews yet." : lines.size() + " review(s)";
+            String status = lines.isEmpty()
+                    ? LocaleManager.getBundle().getString("class.noReviewsYet")
+                    : MessageFormat.format(LocaleManager.getBundle().getString("class.reviewCount"), lines.size());
             return new ReviewsFetchResult(status, lines);
         } catch (Exception e) {
             return new ReviewsFetchResult("Review list API unavailable. Connect backend GET /api/reviews/material/{fileId}.", new ArrayList<>());
