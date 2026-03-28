@@ -1,6 +1,7 @@
 package com.example.app;
 
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -85,6 +86,7 @@ public class SceneManager {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/main.fxml"));
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
+            scene.getRoot().setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
             primaryStage.setTitle(LocaleManager.getBundle().getString("app.title") + " - Main");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -108,6 +110,7 @@ public class SceneManager {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/login.fxml"));
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
+            scene.getRoot().setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
             primaryStage.setTitle(LocaleManager.getBundle().getString("app.title") + " - Login");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -130,6 +133,7 @@ public class SceneManager {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/register.fxml"));
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
+            scene.getRoot().setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
             primaryStage.setTitle(LocaleManager.getBundle().getString("app.title") + " - Register");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -153,6 +157,7 @@ public class SceneManager {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/profile.fxml"));
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
+            scene.getRoot().setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
             primaryStage.setTitle(LocaleManager.getBundle().getString("app.title") + " - Profile");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -175,6 +180,7 @@ public class SceneManager {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/home.fxml"));
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
+            scene.getRoot().setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
             primaryStage.setTitle(LocaleManager.getBundle().getString("app.title") + " - Home");
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -192,6 +198,7 @@ public class SceneManager {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/class.fxml"));
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load(), primaryStage.getWidth(), primaryStage.getHeight());
+            scene.getRoot().setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
             primaryStage.setTitle(LocaleManager.getBundle().getString("app.title") + " - Class");
             primaryStage.setScene(scene);
             primaryStage.show();

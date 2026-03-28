@@ -18,4 +18,8 @@ public class LocaleManager {
     public static ResourceBundle getBundle() {
         return ResourceBundle.getBundle(BUNDLE_BASE_NAME, currentLocale);
     }
+
+    public static boolean isRightToLeft() {
+        return currentLocale != null && "fa".equals(currentLocale.getLanguage());
+    }
 }

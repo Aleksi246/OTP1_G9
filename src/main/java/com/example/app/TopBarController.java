@@ -23,16 +23,34 @@ public class TopBarController {
     @FXML
     private void initialize() {
         if (languageChoiceBox != null) {
-            languageChoiceBox.getItems().setAll(Locale.ENGLISH, Locale.FRENCH);
+            languageChoiceBox.getItems().setAll(Locale.ENGLISH, Locale.FRENCH, new Locale("fa"));
             languageChoiceBox.setConverter(new StringConverter<>() {
                 @Override
                 public String toString(Locale locale) {
-                    return Locale.FRENCH.equals(locale) ? "French" : "English";
+                    if (locale == null) {
+                        return "";
+                    }
+                    if ("fa".equals(locale.getLanguage())) {
+                        return "فارسی";
+                    }
+                    if (Locale.FRENCH.equals(locale)) {
+                        return "Français";
+                    }
+                    return "English";
                 }
 
                 @Override
                 public Locale fromString(String string) {
-                    return "French".equals(string) ? Locale.FRENCH : Locale.ENGLISH;
+                    if (string == null) {
+                        return Locale.ENGLISH;
+                    }
+                    if (string.equals("فارسی")) {
+                        return new Locale("fa");
+                    }
+                    if (string.equals("Français")) {
+                        return Locale.FRENCH;
+                    }
+                    return Locale.ENGLISH;
                 }
             });
             languageChoiceBox.setValue(LocaleManager.getLocale());
