@@ -416,14 +416,15 @@ public class ClassController {
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/app/view-reviews-dialog.fxml"));
+            loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
 
             ViewReviewsDialogController controller = loader.getController();
             controller.setMaterialName(filename);
-            controller.setStatus("Loading reviews...");
+            controller.setStatus(LocaleManager.getBundle().getString("viewreviews.loading"));
 
             Stage dialogStage = new Stage();
-            dialogStage.setTitle("Material Reviews");
+            dialogStage.setTitle(LocaleManager.getBundle().getString("viewreviews.title"));
             dialogStage.initOwner(classNameLabel.getScene().getWindow());
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.setResizable(false);
@@ -496,13 +497,14 @@ public class ClassController {
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/app/review-dialog.fxml"));
+            loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
 
             ReviewDialogController dialogController = loader.getController();
             dialogController.setMaterialName(filename);
 
             Stage dialogStage = new Stage();
-            dialogStage.setTitle("Review Material");
+            dialogStage.setTitle(LocaleManager.getBundle().getString("review.dialog.title"));
             dialogStage.initOwner(classNameLabel.getScene().getWindow());
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.setResizable(false);

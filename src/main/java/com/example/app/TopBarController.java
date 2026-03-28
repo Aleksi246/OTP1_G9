@@ -3,21 +3,60 @@ package com.example.app;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.ImageView;
+import javafx.util.StringConverter;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class TopBarController {
 
+    @FXML
+    private ResourceBundle resources;
 
     @FXML
     private ImageView learningPlatformImage;
+
+    @FXML
+    private ChoiceBox<Locale> languageChoiceBox;
 
     @FXML
     private Button profileButton;
 
     @FXML
     private void initialize() {
+        if (languageChoiceBox != null && resources != null) {
+            languageChoiceBox.getItems().setAll(Locale.ENGLISH, Locale.FRENCH);
+            languageChoiceBox.setConverter(new StringConverter<>() {
+                @Override
+                public String toString(Locale locale) {
+                    return Locale.FRENCH.equals(locale) ? "French" : "English";
+                }
+
+                @Override
+                public Locale fromString(String string) {
+                    return "French".equals(string) ? Locale.FRENCH : Locale.ENGLISH;
+                }
+            });
+            languageChoiceBox.setValue(LocaleManager.getLocale());
+        }
+
         // Update button states after a short delay to allow scene to fully load
         Platform.runLater(this::updateButtonStates);
+    }
+
+    @FXML
+    public void handleLanguageChange() {
+        if (languageChoiceBox == null) {
+            return;
+        }
+
+        Locale selected = languageChoiceBox.getValue();
+        if (selected != null && !selected.equals(LocaleManager.getLocale())) {
+            LocaleManager.setLocale(selected);
+            SceneManager.reloadCurrentScene();
+        }
     }
 
     @FXML
@@ -43,7 +82,6 @@ public class TopBarController {
         Platform.runLater(this::updateButtonStates);
     }
 
-
     private void updateButtonStates() {
         boolean isLoggedIn = SessionManager.isLoggedIn();
 
@@ -60,14 +98,13 @@ public class TopBarController {
         }
 
         // Update profile button text and styling
-        if (profileButton != null) {
+        if (profileButton != null && resources != null) {
             if (isLoggedIn) {
-                profileButton.setText("Profile");
-                profileButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;");
+                profileButton.setText(resources.getString("topbar.profile"));
             } else {
-                profileButton.setText("Log in");
-                profileButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;");
+                profileButton.setText(resources.getString("topbar.login"));
             }
+            profileButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;");
         }
     }
 

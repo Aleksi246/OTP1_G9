@@ -9,10 +9,12 @@ import io.javalin.http.UnauthorizedResponse;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import java.util.Locale;
 
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
+        LocaleManager.setLocale(Locale.ENGLISH);
         stage.setMaximized(true);
         SceneManager.setPrimaryStage(stage);
         SceneManager.loadMain();

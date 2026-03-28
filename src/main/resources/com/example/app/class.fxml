@@ -27,19 +27,19 @@
                 <!-- Toolbar -->
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                     <Button onAction="#handleGoBack"
-                            text="← Back"
+                            text="%class.back"
                             style="-fx-background-color: #e2e8f0; -fx-text-fill: #334155; -fx-font-weight: bold;
                                    -fx-padding: 9 16; -fx-background-radius: 8; -fx-cursor: hand;
                                    -fx-font-size: 13px; -fx-font-family: 'Segoe UI';" />
                     <Button fx:id="joinButton" onAction="#handleJoinClass"
-                            text="Join Class"
+                            text="%class.joinClass"
                             style="-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-weight: bold;
                                    -fx-padding: 9 16; -fx-background-radius: 8; -fx-cursor: hand;
                                    -fx-font-size: 13px; -fx-font-family: 'Segoe UI';
                                    -fx-effect: dropshadow(gaussian, rgba(34,197,94,0.30), 6, 0, 0, 2);" />
                     <Region HBox.hgrow="ALWAYS" />
                     <Button onAction="#handleRefreshMaterials"
-                            text="↻  Refresh"
+                            text="%class.refresh"
                             style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;
                                    -fx-padding: 9 16; -fx-background-radius: 8; -fx-cursor: hand;
                                    -fx-font-size: 13px; -fx-font-family: 'Segoe UI';" />
@@ -55,29 +55,29 @@
                             <Label fx:id="classNameLabel"
                                    style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
                                           -fx-font-family: 'Segoe UI';"
-                                   text="Class Name" />
+                                   text="%class.namePlaceholder" />
                             <HBox spacing="12.0" alignment="CENTER_LEFT">
                                 <Label fx:id="classIdLabel"
                                        style="-fx-font-size: 12px; -fx-text-fill: white; -fx-font-family: 'Segoe UI';
                                               -fx-background-color: #3b82f6; -fx-background-radius: 20;
                                               -fx-padding: 3 10; -fx-font-weight: bold;"
-                                       text="ID: 0" />
+                                       text="%class.idPlaceholder" />
                                 <Label fx:id="topicLabel"
                                        style="-fx-font-size: 14px; -fx-text-fill: #475569; -fx-font-family: 'Segoe UI';"
-                                       text="Topic: —" />
+                                       text="%class.topicPlaceholder" />
                             </HBox>
                             <Label fx:id="creatorLabel"
                                    style="-fx-font-size: 13px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';"
-                                   text="Created by: Unknown" />
+                                   text="%class.creatorPlaceholder" />
                         </VBox>
                         <MenuButton fx:id="classActionsMenu" mnemonicParsing="false"
-                                    text="⋯  Actions" textFill="WHITE"
+                                    text="%class.actions" textFill="WHITE"
                                     style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-font-weight: bold;
                                            -fx-padding: 9 16; -fx-background-radius: 8; -fx-cursor: hand;
                                            -fx-font-size: 13px; -fx-font-family: 'Segoe UI';">
                             <items>
-                                <MenuItem fx:id="deleteClassMenuItem" onAction="#handleDeleteClass" text="🗑  Delete Class" />
-                                <MenuItem fx:id="leaveClassMenuItem" onAction="#handleLeaveClass" text="↩  Leave Class" />
+                                <MenuItem fx:id="deleteClassMenuItem" onAction="#handleDeleteClass" text="%class.deleteClass" />
+                                <MenuItem fx:id="leaveClassMenuItem" onAction="#handleLeaveClass" text="%class.leaveClass" />
                             </items>
                         </MenuButton>
                     </HBox>
@@ -90,38 +90,38 @@
                              -fx-padding: 24 30 24 30;">
                     <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
                                   -fx-font-family: 'Segoe UI';"
-                           text="📤  Upload Class Material" />
+                           text="%class.uploadTitle" />
                     <Label style="-fx-font-size: 13px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';"
-                           text="Only the class creator can upload files." />
+                           text="%class.uploadSubtitle" />
 
                     <Region prefHeight="1.0" maxWidth="Infinity" style="-fx-background-color: #f1f5f9;" />
 
                     <HBox alignment="CENTER_LEFT" spacing="12.0">
                         <Button onAction="#handleChooseFile"
-                                text="📁  Choose File"
+                                text="%class.chooseFile"
                                 style="-fx-background-color: #f1f5f9; -fx-text-fill: #334155; -fx-font-weight: bold;
                                        -fx-padding: 9 16; -fx-background-radius: 8; -fx-cursor: hand;
                                        -fx-font-size: 13px; -fx-font-family: 'Segoe UI';
                                        -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1.5;" />
                         <Label fx:id="selectedFileLabel"
                                style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI';"
-                               text="No file selected" />
+                               text="%class.noFileSelected" />
                     </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="12.0">
                         <ComboBox fx:id="materialTypeCombo" prefWidth="200.0" prefHeight="38.0"
-                                  promptText="Material Type"
+                                  promptText="%class.materialType.prompt"
                                   style="-fx-font-size: 13px; -fx-font-family: 'Segoe UI';
                                          -fx-background-radius: 8; -fx-border-color: #cbd5e1;
                                          -fx-border-radius: 8; -fx-border-width: 1.5;" />
                         <Button fx:id="uploadButton" onAction="#handleUploadMaterial"
-                                text="Upload"
+                                text="%class.upload"
                                 style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;
                                        -fx-padding: 9 20; -fx-background-radius: 8; -fx-cursor: hand;
                                        -fx-font-size: 13px; -fx-font-family: 'Segoe UI';" />
                     </HBox>
                     <Label fx:id="uploadProgressLabel" managed="false" visible="false"
                            style="-fx-font-size: 12px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI';"
-                           text="Uploading…" />
+                           text="%class.uploading" />
                     <ProgressBar fx:id="uploadProgressBar" managed="false" visible="false"
                                  prefWidth="320.0" prefHeight="8.0" progress="-1.0"
                                  style="-fx-accent: #3b82f6;" />
@@ -134,10 +134,10 @@
                              -fx-padding: 24 30 24 30;">
                     <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
                                   -fx-font-family: 'Segoe UI';"
-                           text="📂  Class Materials" />
+                           text="%class.materialsTitle" />
                     <Label fx:id="materialsStatusLabel"
                            style="-fx-font-size: 13px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';"
-                           text="Loading files…" />
+                           text="%class.loadingFiles" />
                     <VBox fx:id="materialsContainer" spacing="10.0" />
                 </VBox>
 

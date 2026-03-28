@@ -19,10 +19,10 @@
 
     <!-- Header -->
     <VBox spacing="4.0">
-        <Label text="⭐  Write a Review"
+        <Label text="%review.title"
                style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
                       -fx-font-family: 'Segoe UI';" />
-        <Label text="File:" style="-fx-font-size: 12px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';" />
+        <Label text="%review.file" style="-fx-font-size: 12px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';" />
         <Label fx:id="materialNameLabel" wrapText="true"
                style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #334155;
                       -fx-font-family: 'Segoe UI';" />
@@ -32,7 +32,7 @@
 
     <!-- Rating -->
     <VBox spacing="6.0">
-        <Label text="Rating (1 – 5)"
+        <Label text="%review.rating"
                style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #334155;
                       -fx-font-family: 'Segoe UI';" />
         <ComboBox fx:id="ratingCombo" prefWidth="140.0" prefHeight="38.0"
@@ -43,11 +43,11 @@
 
     <!-- Comment -->
     <VBox spacing="6.0" VBox.vgrow="ALWAYS">
-        <Label text="Comment"
+        <Label text="%review.comment"
                style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #334155;
                       -fx-font-family: 'Segoe UI';" />
         <TextArea fx:id="commentTextArea" prefHeight="120.0" prefWidth="Infinity"
-                  promptText="Share your feedback about this material…" wrapText="true"
+                  promptText="%review.comment.prompt" wrapText="true"
                   style="-fx-font-size: 13px; -fx-font-family: 'Segoe UI';
                          -fx-background-radius: 8; -fx-border-color: #cbd5e1;
                          -fx-border-radius: 8; -fx-border-width: 1.5;
@@ -60,12 +60,12 @@
     <!-- Buttons -->
     <HBox alignment="CENTER_RIGHT" spacing="10.0">
         <Button mnemonicParsing="false" onAction="#handleCancel" prefHeight="38.0" prefWidth="90.0"
-                text="Cancel"
+                text="%review.cancel"
                 style="-fx-background-color: #e2e8f0; -fx-text-fill: #334155; -fx-font-weight: bold;
                        -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;
                        -fx-font-family: 'Segoe UI';" />
         <Button mnemonicParsing="false" onAction="#handleSubmit" prefHeight="38.0" prefWidth="140.0"
-                text="Submit Review"
+                text="%review.submit"
                 style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;
                        -fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;
                        -fx-font-family: 'Segoe UI';" />

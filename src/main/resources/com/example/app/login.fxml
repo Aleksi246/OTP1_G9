@@ -35,10 +35,10 @@
                     <VBox spacing="6.0">
                         <Label style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
                                       -fx-font-family: 'Segoe UI';"
-                               text="Welcome back" />
+                               text="%login.welcome" />
                         <Label fx:id="contextLabel"
                                style="-fx-font-size: 14px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI';"
-                               text="Sign in to your account to continue." />
+                               text="%login.subtitle" />
                     </VBox>
 
                     <!-- Divider -->
@@ -48,27 +48,27 @@
                     <!-- Inputs -->
                     <VBox spacing="14.0">
                         <VBox spacing="6.0">
-                            <Label text="Username" style="-fx-font-size: 13px; -fx-font-weight: bold;
+                            <Label text="%login.username" style="-fx-font-size: 13px; -fx-font-weight: bold;
                                           -fx-text-fill: #334155; -fx-font-family: 'Segoe UI';" />
                             <TextField fx:id="usernameField" prefHeight="42.0"
-                                       promptText="Enter your username"
+                                       promptText="%login.username.prompt"
                                        style="-fx-background-radius: 8; -fx-font-size: 14px;
                                               -fx-font-family: 'Segoe UI'; -fx-border-color: #cbd5e1;
                                               -fx-border-radius: 8; -fx-border-width: 1.5;
                                               -fx-background-color: #f8fafc; -fx-padding: 0 12;" />
                         </VBox>
                         <VBox spacing="6.0">
-                            <Label text="Password" style="-fx-font-size: 13px; -fx-font-weight: bold;
+                            <Label text="%login.password" style="-fx-font-size: 13px; -fx-font-weight: bold;
                                           -fx-text-fill: #334155; -fx-font-family: 'Segoe UI';" />
                             <PasswordField fx:id="passwordField" prefHeight="42.0"
-                                           promptText="Enter your password"
+                                           promptText="%login.password.prompt"
                                            style="-fx-background-radius: 8; -fx-font-size: 14px;
                                                   -fx-font-family: 'Segoe UI'; -fx-border-color: #cbd5e1;
                                                   -fx-border-radius: 8; -fx-border-width: 1.5;
                                                   -fx-background-color: #f8fafc; -fx-padding: 0 12;" />
                         </VBox>
                         <PasswordField fx:id="confirmPasswordField" managed="false" visible="false"
-                                       prefHeight="42.0" promptText="Confirm Password"
+                                       prefHeight="42.0" promptText="%login.confirmPassword"
                                        style="-fx-background-radius: 8; -fx-font-size: 14px;
                                               -fx-font-family: 'Segoe UI'; -fx-border-color: #cbd5e1;
                                               -fx-border-radius: 8; -fx-border-width: 1.5;
@@ -84,7 +84,7 @@
                     <VBox spacing="12.0">
                         <Button fx:id="primaryActionButton" maxWidth="Infinity"
                                 onAction="#handlePrimaryAction" prefHeight="44.0"
-                                text="Sign In"
+                                text="%login.signIn"
                                 style="-fx-background-color: #3b82f6; -fx-text-fill: white;
                                        -fx-background-radius: 9; -fx-cursor: hand;
                                        -fx-font-weight: bold; -fx-font-size: 15px;
@@ -94,9 +94,9 @@
                         <HBox alignment="CENTER" spacing="6.0">
                             <Label fx:id="switchContextLabel"
                                    style="-fx-text-fill: #64748b; -fx-font-size: 13px; -fx-font-family: 'Segoe UI';"
-                                   text="Don't have an account?" />
+                                   text="%login.noAccount" />
                             <Button fx:id="switchActionButton" onAction="#handleSwitchContext"
-                                    text="Register Now"
+                                    text="%login.registerNow"
                                     style="-fx-background-color: transparent; -fx-text-fill: #3b82f6;
                                            -fx-padding: 0; -fx-cursor: hand; -fx-font-weight: bold;
                                            -fx-font-size: 13px; -fx-font-family: 'Segoe UI';" />

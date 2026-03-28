@@ -30,25 +30,25 @@
                     <Label fx:id="welcomeLabel"
                            style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0f172a;
                                   -fx-font-family: 'Segoe UI';"
-                           text="Welcome!" />
+                           text="%home.welcome" />
                     <Label style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI';"
-                           text="Here are your enrolled classes." />
+                           text="%home.subtitle" />
                 </VBox>
                 <MenuButton mnemonicParsing="false" prefHeight="40.0" prefWidth="160.0"
-                            text="＋  Manage Classes" textFill="WHITE"
+                            text="%home.manageClasses" textFill="WHITE"
                             style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;
                                    -fx-background-radius: 9; -fx-cursor: hand; -fx-font-size: 13px;
                                    -fx-font-family: 'Segoe UI';
                                    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.32), 6, 0, 0, 2);">
                     <items>
-                        <MenuItem onAction="#handleJoinClass" text="🔗  Join a Class" />
-                        <MenuItem onAction="#handleCreateClass" text="🏫  Create a Class" />
+                        <MenuItem onAction="#handleJoinClass" text="%home.joinClass" />
+                        <MenuItem onAction="#handleCreateClass" text="%home.createClass" />
                     </items>
                 </MenuButton>
             </HBox>
 
             <!-- Loading label -->
-            <Label fx:id="loadingLabel" text="Loading your classes…"
+            <Label fx:id="loadingLabel" text="%home.loadingClasses"
                    style="-fx-font-size: 14px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';
                           -fx-padding: 20 32 0 32;" />
 
