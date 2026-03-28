@@ -10,7 +10,7 @@ public class DatabaseInitializer {
     private static final String URL = System.getenv().getOrDefault(
     "DB_URL",
     "jdbc:mariadb://localhost:3306/otptestdb"
-);
+    );
     private static final String USER = "otptestuser";
     private static final String PASS = "testpass";
 
