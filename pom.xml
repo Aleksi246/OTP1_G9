@@ -11,8 +11,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release> <!-- define this -->
-        <javafx.version>23.0.1</javafx.version>
-        <javafx.platform>win</javafx.platform> <!-- use mac-aarch64 if on Apple Silicon and win/win-aarch64 respectively-->
+            <javafx.version>21.0.6</javafx.version>
+            <javafx.platform>linux</javafx.platform> <!-- use mac-aarch64 on Apple Silicon, win/win-aarch64 on Windows -->
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
     </properties>
 

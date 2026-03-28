@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="1200.0" spacing="14.0" style="-fx-background-color: #1e293b; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.22), 8, 0, 0, 3);" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.TopBarController">
+<HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="1200.0" spacing="14.0" style="-fx-background-color: #1e293b; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.22), 8, 0, 0, 3);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app.TopBarController">
     <padding>
         <Insets bottom="10.0" left="28.0" right="28.0" top="10.0" />
     </padding>

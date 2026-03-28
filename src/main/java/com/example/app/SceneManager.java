@@ -1,5 +1,6 @@
 package com.example.app;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.Scene;
@@ -14,6 +15,36 @@ public class SceneManager {
     private static List<String> navigationHistory = new ArrayList<>();
     private static int currentIndex = -1;
     private static String currentSceneName = "main";
+
+    private static void applyScene(Scene scene, String title) {
+        boolean wasFullScreen = primaryStage.isFullScreen();
+        boolean wasMaximized = primaryStage.isMaximized();
+        double previousX = primaryStage.getX();
+        double previousY = primaryStage.getY();
+        double previousWidth = primaryStage.getWidth();
+        double previousHeight = primaryStage.getHeight();
+
+        primaryStage.setTitle(title);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+        if (wasFullScreen) {
+            // Full-screen mode can be dropped by setScene on some Linux window managers.
+            Platform.runLater(() -> primaryStage.setFullScreen(true));
+            return;
+        }
+
+        if (wasMaximized) {
+            // Some Linux window managers drop maximized state on setScene.
+            Platform.runLater(() -> primaryStage.setMaximized(true));
+            return;
+        }
+
+        primaryStage.setX(previousX);
+        primaryStage.setY(previousY);
+        primaryStage.setWidth(previousWidth);
+        primaryStage.setHeight(previousHeight);
+    }
 
     public static void setPrimaryStage(Stage stage) {
         primaryStage = stage;
@@ -90,9 +121,7 @@ public class SceneManager {
             Scene scene = new Scene(loader.load());
             // Keep landing page layout consistent across locales.
             scene.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-            primaryStage.setTitle(LocaleManager.getBundle().getString("app.title") + " - Main");
-            primaryStage.setScene(scene);
-            primaryStage.show();
+            applyScene(scene, LocaleManager.getBundle().getString("app.title") + " - Main");
         } catch (Exception e) {
             System.err.println("Error loading main scene: " + e.getMessage());
             e.printStackTrace();
@@ -115,9 +144,7 @@ public class SceneManager {
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
             scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
-            primaryStage.setTitle(LocaleManager.getBundle().getString("app.title") + " - Login");
-            primaryStage.setScene(scene);
-            primaryStage.show();
+            applyScene(scene, LocaleManager.getBundle().getString("app.title") + " - Login");
         } catch (Exception e) {
             System.err.println("Error loading login scene: " + e.getMessage());
             e.printStackTrace();
@@ -139,9 +166,7 @@ public class SceneManager {
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
             scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
-            primaryStage.setTitle(LocaleManager.getBundle().getString("app.title") + " - Register");
-            primaryStage.setScene(scene);
-            primaryStage.show();
+            applyScene(scene, LocaleManager.getBundle().getString("app.title") + " - Register");
         } catch (Exception e) {
             System.err.println("Error loading register scene: " + e.getMessage());
             e.printStackTrace();
@@ -164,9 +189,7 @@ public class SceneManager {
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
             scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
-            primaryStage.setTitle(LocaleManager.getBundle().getString("app.title") + " - Profile");
-            primaryStage.setScene(scene);
-            primaryStage.show();
+            applyScene(scene, LocaleManager.getBundle().getString("app.title") + " - Profile");
         } catch (Exception e) {
             System.err.println("Error loading profile scene: " + e.getMessage());
             e.printStackTrace();
@@ -188,9 +211,7 @@ public class SceneManager {
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
             scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
-            primaryStage.setTitle(LocaleManager.getBundle().getString("app.title") + " - Home");
-            primaryStage.setScene(scene);
-            primaryStage.show();
+            applyScene(scene, LocaleManager.getBundle().getString("app.title") + " - Home");
         } catch (Exception e) {
             System.err.println("Error loading home scene: " + e.getMessage());
             e.printStackTrace();
@@ -207,9 +228,7 @@ public class SceneManager {
             loader.setResources(LocaleManager.getBundle());
             Scene scene = new Scene(loader.load());
             scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
-            primaryStage.setTitle(LocaleManager.getBundle().getString("app.title") + " - Class");
-            primaryStage.setScene(scene);
-            primaryStage.show();
+            applyScene(scene, LocaleManager.getBundle().getString("app.title") + " - Class");
         } catch (Exception e) {
             System.err.println("Error loading class scene: " + e.getMessage());
             e.printStackTrace();
