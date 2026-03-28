@@ -128,9 +128,7 @@ public class ClassController {
     }
 
     private Integer getClassIdFromContext() {
-        Integer id = ClassContextHolder.getClassId();
-        ClassContextHolder.clear();
-        return id;
+        return ClassContextHolder.getClassId();
     }
 
     private void loadClassDetails() {

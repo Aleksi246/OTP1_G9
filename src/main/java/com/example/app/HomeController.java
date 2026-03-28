@@ -9,7 +9,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.paint.Color;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TextField;
@@ -19,6 +18,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 import com.google.gson.JsonArray;
@@ -51,7 +51,7 @@ public class HomeController {
 
         // Set welcome message
         String username = SessionManager.getUsername();
-        welcomeLabel.setText("Welcome, " + username + "! 📚");
+        welcomeLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("home.welcome"), username));
 
         // Load user's classes
         loadUserClasses();
@@ -65,7 +65,7 @@ public class HomeController {
 
                 if (token == null || email == null) {
                     Platform.runLater(() -> {
-                        loadingLabel.setText("Error: Not authenticated");
+                        loadingLabel.setText(LocaleManager.getBundle().getString("home.error.notAuthenticated"));
                     });
                     return;
                 }
@@ -74,7 +74,7 @@ public class HomeController {
                 Integer userId = fetchUserId(email, token);
                 if (userId == null) {
                     Platform.runLater(() -> {
-                        loadingLabel.setText("Error: Could not fetch user information");
+                        loadingLabel.setText(LocaleManager.getBundle().getString("home.error.fetchUser"));
                     });
                     return;
                 }
@@ -87,7 +87,7 @@ public class HomeController {
 
                 Platform.runLater(() -> {
                     if (classIds.isEmpty()) {
-                        loadingLabel.setText("No classes yet. Ask your instructor to add you to a class!");
+                        loadingLabel.setText(LocaleManager.getBundle().getString("home.noClasses"));
                         classesContainer.getChildren().clear();
                     } else {
                         loadingLabel.setText("");
@@ -97,7 +97,7 @@ public class HomeController {
 
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    loadingLabel.setText("Error loading classes: " + e.getMessage());
+                    loadingLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("home.error.loadingClasses"), e.getMessage()));
                     e.printStackTrace();
                 });
             }
@@ -168,7 +168,7 @@ public class HomeController {
                 if (response.statusCode() == 200) {
                     var courseJson = JsonParser.parseString(response.body()).getAsJsonObject();
                     String className = courseJson.get("className").getAsString();
-                    String topic = courseJson.has("topic") ? courseJson.get("topic").getAsString() : "No topic";
+String topic = courseJson.has("topic") ? courseJson.get("topic").getAsString() : LocaleManager.getBundle().getString("home.noTopic");
 
                     Platform.runLater(() -> {
                         VBox classCard = createClassCard(className, topic, classId);
@@ -225,7 +225,9 @@ public class HomeController {
         contentBox.setSpacing(10);
         VBox.setVgrow(contentBox, Priority.ALWAYS);
 
-        Label topicLabel = new Label(topic == null || topic.isEmpty() ? "No topic set" : topic);
+        Label topicLabel = new Label(topic == null || topic.isEmpty()
+                ? LocaleManager.getBundle().getString("home.noTopic")
+                : topic);
         topicLabel.setStyle(
                 "-fx-font-size: 13px; -fx-text-fill: #475569; -fx-font-family: 'Segoe UI';"
         );
@@ -235,7 +237,7 @@ public class HomeController {
         VBox spacer = new VBox();
         VBox.setVgrow(spacer, Priority.ALWAYS);
 
-        Button viewButton = new Button("Open Class →");
+        Button viewButton = new Button(LocaleManager.getBundle().getString("home.openClass"));
         viewButton.setPrefWidth(264);
         viewButton.setPrefHeight(38);
         viewButton.setStyle(
@@ -274,11 +276,11 @@ public class HomeController {
     @FXML
     private void handleJoinClass() {
         Dialog<String> dialog = new Dialog<>();
-        dialog.setTitle("Join Class");
-        dialog.setHeaderText("Enter Class ID to join");
+        dialog.setTitle(LocaleManager.getBundle().getString("home.joinClass.title"));
+        dialog.setHeaderText(LocaleManager.getBundle().getString("home.joinClass.header"));
 
         TextField classIdField = new TextField();
-        classIdField.setPromptText("Enter class ID");
+        classIdField.setPromptText(LocaleManager.getBundle().getString("home.joinClass.prompt"));
 
         VBox content = new VBox(10);
         content.setPadding(new Insets(20));
@@ -297,7 +299,8 @@ public class HomeController {
                 // Navigate to class view
                 SceneManager.loadClass(classId);
             } catch (NumberFormatException e) {
-                showError("Invalid Input", "Please enter a valid class ID number");
+                showError(LocaleManager.getBundle().getString("home.error.title"),
+                        LocaleManager.getBundle().getString("home.invalidInput"));
             }
         }
     }
@@ -305,21 +308,21 @@ public class HomeController {
     @FXML
     private void handleCreateClass() {
         Dialog<String> dialog = new Dialog<>();
-        dialog.setTitle("Create Class");
-        dialog.setHeaderText("Create a new class");
+        dialog.setTitle(LocaleManager.getBundle().getString("home.createClass.title"));
+        dialog.setHeaderText(LocaleManager.getBundle().getString("home.createClass.header"));
 
         TextField classNameField = new TextField();
-        classNameField.setPromptText("Enter class name");
+        classNameField.setPromptText(LocaleManager.getBundle().getString("home.createClass.namePrompt"));
 
         TextField topicField = new TextField();
-        topicField.setPromptText("Enter topic (optional)");
+        topicField.setPromptText(LocaleManager.getBundle().getString("home.createClass.topicPrompt"));
 
         VBox content = new VBox(10);
         content.setPadding(new Insets(20));
         content.getChildren().addAll(
-                new Label("Class Name:"),
+                new Label(LocaleManager.getBundle().getString("home.createClass.nameLabel")),
                 classNameField,
-                new Label("Topic:"),
+                new Label(LocaleManager.getBundle().getString("home.createClass.topicLabel")),
                 topicField
         );
 
@@ -356,16 +359,19 @@ public class HomeController {
 
                 Platform.runLater(() -> {
                     if (response.statusCode() == 201 || response.statusCode() == 200) {
-                        showSuccess("Success", "Class created successfully!");
+                        showSuccess(LocaleManager.getBundle().getString("home.success.title"),
+                                LocaleManager.getBundle().getString("home.createClass.success"));
                         // Reload classes
                         loadUserClasses();
                     } else {
-                        showError("Error", "Failed to create class: " + response.statusCode());
+                        showError(LocaleManager.getBundle().getString("home.error.title"),
+                                MessageFormat.format(LocaleManager.getBundle().getString("home.error.createClass"), response.statusCode()));
                     }
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    showError("Error", "Failed to create class: " + e.getMessage());
+                    showError(LocaleManager.getBundle().getString("home.error.title"),
+                            MessageFormat.format(LocaleManager.getBundle().getString("home.error.createClassException"), e.getMessage()));
                     e.printStackTrace();
                 });
             }

@@ -8,12 +8,8 @@ import javafx.scene.image.ImageView;
 import javafx.util.StringConverter;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 public class TopBarController {
-
-    @FXML
-    private ResourceBundle resources;
 
     @FXML
     private ImageView learningPlatformImage;
@@ -26,7 +22,7 @@ public class TopBarController {
 
     @FXML
     private void initialize() {
-        if (languageChoiceBox != null && resources != null) {
+        if (languageChoiceBox != null) {
             languageChoiceBox.getItems().setAll(Locale.ENGLISH, Locale.FRENCH);
             languageChoiceBox.setConverter(new StringConverter<>() {
                 @Override
@@ -98,11 +94,11 @@ public class TopBarController {
         }
 
         // Update profile button text and styling
-        if (profileButton != null && resources != null) {
+        if (profileButton != null) {
             if (isLoggedIn) {
-                profileButton.setText(resources.getString("topbar.profile"));
+                profileButton.setText(LocaleManager.getBundle().getString("topbar.profile"));
             } else {
-                profileButton.setText(resources.getString("topbar.login"));
+                profileButton.setText(LocaleManager.getBundle().getString("topbar.login"));
             }
             profileButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;");
         }
