@@ -45,7 +45,7 @@ pipeline {
             }
         }
 
-        stage('Publish Coverage Report') {6
+        stage('Publish Coverage Report') {
             steps {
                 jacoco()
             }

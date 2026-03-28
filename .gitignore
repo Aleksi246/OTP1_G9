@@ -2,4 +2,3 @@ target/
 uploads/
 Dockerfile
 docker-compose.yml
-Jenkinsfile
