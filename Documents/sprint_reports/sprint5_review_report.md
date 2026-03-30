@@ -1,21 +1,21 @@
 ## Sprint 5 Review Summary
 
-**Sprint Goal:** Prepare the application for full multilingual support and implement GUI localization for future scalability[cite: 16].
+**Sprint Goal:** Prepare the application for full multilingual support and implement GUI localization for future scalability.
 
 ---
 
 ### **1. Accomplishments**
-* **UI Localization:** Externalized all static text and implemented functional language selectors[cite: 21, 25].
-* **Multilingual Support:** Successfully localized the interface for at least two non-Latin languages with dynamic LTR/RTL support[cite: 28, 29, 31].
-* **Documentation:** Updated the GitHub `README.md` with setup instructions and added new UML diagrams[cite: 41, 44, 45].
-* **Project Management:** Updated the Product and Sprint backlogs with localization-specific user stories and acceptance criteria[cite: 34, 38, 39].
+* **UI Localization:** Externalized all static text and implemented functional language selectors.
+* **Multilingual Support:** Successfully localized the interface for at least two non-Latin languages with dynamic LTR/RTL support.
+* **Documentation:** Updated the GitHub `README.md` with setup instructions and added new UML diagrams.
+* **Project Management:** Updated the Product and Sprint backlogs with localization-specific user stories and acceptance criteria.
 
 ---
 
 ### **2. Team Contribution Table**
 | Team Member Name   | Assigned Tasks                       | Time Spent (hrs) | In-class tasks         |
 |:-------------------|:-------------------------------------|:-----------------|:-----------------------|
-| Elias Eide         | Localization, backlog, documentation               | 10               | Submitted              |
+| Elias Eide         | Localization, backlog, documentation               | 15               | Submitted              |
 | Aleksi Lappalainen | Localization, backlog, documentation | 20               | Submitted              |
 | Arttu Salo         | Localization, backlog, documentation                         | 10               | Submitted |
 | Eero Koivukoski    | Localization, backlog, documentation                               | 10               | Submitted |
