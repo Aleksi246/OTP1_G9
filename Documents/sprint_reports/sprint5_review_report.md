@@ -15,7 +15,7 @@
 ### **2. Team Contribution Table**
 | Team Member Name   | Assigned Tasks                       | Time Spent (hrs) | In-class tasks         |
 |:-------------------|:-------------------------------------|:-----------------|:-----------------------|
-| Elias Eide         | Localization, backlog, documentation               | 15               | Submitted              |
+| Elias Eide         | Localization, backlog, documentation               | 20               | Submitted              |
 | Aleksi Lappalainen | Localization, backlog, documentation | 20               | Submitted              |
 | Arttu Salo         | Localization, backlog, documentation                         | 10               | Submitted |
 | Eero Koivukoski    | Localization, backlog, documentation                               | 10               | Submitted |

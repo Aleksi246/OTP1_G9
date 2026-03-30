@@ -127,6 +127,16 @@ The application supports **4 languages** that can be switched seamlessly within 
 | Русский (Russian) | `ru` | | ✗ |
 | فارسی (Persian/Farsi) | `fa` | | ✓ |
 
+### Localization Implementation
+
+- Localization and translation work was assisted with GitHub Copilot during development.
+- UI text is externalized with Java `ResourceBundle` property files in `src/main/resources/com/example/app/`:
+  - `messages.properties` (default)
+  - `messages_fr.properties`
+  - `messages_ru.properties`
+  - `messages_fa.properties`
+- Bundles are loaded through `LocaleManager.getBundle()` in `src/main/java/com/example/app/LocaleManager.java` using UTF-8 support.
+
 ### Selecting a Language at Runtime
 
 1. **Launch the Application:**
@@ -202,7 +212,7 @@ To add a new language to the application:
 
 - **Published JaCoCo Report:** https://users.metropolia.fi/~aleklap/Aleksi246%20OTP1_G9%20main%20target-site_jacoco/
 - **Database Initialization Guide:** See [DB_INIT_GUIDE.md](DB_INIT_GUIDE.md)
-- **Project Management:** https://trello.com/b/2XyOSUYe/sprint2
+- **Project Management:** Trello Board - https://trello.com/b/JAtHGqiA/sprint5
 
 ## Troubleshooting
 
