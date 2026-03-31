@@ -1,18 +1,10 @@
-# Use a known-good OpenJDK base image
-FROM eclipse-temurin:21-jdk
+# We use the 'platform' flag to ensure it works on your Mac and their Windows
+FROM --platform=linux/amd64 eclipse-temurin:21-jdk
 
-# Optional: set up display (for GUI forwarding)
-ENV DISPLAY=host.docker.internal:0.0
-
-# Install dependencies for GUI + Maven build
+# Install dependencies for GUI + Maven
 RUN apt-get update && \
-    apt-get install -y maven wget unzip libgtk-3-0 libgbm1 libx11-6 && \
+    apt-get install -y maven libgtk-3-0 libgbm1 libx11-6 libcanberra-gtk3-module && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Download JavaFX SDK 21
-RUN wget https://download2.gluonhq.com/openjfx/21/openjfx-21_linux-x64_bin-sdk.zip -O /tmp/openjfx.zip && \
-    unzip /tmp/openjfx.zip -d /opt && \
-    rm /tmp/openjfx.zip
 
 WORKDIR /app
 
@@ -20,14 +12,10 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-# Build the shaded JAR
-RUN mvn clean package -DskipTests
+# Build the JAR
+# We use -Djavafx.platform=linux to force Maven to grab the correct UI libs
+RUN mvn clean package -DskipTests -Djavafx.platform=linux
 
-# List target folder to check JAR
-RUN ls -l target
-
-# Copy fat jar
-COPY target/otp-1.0-SNAPSHOT.jar app.jar
-
-# Run the **shaded JAR** with JavaFX modules
-CMD ["java", "--module-path", "/opt/javafx-sdk-21/lib", "--add-modules", "javafx.controls,javafx.fxml", "-jar", "target/otp-1.0-SNAPSHOT.jar"]
+# Run the JAR
+# Adjust the name if your JAR isn't exactly 'otp-1.0-SNAPSHOT.jar'
+CMD ["java", "-jar", "target/otp-1.0-SNAPSHOT.jar"]

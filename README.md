@@ -32,7 +32,7 @@ The Classroom Sharing System is a comprehensive application designed to facilita
 ### Use Case Diagram
 The system supports the following primary use cases:
 
-![Use Case Diagram](img.png)
+![Use Case Diagram](Documents/diagrams/img_1.png)
 
 The use case diagram depicts the key interactions between actors (Students, Instructors, Administrators) and the system, including:
 - User authentication and profile management
