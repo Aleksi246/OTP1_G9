@@ -4,13 +4,13 @@ import javafx.fxml.FXML;
 
 public class MainController {
 
-    @FXML
-    private void onLoginButtonClick() {
-        SceneManager.loadLogin();
-    }
+  @FXML
+  private void onLoginButtonClick() {
+    SceneManager.loadLogin();
+  }
 
-    @FXML
-    private void onRegisterButtonClick() {
-        SceneManager.loadRegister();
-    }
+  @FXML
+  private void onRegisterButtonClick() {
+    SceneManager.loadRegister();
+  }
 }
