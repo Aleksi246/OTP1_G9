@@ -1,42 +1,39 @@
-version: '3.8'
-
 services:
   db:
     image: mariadb:11
     container_name: platform-db
-    restart: always
+    restart: unless-stopped
     environment:
-      # make sure your DB_PASSWORD is correct mine is root
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: otptestdb
-      MYSQL_USER: otptestuser       # dedicated DB user for your app
-      MYSQL_PASSWORD: testpass   # password for the app user
-      # Make sure your 3307 port is available
+      MYSQL_USER: otptestuser
+      MYSQL_PASSWORD: testpass
     ports:
       - "3307:3306"
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   app:
-    # image is my own account for the exercise you have to change to your account
-    #IMPORTANT docker build -t yourname/sum-product-fx .
-    # docker push yourname/sum-product-fx: last
-    # then you can change the image in the following statment
-    image: aleksi246/otp:latest
+    build:
+      context: .
+    image: classroom-sharing-system:latest
     container_name: otp
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
-      DB_URL: jdbc:mariadb://platform-db:3306/otptestdb
-      # make sure your DB_USER name is correct mine is root
-      DB_USER: otptestuser
-      # make sure your DB_PASSWORD is correct mine is root
-      DB_PASSWORD: testpass
-      DISPLAY: host.docker.internal:0
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
-#    network_mode: bridge # it cancels network of docker -> docker cannot find host db.
+      DB_URL: jdbc:mariadb://db:3306/otptestdb
+      JAVA_TOOL_OPTIONS: -Dprism.order=sw
+      DISPLAY: host.docker.internal:0.0
+    ports:
+      - "7700:7700"
+    restart: unless-stopped
+
 volumes:
   db_data:
-
-#  Then execute docker compose up --build

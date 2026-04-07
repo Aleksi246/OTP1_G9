@@ -104,16 +104,27 @@ mvn -DskipTests javafx:run
 mvn clean test jacoco:report
 ```
 
-#### Option 2: Using Docker
+#### Option 2: Using Docker Compose (macOS & Windows)
 ```bash
-# Build the Docker image
-docker build -t classroom-sharing-system:latest .
+# Start the database + app, and build the local image if needed
+docker compose up --build
+```
 
-# Run the container with Docker Compose
-docker-compose up -d
+The Compose file now builds the app locally and connects it to the database service automatically, so you do not need separate `docker build` or `docker run` commands.
 
-# View logs
-docker-compose logs -f
+Before first run, make sure your host X server is ready:
+
+- **macOS:** install/open **XQuartz**, then run `xhost + 127.0.0.1`
+- **Windows:** start **VcXsrv** or **Xming** and allow local connections
+
+
+Useful commands:
+```bash
+# Follow logs
+docker compose logs -f
+
+# Stop containers
+docker compose down
 ```
 
 ## Language Selection & Localization
