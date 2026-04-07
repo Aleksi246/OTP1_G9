@@ -4,6 +4,20 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,302 +38,297 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.ByteArrayOutputStream;
-import java.text.MessageFormat;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 public class ClassController {
 
-    @FXML private Label classNameLabel;
-    @FXML private Label classIdLabel;
-    @FXML private Label topicLabel;
-    @FXML private Label creatorLabel;
-    @FXML private Button joinButton;
-    @FXML private MenuButton classActionsMenu;
-    @FXML private MenuItem deleteClassMenuItem;
-    @FXML private MenuItem leaveClassMenuItem;
-    @FXML private VBox uploadSection;
-    @FXML private Label selectedFileLabel;
-    @FXML private ComboBox<String> materialTypeCombo;
-    @FXML private Button uploadButton;
-    @FXML private Label uploadProgressLabel;
-    @FXML private ProgressBar uploadProgressBar;
-    @FXML private Label materialsStatusLabel;
-    @FXML private VBox materialsContainer;
+  @FXML private Label classNameLabel;
+  @FXML private Label classIdLabel;
+  @FXML private Label topicLabel;
+  @FXML private Label creatorLabel;
+  @FXML private Button joinButton;
+  @FXML private MenuButton classActionsMenu;
+  @FXML private MenuItem deleteClassMenuItem;
+  @FXML private MenuItem leaveClassMenuItem;
+  @FXML private VBox uploadSection;
+  @FXML private Label selectedFileLabel;
+  @FXML private ComboBox<String> materialTypeCombo;
+  @FXML private Button uploadButton;
+  @FXML private Label uploadProgressLabel;
+  @FXML private ProgressBar uploadProgressBar;
+  @FXML private Label materialsStatusLabel;
+  @FXML private VBox materialsContainer;
 
-    private Integer classId;
-    private Integer userId;
-    private Integer creatorId;
-    private String token;
-    private boolean isCreator;
-    private boolean isEnrolled;
-    private File selectedFile;
-    private final HttpClient httpClient = HttpClient.newHttpClient();
-    private static final int REVIEW_COMMENT_MAX_LENGTH = 500;
+  private Integer classId;
+  private Integer userId;
+  private Integer creatorId;
+  private String token;
+  private boolean isCreator;
+  private boolean isEnrolled;
+  private File selectedFile;
+  private final HttpClient httpClient = HttpClient.newHttpClient();
+  private static final int REVIEW_COMMENT_MAX_LENGTH = 500;
 
-    @FXML
-    private void initialize() {
-        if (!SessionManager.isLoggedIn()) {
-            Platform.runLater(SceneManager::loadLogin);
-            return;
-        }
-
-        token = SessionManager.getToken();
-        userId = SessionManager.getUserId();
-        classId = ClassContextHolder.getClassId();
-
-        materialTypeCombo.getItems().setAll("Lecture Notes", "Assignment", "Slides", "Reference", "Other");
-        materialTypeCombo.getSelectionModel().selectFirst();
-
-        setUploadSectionVisible(false);
-        setUploadProgressVisible(false, "");
-
-        if (classId == null) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
-                    LocaleManager.getBundle().getString("class.error.missingId"));
-            return;
-        }
-
-        loadClassDetails();
+  @FXML
+  private void initialize() {
+    if (!SessionManager.isLoggedIn()) {
+      Platform.runLater(SceneManager::loadLogin);
+      return;
     }
 
-    private void loadClassDetails() {
-        runAsync(() -> {
-            try {
-                if (userId == null) {
-                    userId = fetchUserId();
-                    if (userId != null) {
-                        SessionManager.setUserId(userId);
-                    }
-                }
+    token = SessionManager.getToken();
+    userId = SessionManager.getUserId();
+    classId = ClassContextHolder.getClassId();
 
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI("http://localhost:7700/api/courses/" + classId))
-                        .header("Authorization", "Bearer " + token)
-                        .GET()
-                        .build();
+    materialTypeCombo.getItems().setAll("Lecture Notes", "Assignment", "Slides", "Reference",
+            "Other");
+    materialTypeCombo.getSelectionModel().selectFirst();
 
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+    setUploadSectionVisible(false);
+    setUploadProgressVisible(false, "");
 
-                if (response.statusCode() != 200) {
-                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
-                            LocaleManager.getBundle().getString("class.error.loadDetails")));
-                    return;
-                }
+    if (classId == null) {
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+          LocaleManager.getBundle().getString("class.error.missingId"));
+      return;
+    }
 
-                JsonObject courseJson = JsonParser.parseString(response.body()).getAsJsonObject();
-                String className = getStringOrDefault(courseJson, "className", LocaleManager.getBundle().getString("class.unknown"));
-                String topic = getStringOrDefault(courseJson, "topic", LocaleManager.getBundle().getString("class.noTopic"));
-                creatorId = courseJson.has("creatorId") && !courseJson.get("creatorId").isJsonNull()
+    loadClassDetails();
+  }
+
+  private void loadClassDetails() {
+    runAsync(() -> {
+      try {
+        if (userId == null) {
+          userId = fetchUserId();
+          if (userId != null) {
+            SessionManager.setUserId(userId);
+          }
+        }
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI("http://localhost:7700/api/courses/" + classId))
+                .header("Authorization", "Bearer " + token)
+                .GET()
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request,
+                HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+          Platform.runLater(() -> showAlert(Alert.AlertType.ERROR,
+                  LocaleManager.getBundle().getString("class.error.title"),
+                  LocaleManager.getBundle().getString("class.error.loadDetails")));
+          return;
+        }
+
+        JsonObject courseJson = JsonParser.parseString(response.body()).getAsJsonObject();
+        String className = getStringOrDefault(courseJson, "className",
+                LocaleManager.getBundle().getString("class.unknown"));
+        String topic = getStringOrDefault(courseJson, "topic",
+                LocaleManager.getBundle().getString("class.noTopic"));
+        creatorId = courseJson.has("creatorId") && !courseJson.get("creatorId").isJsonNull()
                         ? courseJson.get("creatorId").getAsInt()
                         : null;
 
-                isCreator = creatorId != null && creatorId.equals(userId);
-                isEnrolled = isCreator || isUserEnrolled();
+        isCreator = creatorId != null && creatorId.equals(userId);
+        isEnrolled = isCreator || isUserEnrolled();
 
-                Platform.runLater(() -> {
-                    classNameLabel.setText(className);
-                    classIdLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("class.classId"), classId));
-                    topicLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("class.topic"), topic));
-                    creatorLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("class.creator"),
-                            creatorId == null ? LocaleManager.getBundle().getString("class.creatorUnknown") : creatorId));
-                    updateAccessUi();
-                });
-
-
-                loadMaterials();
-            } catch (Exception e) {
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
-                        MessageFormat.format(LocaleManager.getBundle().getString("class.error.failedLoad"), e.getMessage())));
-            }
+        Platform.runLater(() -> {
+          classNameLabel.setText(className);
+          classIdLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString(
+                  "class.classId"), classId));
+          topicLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString(
+                  "class.topic"), topic));
+          creatorLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString(
+                  "class.creator"), creatorId == null ? LocaleManager.getBundle().getString(
+                          "class.creatorUnknown") : creatorId));
+          updateAccessUi();
         });
+
+
+        loadMaterials();
+      } catch (Exception e) {
+        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle()
+                        .getString("class.error.title"), MessageFormat.format(LocaleManager
+                .getBundle().getString("class.error.failedLoad"), e.getMessage())));
+      }
+    });
+  }
+
+  private Integer fetchUserId() {
+    try {
+      String email = SessionManager.getEmail();
+      if (email == null || email.isBlank()) {
+        return null;
+      }
+
+      String encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8);
+      HttpRequest request = HttpRequest.newBuilder()
+                  .uri(new URI("http://localhost:7700/api/users/by-email/" + encodedEmail))
+                  .header("Authorization", "Bearer " + token)
+                  .GET()
+                  .build();
+
+      HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers
+              .ofString());
+      if (response.statusCode() != 200) {
+        return null;
+      }
+
+      JsonObject userJson = JsonParser.parseString(response.body()).getAsJsonObject();
+      if (!userJson.has("userId") || userJson.get("userId").isJsonNull()) {
+        return null;
+      }
+      return userJson.get("userId").getAsInt();
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  private boolean isUserEnrolled() {
+    if (userId == null) {
+      return false;
     }
 
-    private Integer fetchUserId() {
-        try {
-            String email = SessionManager.getEmail();
-            if (email == null || email.isBlank()) {
-                return null;
-            }
+    try {
+      HttpRequest request = HttpRequest.newBuilder()
+                  .uri(new URI("http://localhost:7700/api/participants/user/" + userId))
+                  .header("Authorization", "Bearer " + token)
+                  .GET()
+                  .build();
 
-            String encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8);
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:7700/api/users/by-email/" + encodedEmail))
-                    .header("Authorization", "Bearer " + token)
-                    .GET()
-                    .build();
+      HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers
+              .ofString());
+      if (response.statusCode() != 200) {
+        return false;
+      }
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                return null;
-            }
-
-            JsonObject userJson = JsonParser.parseString(response.body()).getAsJsonObject();
-            if (!userJson.has("userId") || userJson.get("userId").isJsonNull()) {
-                return null;
-            }
-            return userJson.get("userId").getAsInt();
-        } catch (Exception e) {
-            return null;
+      JsonArray classesArray = JsonParser.parseString(response.body()).getAsJsonArray();
+      for (JsonElement element : classesArray) {
+        if (element.getAsInt() == classId) {
+          return true;
         }
+      }
+      return false;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  private void updateAccessUi() {
+    var bundle = LocaleManager.getBundle();
+    if (isCreator) {
+      joinButton.setText(bundle.getString("class.classCreator"));
+      joinButton.setDisable(true);
+      deleteClassMenuItem.setVisible(true);
+      leaveClassMenuItem.setVisible(false);
+    } else if (isEnrolled) {
+      joinButton.setText(bundle.getString("class.alreadyEnrolled"));
+      joinButton.setDisable(true);
+      deleteClassMenuItem.setVisible(false);
+      leaveClassMenuItem.setVisible(true);
+    } else {
+      joinButton.setText(bundle.getString("class.joinClass"));
+      joinButton.setDisable(false);
+      deleteClassMenuItem.setVisible(false);
+      leaveClassMenuItem.setVisible(false);
     }
 
-    private boolean isUserEnrolled() {
-        if (userId == null) {
-            return false;
-        }
+    setUploadSectionVisible(isCreator);
 
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:7700/api/participants/user/" + userId))
-                    .header("Authorization", "Bearer " + token)
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                return false;
-            }
-
-            JsonArray classesArray = JsonParser.parseString(response.body()).getAsJsonArray();
-            for (JsonElement element : classesArray) {
-                if (element.getAsInt() == classId) {
-                    return true;
-                }
-            }
-            return false;
-        } catch (Exception e) {
-            return false;
-        }
+    if (!isCreator && !isEnrolled) {
+      materialsStatusLabel.setText(bundle.getString("class.joinToAccess"));
+      materialsContainer.getChildren().clear();
     }
+  }
 
-    private void updateAccessUi() {
-        var bundle = LocaleManager.getBundle();
-        if (isCreator) {
-            joinButton.setText(bundle.getString("class.classCreator"));
-            joinButton.setDisable(true);
-            deleteClassMenuItem.setVisible(true);
-            leaveClassMenuItem.setVisible(false);
-        } else if (isEnrolled) {
-            joinButton.setText(bundle.getString("class.alreadyEnrolled"));
-            joinButton.setDisable(true);
-            deleteClassMenuItem.setVisible(false);
-            leaveClassMenuItem.setVisible(true);
-        } else {
-            joinButton.setText(bundle.getString("class.joinClass"));
-            joinButton.setDisable(false);
-            deleteClassMenuItem.setVisible(false);
-            leaveClassMenuItem.setVisible(false);
-        }
+  private void setUploadSectionVisible(boolean visible) {
+    uploadSection.setVisible(visible);
+    uploadSection.setManaged(visible);
+  }
 
-        setUploadSectionVisible(isCreator);
+  private void loadMaterials() {
+    if (!isCreator && !isEnrolled) return;
 
-        if (!isCreator && !isEnrolled) {
-            materialsStatusLabel.setText(bundle.getString("class.joinToAccess"));
-            materialsContainer.getChildren().clear();
-        }
-    }
-
-    private void setUploadSectionVisible(boolean visible) {
-        uploadSection.setVisible(visible);
-        uploadSection.setManaged(visible);
-    }
-
-
-    private void loadMaterials() {
-        if (!isCreator && !isEnrolled) return;
-
-        runAsync(() -> {
-            try {
-                Platform.runLater(() -> {
-                    materialsStatusLabel.setText(LocaleManager.getBundle().getString("class.loadingFiles"));
-                    materialsContainer.getChildren().clear();
-                });
-
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI("http://localhost:7700/api/materials/course/" + classId))
-                        .header("Authorization", "Bearer " + token)
-                        .GET()
-                        .build();
-
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-                if (response.statusCode() != 200) {
-                    Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getBundle().getString("class.couldNotLoadFiles")));
-                    return;
-                }
-
-                JsonArray materials = JsonParser.parseString(response.body()).getAsJsonArray();
-                List<JsonObject> rows = new ArrayList<>();
-                for (JsonElement element : materials) {
-                    if (element.isJsonObject()) {
-                        rows.add(element.getAsJsonObject());
-                    }
-                }
-                rows.sort(Comparator.comparing(o -> getStringOrDefault(o, "uploadedAt", ""), Comparator.reverseOrder()));
-
-                Platform.runLater(() -> renderMaterials(rows));
-            } catch (Exception e) {
-                Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getBundle().getString("class.couldNotLoadFilesShort")));
-            }
+    runAsync(() -> {
+      try {
+        Platform.runLater(() -> {
+          materialsStatusLabel.setText(LocaleManager.getBundle().getString("class.loadingFiles"));
+          materialsContainer.getChildren().clear();
         });
-    }
 
-    private void renderMaterials(List<JsonObject> materials) {
-        materialsContainer.getChildren().clear();
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(new URI("http://localhost:7700/api/materials/course/" + classId))
+            .header("Authorization", "Bearer " + token)
+            .GET()
+            .build();
 
-        if (materials.isEmpty()) {
-            materialsStatusLabel.setText(LocaleManager.getBundle().getString("class.noFilesUploadedYet"));
-            return;
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+          Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getBundle().getString("class.couldNotLoadFiles")));
+          return;
         }
 
-        materialsStatusLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("class.filesAvailable"), materials.size()));
-
-        for (JsonObject material : materials) {
-            materialsContainer.getChildren().add(createMaterialCard(material));
+        JsonArray materials = JsonParser.parseString(response.body()).getAsJsonArray();
+        List<JsonObject> rows = new ArrayList<>();
+        for (JsonElement element : materials) {
+          if (element.isJsonObject()) {
+            rows.add(element.getAsJsonObject());
+          }
         }
+        rows.sort(Comparator.comparing(o -> getStringOrDefault(o, "uploadedAt", ""), Comparator.reverseOrder()));
+
+        Platform.runLater(() -> renderMaterials(rows));
+      } catch (Exception e) {
+        Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getBundle().getString("class.couldNotLoadFilesShort")));
+      }
+    });
+  }
+
+  private void renderMaterials(List<JsonObject> materials) {
+    materialsContainer.getChildren().clear();
+
+    if (materials.isEmpty()) {
+      materialsStatusLabel.setText(LocaleManager.getBundle().getString("class.noFilesUploadedYet"));
+      return;
     }
 
-    private HBox createMaterialCard(JsonObject material) {
-        Integer fileId = material.has("fileId") && !material.get("fileId").isJsonNull() ? material.get("fileId").getAsInt() : null;
-        String filename = getStringOrDefault(material, "originalFilename", "Unnamed file");
-        String type = getStringOrDefault(material, "materialType", "Other");
-        String uploadedAt = getStringOrDefault(material, "uploadedAt", "Unknown date");
-        String uploader = material.has("userId") && !material.get("userId").isJsonNull()
-                ? MessageFormat.format(LocaleManager.getBundle().getString("class.uploadedByUser"), material.get("userId").getAsInt())
-                : LocaleManager.getBundle().getString("class.uploaderUnknown");
+    materialsStatusLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("class.filesAvailable"), materials.size()));
 
-        // File type badge color
-        String badgeColor = switch (type.toLowerCase()) {
-            case "lecture notes" -> "#3b82f6";
-            case "assignment"    -> "#f59e0b";
-            case "slides"        -> "#8b5cf6";
-            case "reference"     -> "#06b6d4";
-            default              -> "#64748b";
-        };
+    for (JsonObject material : materials) {
+      materialsContainer.getChildren().add(createMaterialCard(material));
+    }
+  }
 
-        Label nameLabel = new Label(filename);
-        nameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0f172a; -fx-font-family: 'Segoe UI';");
+  private HBox createMaterialCard(JsonObject material) {
+    Integer fileId = material.has("fileId") && !material.get("fileId").isJsonNull() ? material.get("fileId").getAsInt() : null;
+    String filename = getStringOrDefault(material, "originalFilename", "Unnamed file");
+    String type = getStringOrDefault(material, "materialType", "Other");
+    String uploadedAt = getStringOrDefault(material, "uploadedAt", "Unknown date");
+    String uploader = material.has("userId") && !material.get("userId").isJsonNull()
+            ? MessageFormat.format(LocaleManager.getBundle().getString("class.uploadedByUser"), material.get("userId").getAsInt())
+            : LocaleManager.getBundle().getString("class.uploaderUnknown");
 
-        Label typeBadge = new Label(type);
-        typeBadge.setStyle(
-                "-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: white; -fx-font-family: 'Segoe UI';" +
-                "-fx-background-color: " + badgeColor + "; -fx-background-radius: 20; -fx-padding: 2 9;"
-        );
+    // File type badge color
+    String badgeColor = switch (type.toLowerCase()) {
+      case "lecture notes" -> "#3b82f6";
+      case "assignment"    -> "#f59e0b";
+      case "slides"        -> "#8b5cf6";
+      case "reference"     -> "#06b6d4";
+      default              -> "#64748b";
+    };
 
-        Label metaLabel = new Label(uploader + "  ·  " + uploadedAt.replace("T", " "));
-        metaLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';");
+    Label nameLabel = new Label(filename);
+    nameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0f172a; -fx-font-family: 'Segoe UI';");
+
+    Label typeBadge = new Label(type);
+    typeBadge.setStyle(
+        "-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: white; -fx-font-family: 'Segoe UI';"
+                + "-fx-background-color: " + badgeColor + "; -fx-background-radius: 20; -fx-padding: 2 9;"
+    );
+
+    Label metaLabel = new Label(uploader + "  ·  " + uploadedAt.replace("T", " "));
+    metaLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';");
 
         Label rowStatusLabel = new Label("");
         rowStatusLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI';");
@@ -714,22 +723,22 @@ public class ClassController {
         return output.toByteArray();
     }
 
-    private void writeTextPart(ByteArrayOutputStream output, String boundary, String name, String value) throws IOException {
-        String crlf = "\r\n";
-        output.write(("--" + boundary + crlf).getBytes(StandardCharsets.UTF_8));
-        output.write(("Content-Disposition: form-data; name=\"" + name + "\"" + crlf + crlf).getBytes(StandardCharsets.UTF_8));
-        output.write(value.getBytes(StandardCharsets.UTF_8));
-        output.write(crlf.getBytes(StandardCharsets.UTF_8));
+  private void writeTextPart(ByteArrayOutputStream output, String boundary, String name, String value) throws IOException {
+    String crlf = "\r\n";
+    output.write(("--" + boundary + crlf).getBytes(StandardCharsets.UTF_8));
+    output.write(("Content-Disposition: form-data; name=\"" + name + "\"" + crlf + crlf).getBytes(StandardCharsets.UTF_8));
+    output.write(value.getBytes(StandardCharsets.UTF_8));
+    output.write(crlf.getBytes(StandardCharsets.UTF_8));
+  }
+
+  private void handleDownloadMaterial(Integer fileId, String filename, Button downloadButton, Button deleteButton, Label rowStatusLabel) {
+    if (fileId == null) {
+      return;
     }
 
-    private void handleDownloadMaterial(Integer fileId, String filename, Button downloadButton, Button deleteButton, Label rowStatusLabel) {
-        if (fileId == null) {
-            return;
-        }
-
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle(LocaleManager.getBundle().getString("class.dialog.saveMaterial"));
-        chooser.setInitialFileName(filename == null || filename.isBlank() ? LocaleManager.getBundle().getString("class.unknown") : filename);
+    FileChooser chooser = new FileChooser();
+    chooser.setTitle(LocaleManager.getBundle().getString("class.dialog.saveMaterial"));
+    chooser.setInitialFileName(filename == null || filename.isBlank() ? LocaleManager.getBundle().getString("class.unknown") : filename);
 
         File destination = chooser.showSaveDialog(classNameLabel.getScene().getWindow());
         if (destination == null) {
@@ -947,28 +956,27 @@ public class ClassController {
                     Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
                             MessageFormat.format(LocaleManager.getBundle().getString("class.error.leaveFailed"), response.statusCode())));
                 }
-            } catch (Exception e) {
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
-                        MessageFormat.format(LocaleManager.getBundle().getString("class.error.leaveFailedDetailed"), e.getMessage())));
-            }
-        });
-    }
+          } catch (Exception e) {
+            Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+              MessageFormat.format(LocaleManager.getBundle().getString("class.error.leaveFailedDetailed"), e.getMessage())));
+          }
+      });
+  }
 
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
+  private void showAlert(Alert.AlertType type, String title, String message) {
+      Alert alert = new Alert(type);
+      alert.setTitle(title);
+      alert.setHeaderText(null);
+      alert.setContentText(message);
+      alert.showAndWait();
+  }
 
     private record ReviewSubmitResult(boolean success, String message) {}
     private record ReviewsFetchResult(String message, List<String> reviewLines) {}
 }
 
 class ClassContextHolder {
-    private static Integer classId;
-
-    public static void setClassId(Integer id) { classId = id; }
-    public static Integer getClassId() { return classId; }
+  private static Integer classId;
+  public static void setClassId(Integer id) { classId = id; }
+  public static Integer getClassId() { return classId; }
 }
