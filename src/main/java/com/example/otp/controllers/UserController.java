@@ -4,49 +4,48 @@ import com.example.otp.dao.UserDao;
 import com.example.otp.model.User;
 import com.example.otp.util.BCryptUtil;
 import com.example.otp.util.JWTUtil;
-import io.javalin.http.Context;
-import io.javalin.http.HttpStatus;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
+import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
 import java.util.List;
 import java.util.Map;
 
 public class UserController {
-    private UserDao userDao = new UserDao();
+  private UserDao userDao = new UserDao();
 
-    private void jsonMessage(Context ctx, HttpStatus status, String message) {
-        ctx.status(status).json(Map.of("message", message));
-    }
+  private void jsonMessage(Context ctx, HttpStatus status, String message) {
+    ctx.status(status).json(Map.of("message", message));
+  }
 
-    public void register(Context ctx) {
-        try {
-            System.out.println("[REGISTRATION] Received registration request");
-            JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
-            String username = body.has("username") ? body.get("username").getAsString() : null;
-            String password = body.has("password") ? body.get("password").getAsString() : null;
-            String email = body.has("email") ? body.get("email").getAsString() : null;
+  public void register(Context ctx) {
+    try {
+      System.out.println("[REGISTRATION] Received registration request");
+      JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
+      String username = body.has("username") ? body.get("username").getAsString() : null;
+      String password = body.has("password") ? body.get("password").getAsString() : null;
+      String email = body.has("email") ? body.get("email").getAsString() : null;
 
-            System.out.println("[REGISTRATION] Username: " + username + ", Email: " + email);
+      System.out.println("[REGISTRATION] Username: " + username + ", Email: " + email);
 
-            if (username == null || password == null || email == null) {
-                jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
-                return;
-            }
+      if (username == null || password == null || email == null) {
+        jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
+        return;
+      }
 
-            User existing = userDao.findByUsername(username);
-            if (existing != null) {
-                System.out.println("[REGISTRATION] User already exists: " + username);
-                jsonMessage(ctx, HttpStatus.CONFLICT, "Username already exists");
-                return;
-            }
+      User existing = userDao.findByUsername(username);
+      if (existing != null) {
+        System.out.println("[REGISTRATION] User already exists: " + username);
+        jsonMessage(ctx, HttpStatus.CONFLICT, "Username already exists");
+        return;
+      }
 
-            User existingByEmail = userDao.findByEmail(email);
-            if (existingByEmail != null) {
-                System.out.println("[REGISTRATION] Email already exists: " + email);
-                jsonMessage(ctx, HttpStatus.CONFLICT, "Email already exists");
-                return;
-            }
+      User existingByEmail = userDao.findByEmail(email);
+      if (existingByEmail != null) {
+        System.out.println("[REGISTRATION] Email already exists: " + email);
+        jsonMessage(ctx, HttpStatus.CONFLICT, "Email already exists");
+        return;
+      }
 
             String hashedPassword = BCryptUtil.hashPassword(password);
             User user = new User();
