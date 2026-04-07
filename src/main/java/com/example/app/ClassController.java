@@ -332,8 +332,9 @@ public class ClassController {
 
     Label typeBadge = new Label(type);
     typeBadge.setStyle(
-        "-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: white; -fx-font-family: 'Segoe UI';"
-                + "-fx-background-color: " + badgeColor + "; -fx-background-radius: 20; -fx-padding: 2 9;"
+        "-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: white;"
+                + " -fx-font-family: 'Segoe UI'; -fx-background-color: " + badgeColor
+                + "; -fx-background-radius: 20; -fx-padding: 2 9;"
     );
 
     Label metaLabel = new Label(uploader + "  ·  " + uploadedAt.replace("T", " "));
@@ -417,35 +418,35 @@ public class ClassController {
 
       dialogStage.showAndWait();
     } catch (Exception e) {
-        showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.reviews.title"),
-          MessageFormat.format(LocaleManager.getBundle().getString("class.error.openReviews"), e.getMessage()));
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.reviews.title"),
+        MessageFormat.format(LocaleManager.getBundle().getString("class.error.openReviews"), e.getMessage()));
     }
   }
 
-    private ReviewsFetchResult fetchMaterialReviews(Integer fileId) {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:7700/api/reviews/material/" + fileId))
-                    .header("Authorization", "Bearer " + token)
-                    .GET()
-                    .build();
+  private ReviewsFetchResult fetchMaterialReviews(Integer fileId) {
+    try {
+      HttpRequest request = HttpRequest.newBuilder()
+          .uri(new URI("http://localhost:7700/api/reviews/material/" + fileId))
+          .header("Authorization", "Bearer " + token)
+          .GET()
+          .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                return new ReviewsFetchResult("Could not load reviews (" + response.statusCode() + ").", new ArrayList<>());
-            }
+      HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+      if (response.statusCode() != 200) {
+        return new ReviewsFetchResult("Could not load reviews (" + response.statusCode() + ").", new ArrayList<>());
+      }
 
             JsonArray reviewsArray = JsonParser.parseString(response.body()).getAsJsonArray();
             List<String> lines = new ArrayList<>();
-            for (JsonElement element : reviewsArray) {
-                if (!element.isJsonObject()) {
-                    continue;
-                }
-                JsonObject review = element.getAsJsonObject();
-                String rating = review.has("rating") && !review.get("rating").isJsonNull()
-                        ? String.valueOf(review.get("rating").getAsInt())
+      for (JsonElement element : reviewsArray) {
+        if (!element.isJsonObject()) {
+          continue;
+        }
+        JsonObject review = element.getAsJsonObject();
+        String rating = review.has("rating") && !review.get("rating").isJsonNull()
+          ? String.valueOf(review.get("rating").getAsInt())
                         : "-";
-                String reviewer = review.has("userId") && !review.get("userId").isJsonNull()
+        String reviewer = review.has("userId") && !review.get("userId").isJsonNull()
                         ? MessageFormat.format(LocaleManager.getBundle().getString("class.reviewer"), review.get("userId").getAsInt())
                         : LocaleManager.getBundle().getString("class.unknownUser");
                 String comment = getStringOrDefault(review, "comment", getStringOrDefault(review, "review", ""));
@@ -459,8 +460,8 @@ public class ClassController {
                     ? LocaleManager.getBundle().getString("class.noReviewsYet")
                     : MessageFormat.format(LocaleManager.getBundle().getString("class.reviewCount"), lines.size());
             return new ReviewsFetchResult(status, lines);
-        } catch (Exception e) {
-            return new ReviewsFetchResult(LocaleManager.getBundle().getString("class.error.reviewListUnavailable"), new ArrayList<>());
+    } catch (Exception e) {
+      return new ReviewsFetchResult(LocaleManager.getBundle().getString("class.error.reviewListUnavailable"), new ArrayList<>());
         }
     }
 
@@ -470,7 +471,7 @@ public class ClassController {
                                   Button deleteButton,
                                   Button reviewButton,
                                   Label rowStatusLabel) {
-        if (isCreator) {
+      if (isCreator) {
             showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
                     LocaleManager.getBundle().getString("class.error.forbiddenReview"));
             return;
@@ -482,31 +483,31 @@ public class ClassController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/app/review-dialog.fxml"));
             loader.setResources(LocaleManager.getBundle());
-            Scene scene = new Scene(loader.load());
+      Scene scene = new Scene(loader.load());
 
-            ReviewDialogController dialogController = loader.getController();
-            dialogController.setMaterialName(filename);
+      ReviewDialogController dialogController = loader.getController();
+      dialogController.setMaterialName(filename);
 
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle(LocaleManager.getBundle().getString("review.dialog.title"));
-            dialogStage.initOwner(classNameLabel.getScene().getWindow());
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.setResizable(false);
-            dialogStage.setScene(scene);
-            dialogStage.showAndWait();
+      Stage dialogStage = new Stage();
+      dialogStage.setTitle(LocaleManager.getBundle().getString("review.dialog.title"));
+      dialogStage.initOwner(classNameLabel.getScene().getWindow());
+      dialogStage.initModality(Modality.WINDOW_MODAL);
+      dialogStage.setResizable(false);
+      dialogStage.setScene(scene);
+      dialogStage.showAndWait();
 
-            if (dialogController.isSubmitted()) {
-                handleSubmitReview(
-                        fileId,
-                        dialogController.getSelectedRating(),
-                        dialogController.getComment(),
-                        downloadButton,
-                        deleteButton,
-                        reviewButton,
-                        rowStatusLabel
-                );
-            }
-        } catch (Exception e) {
+      if (dialogController.isSubmitted()) {
+        handleSubmitReview(
+            fileId,
+            dialogController.getSelectedRating(),
+            dialogController.getComment(),
+            downloadButton,
+            deleteButton,
+            reviewButton,
+            rowStatusLabel
+        );
+      }
+    } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.review.title"),
                     MessageFormat.format(LocaleManager.getBundle().getString("class.error.openReviewForm"), e.getMessage()));
         }
@@ -531,33 +532,33 @@ public class ClassController {
                     LocaleManager.getBundle().getString("class.error.invalidRating"));
             return;
         }
-        if (trimmedComment.isBlank() || trimmedComment.length() > REVIEW_COMMENT_MAX_LENGTH) {
+      if (trimmedComment.isBlank() || trimmedComment.length() > REVIEW_COMMENT_MAX_LENGTH) {
             showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.review.title"),
                     MessageFormat.format(LocaleManager.getBundle().getString("class.error.invalidComment"), REVIEW_COMMENT_MAX_LENGTH));
-            return;
+      return;
+      }
+
+    downloadButton.setDisable(true);
+    reviewButton.setDisable(true);
+    if (deleteButton != null && deleteButton.isManaged()) {
+      deleteButton.setDisable(true);
+    }
+    rowStatusLabel.setText(LocaleManager.getBundle().getString("class.status.submittingReview"));
+    rowStatusLabel.setVisible(true);
+    rowStatusLabel.setManaged(true);
+
+    runAsync(() -> {
+      ReviewSubmitResult result = submitMaterialReview(fileId, rating, trimmedComment);
+      Platform.runLater(() -> {
+        downloadButton.setDisable(false);
+        reviewButton.setDisable(false);
+        if (deleteButton != null && deleteButton.isManaged()) {
+          deleteButton.setDisable(false);
         }
 
-        downloadButton.setDisable(true);
-        reviewButton.setDisable(true);
-        if (deleteButton != null && deleteButton.isManaged()) {
-            deleteButton.setDisable(true);
-        }
-        rowStatusLabel.setText(LocaleManager.getBundle().getString("class.status.submittingReview"));
+        rowStatusLabel.setText(result.message());
         rowStatusLabel.setVisible(true);
         rowStatusLabel.setManaged(true);
-
-        runAsync(() -> {
-            ReviewSubmitResult result = submitMaterialReview(fileId, rating, trimmedComment);
-            Platform.runLater(() -> {
-                downloadButton.setDisable(false);
-                reviewButton.setDisable(false);
-                if (deleteButton != null && deleteButton.isManaged()) {
-                    deleteButton.setDisable(false);
-                }
-
-                rowStatusLabel.setText(result.message());
-                rowStatusLabel.setVisible(true);
-                rowStatusLabel.setManaged(true);
 
                 if (result.success()) {
                     showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString("home.success.title"),
@@ -569,31 +570,31 @@ public class ClassController {
         });
     }
 
-    private ReviewSubmitResult submitMaterialReview(Integer fileId, Integer rating, String comment) {
-        try {
-            JsonObject reviewData = new JsonObject();
-            reviewData.addProperty("fileId", fileId);
-            reviewData.addProperty("rating", rating);
-            reviewData.addProperty("review", comment);
+  private ReviewSubmitResult submitMaterialReview(Integer fileId, Integer rating, String comment) {
+    try {
+      JsonObject reviewData = new JsonObject();
+      reviewData.addProperty("fileId", fileId);
+      reviewData.addProperty("rating", rating);
+      reviewData.addProperty("review", comment);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:7700/api/reviews"))
-                    .header("Authorization", "Bearer " + token)
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(reviewData.toString()))
-                    .build();
+      HttpRequest request = HttpRequest.newBuilder()
+          .uri(new URI("http://localhost:7700/api/reviews"))
+          .header("Authorization", "Bearer " + token)
+          .header("Content-Type", "application/json")
+          .POST(HttpRequest.BodyPublishers.ofString(reviewData.toString()))
+          .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200 || response.statusCode() == 201) {
-                return new ReviewSubmitResult(true, "Review submitted");
-            }
+      HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+      if (response.statusCode() == 200 || response.statusCode() == 201) {
+        return new ReviewSubmitResult(true, "Review submitted");
+      }
 
-            String fallbackMessage = "Could not submit review right now (" + response.statusCode() + ").";
-            return new ReviewSubmitResult(false, extractApiMessage(response.body(), fallbackMessage));
-        } catch (Exception e) {
-            return new ReviewSubmitResult(false, "Review API unavailable. Connect backend endpoint /api/reviews. Details: " + e.getMessage());
-        }
+      String fallbackMessage = "Could not submit review right now (" + response.statusCode() + ").";
+      return new ReviewSubmitResult(false, extractApiMessage(response.body(), fallbackMessage));
+    } catch (Exception e) {
+      return new ReviewSubmitResult(false, "Review API unavailable. Connect backend endpoint /api/reviews. Details: " + e.getMessage());
     }
+  }
 
     @FXML
     private void handleJoinClass() {
@@ -888,10 +889,10 @@ public class ClassController {
             return;
         }
 
-        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmDialog.setTitle(LocaleManager.getBundle().getString("class.confirm.delete.title"));
-        confirmDialog.setHeaderText(LocaleManager.getBundle().getString("class.confirm.delete.header"));
-        confirmDialog.setContentText(LocaleManager.getBundle().getString("class.confirm.delete.content"));
+    Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+    confirmDialog.setTitle(LocaleManager.getBundle().getString("class.confirm.delete.title"));
+    confirmDialog.setHeaderText(LocaleManager.getBundle().getString("class.confirm.delete.header"));
+    confirmDialog.setContentText(LocaleManager.getBundle().getString("class.confirm.delete.content"));
 
     if (confirmDialog.showAndWait().isEmpty() || confirmDialog.getResult() != ButtonType.OK) {
       return;
