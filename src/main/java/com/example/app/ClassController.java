@@ -78,15 +78,16 @@ public class ClassController {
     userId = SessionManager.getUserId();
     classId = ClassContextHolder.getClassId();
 
-    materialTypeCombo.getItems().setAll("Lecture Notes", "Assignment", "Slides", "Reference",
-            "Other");
+    materialTypeCombo.getItems().setAll("Lecture Notes", "Assignment", "Slides",
+            "Reference", "Other");
     materialTypeCombo.getSelectionModel().selectFirst();
 
     setUploadSectionVisible(false);
     setUploadProgressVisible(false, "");
 
     if (classId == null) {
-      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(
+              "class.error.title"),
           LocaleManager.getBundle().getString("class.error.missingId"));
       return;
     }
@@ -262,10 +263,12 @@ public class ClassController {
             .GET()
             .build();
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers
+                .ofString());
 
         if (response.statusCode() != 200) {
-          Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getBundle().getString("class.couldNotLoadFiles")));
+          Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getBundle().getString(
+                  "class.couldNotLoadFiles")));
           return;
         }
 
@@ -276,11 +279,13 @@ public class ClassController {
             rows.add(element.getAsJsonObject());
           }
         }
-        rows.sort(Comparator.comparing(o -> getStringOrDefault(o, "uploadedAt", ""), Comparator.reverseOrder()));
+        rows.sort(Comparator.comparing(o -> getStringOrDefault(o, "uploadedAt", ""),
+                Comparator.reverseOrder()));
 
         Platform.runLater(() -> renderMaterials(rows));
       } catch (Exception e) {
-        Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getBundle().getString("class.couldNotLoadFilesShort")));
+        Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getBundle().getString(
+                "class.couldNotLoadFilesShort")));
       }
     });
   }
@@ -293,7 +298,8 @@ public class ClassController {
       return;
     }
 
-    materialsStatusLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("class.filesAvailable"), materials.size()));
+    materialsStatusLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString(
+            "class.filesAvailable"), materials.size()));
 
     for (JsonObject material : materials) {
       materialsContainer.getChildren().add(createMaterialCard(material));
@@ -301,12 +307,14 @@ public class ClassController {
   }
 
   private HBox createMaterialCard(JsonObject material) {
-    Integer fileId = material.has("fileId") && !material.get("fileId").isJsonNull() ? material.get("fileId").getAsInt() : null;
+    Integer fileId = material.has("fileId") && !material.get("fileId").isJsonNull() ? material.get(
+            "fileId").getAsInt() : null;
     String filename = getStringOrDefault(material, "originalFilename", "Unnamed file");
     String type = getStringOrDefault(material, "materialType", "Other");
     String uploadedAt = getStringOrDefault(material, "uploadedAt", "Unknown date");
     String uploader = material.has("userId") && !material.get("userId").isJsonNull()
-            ? MessageFormat.format(LocaleManager.getBundle().getString("class.uploadedByUser"), material.get("userId").getAsInt())
+            ? MessageFormat.format(LocaleManager.getBundle().getString("class.uploadedByUser"),
+            material.get("userId").getAsInt())
             : LocaleManager.getBundle().getString("class.uploaderUnknown");
 
     // File type badge color
@@ -319,7 +327,8 @@ public class ClassController {
     };
 
     Label nameLabel = new Label(filename);
-    nameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0f172a; -fx-font-family: 'Segoe UI';");
+    nameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;"
+            + "-fx-text-fill: #0f172a; -fx-font-family: 'Segoe UI';");
 
     Label typeBadge = new Label(type);
     typeBadge.setStyle(
@@ -330,88 +339,88 @@ public class ClassController {
     Label metaLabel = new Label(uploader + "  ·  " + uploadedAt.replace("T", " "));
     metaLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';");
 
-        Label rowStatusLabel = new Label("");
-        rowStatusLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI';");
-        rowStatusLabel.setVisible(false);
-        rowStatusLabel.setManaged(false);
+    Label rowStatusLabel = new Label("");
+    rowStatusLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI';");
+    rowStatusLabel.setVisible(false);
+    rowStatusLabel.setManaged(false);
 
-        HBox badgeRow = new HBox(8, typeBadge);
-        badgeRow.setAlignment(Pos.CENTER_LEFT);
-        VBox infoBox = new VBox(5, nameLabel, badgeRow, metaLabel, rowStatusLabel);
-        infoBox.setAlignment(Pos.CENTER_LEFT);
+    HBox badgeRow = new HBox(8, typeBadge);
+    badgeRow.setAlignment(Pos.CENTER_LEFT);
+    VBox infoBox = new VBox(5, nameLabel, badgeRow, metaLabel, rowStatusLabel);
+    infoBox.setAlignment(Pos.CENTER_LEFT);
 
-        String btnBase = "-fx-font-size: 12px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';" +
-                         "-fx-padding: 7 14; -fx-background-radius: 7; -fx-cursor: hand;";
+    String btnBase = "-fx-font-size: 12px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"
+            + "-fx-padding: 7 14; -fx-background-radius: 7; -fx-cursor: hand;";
 
-        Button downloadButton = new Button(LocaleManager.getBundle().getString("class.download"));
-        downloadButton.setStyle(btnBase + "-fx-background-color: #22c55e; -fx-text-fill: white;");
-        downloadButton.setDisable(fileId == null);
+    Button downloadButton = new Button(LocaleManager.getBundle().getString("class.download"));
+    downloadButton.setStyle(btnBase + "-fx-background-color: #22c55e; -fx-text-fill: white;");
+    downloadButton.setDisable(fileId == null);
 
-        Button viewReviewsButton = new Button(LocaleManager.getBundle().getString("class.reviews"));
-        viewReviewsButton.setStyle(btnBase + "-fx-background-color: #e2e8f0; -fx-text-fill: #334155;");
-        viewReviewsButton.setDisable(fileId == null);
+    Button viewReviewsButton = new Button(LocaleManager.getBundle().getString("class.reviews"));
+    viewReviewsButton.setStyle(btnBase + "-fx-background-color: #e2e8f0; -fx-text-fill: #334155;");
+    viewReviewsButton.setDisable(fileId == null);
 
-        Button reviewButton = new Button(LocaleManager.getBundle().getString("class.review"));
-        reviewButton.setStyle(btnBase + "-fx-background-color: #3b82f6; -fx-text-fill: white;");
-        reviewButton.setDisable(fileId == null || !isEnrolled);
-        reviewButton.setVisible(!isCreator);
-        reviewButton.setManaged(!isCreator);
+    Button reviewButton = new Button(LocaleManager.getBundle().getString("class.review"));
+    reviewButton.setStyle(btnBase + "-fx-background-color: #3b82f6; -fx-text-fill: white;");
+    reviewButton.setDisable(fileId == null || !isEnrolled);
+    reviewButton.setVisible(!isCreator);
+    reviewButton.setManaged(!isCreator);
 
-        Button deleteButton = new Button(LocaleManager.getBundle().getString("class.delete"));
-        deleteButton.setStyle(btnBase + "-fx-background-color: #fee2e2; -fx-text-fill: #dc2626;");
-        deleteButton.setDisable(fileId == null);
-        deleteButton.setVisible(isCreator);
-        deleteButton.setManaged(isCreator);
+    Button deleteButton = new Button(LocaleManager.getBundle().getString("class.delete"));
+    deleteButton.setStyle(btnBase + "-fx-background-color: #fee2e2; -fx-text-fill: #dc2626;");
+    deleteButton.setDisable(fileId == null);
+    deleteButton.setVisible(isCreator);
+    deleteButton.setManaged(isCreator);
 
-        downloadButton.setOnAction(e -> handleDownloadMaterial(fileId, filename, downloadButton, deleteButton, rowStatusLabel));
-        viewReviewsButton.setOnAction(e -> openViewReviewsDialog(fileId, filename));
-        reviewButton.setOnAction(e -> openReviewDialog(fileId, filename, downloadButton, deleteButton, reviewButton, rowStatusLabel));
-        deleteButton.setOnAction(e -> handleDeleteMaterial(fileId, filename, downloadButton, deleteButton, rowStatusLabel));
+    downloadButton.setOnAction(e -> handleDownloadMaterial(fileId, filename, downloadButton, deleteButton, rowStatusLabel));
+    viewReviewsButton.setOnAction(e -> openViewReviewsDialog(fileId, filename));
+    reviewButton.setOnAction(e -> openReviewDialog(fileId, filename, downloadButton, deleteButton, reviewButton, rowStatusLabel));
+    deleteButton.setOnAction(e -> handleDeleteMaterial(fileId, filename, downloadButton, deleteButton, rowStatusLabel));
 
-        HBox actions = new HBox(8, downloadButton, viewReviewsButton, reviewButton, deleteButton);
-        actions.setAlignment(Pos.CENTER_RIGHT);
-        HBox row = new HBox(16, infoBox, actions);
-        row.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(infoBox, Priority.ALWAYS);
-        row.setStyle(
-                "-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0;" +
-                "-fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 14 16;"
-        );
-        return row;
+    HBox actions = new HBox(8, downloadButton, viewReviewsButton, reviewButton, deleteButton);
+    actions.setAlignment(Pos.CENTER_RIGHT);
+    HBox row = new HBox(16, infoBox, actions);
+    row.setAlignment(Pos.CENTER_LEFT);
+    HBox.setHgrow(infoBox, Priority.ALWAYS);
+    row.setStyle(
+            "-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0;"
+                    + "-fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 14 16;"
+    );
+    return row;
+  }
+
+  private void openViewReviewsDialog(Integer fileId, String filename) {
+    if (fileId == null) {
+      return;
     }
 
-    private void openViewReviewsDialog(Integer fileId, String filename) {
-        if (fileId == null) {
-            return;
-        }
+    try {
+      FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/app/view-reviews-dialog.fxml"));
+      loader.setResources(LocaleManager.getBundle());
+      Scene scene = new Scene(loader.load());
 
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/app/view-reviews-dialog.fxml"));
-            loader.setResources(LocaleManager.getBundle());
-            Scene scene = new Scene(loader.load());
+      ViewReviewsDialogController controller = loader.getController();
+      controller.setMaterialName(filename);
+      controller.setStatus(LocaleManager.getBundle().getString("viewreviews.loading"));
 
-            ViewReviewsDialogController controller = loader.getController();
-            controller.setMaterialName(filename);
-            controller.setStatus(LocaleManager.getBundle().getString("viewreviews.loading"));
+      Stage dialogStage = new Stage();
+      dialogStage.setTitle(LocaleManager.getBundle().getString("viewreviews.title"));
+      dialogStage.initOwner(classNameLabel.getScene().getWindow());
+      dialogStage.initModality(Modality.WINDOW_MODAL);
+      dialogStage.setResizable(false);
+      dialogStage.setScene(scene);
 
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle(LocaleManager.getBundle().getString("viewreviews.title"));
-            dialogStage.initOwner(classNameLabel.getScene().getWindow());
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.setResizable(false);
-            dialogStage.setScene(scene);
+      runAsync(() -> {
+        ReviewsFetchResult result = fetchMaterialReviews(fileId);
+        Platform.runLater(() -> controller.setReviewLines(result.reviewLines(), result.message()));
+      });
 
-            runAsync(() -> {
-                ReviewsFetchResult result = fetchMaterialReviews(fileId);
-                Platform.runLater(() -> controller.setReviewLines(result.reviewLines(), result.message()));
-            });
-
-            dialogStage.showAndWait();
-        } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.reviews.title"),
-                    MessageFormat.format(LocaleManager.getBundle().getString("class.error.openReviews"), e.getMessage()));
-        }
+      dialogStage.showAndWait();
+    } catch (Exception e) {
+        showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.reviews.title"),
+          MessageFormat.format(LocaleManager.getBundle().getString("class.error.openReviews"), e.getMessage()));
     }
+  }
 
     private ReviewsFetchResult fetchMaterialReviews(Integer fileId) {
         try {
@@ -624,19 +633,19 @@ public class ClassController {
 
     @FXML
     private void handleChooseFile() {
-        if (!isCreator) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
-                    LocaleManager.getBundle().getString("class.error.onlyCreatorUpload"));
-            return;
-        }
+      if (!isCreator) {
+        showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+            LocaleManager.getBundle().getString("class.error.onlyCreatorUpload"));
+        return;
+      }
 
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle(LocaleManager.getBundle().getString("class.dialog.selectMaterialFile"));
-        File file = chooser.showOpenDialog(classNameLabel.getScene().getWindow());
-        if (file != null) {
-            selectedFile = file;
-            selectedFileLabel.setText(file.getName());
-        }
+      FileChooser chooser = new FileChooser();
+      chooser.setTitle(LocaleManager.getBundle().getString("class.dialog.selectMaterialFile"));
+      File file = chooser.showOpenDialog(classNameLabel.getScene().getWindow());
+      if (file != null) {
+        selectedFile = file;
+        selectedFileLabel.setText(file.getName());
+      }
     }
 
     @FXML
@@ -884,99 +893,110 @@ public class ClassController {
         confirmDialog.setHeaderText(LocaleManager.getBundle().getString("class.confirm.delete.header"));
         confirmDialog.setContentText(LocaleManager.getBundle().getString("class.confirm.delete.content"));
 
-        if (confirmDialog.showAndWait().isEmpty() || confirmDialog.getResult() != ButtonType.OK) {
-            return;
-        }
-
-        runAsync(() -> {
-            try {
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI("http://localhost:7700/api/courses/" + classId))
-                        .header("Authorization", "Bearer " + token)
-                        .DELETE()
-                        .build();
-
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-                if (response.statusCode() == 200 || response.statusCode() == 204) {
-                    Platform.runLater(() -> {
-                        showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString("home.success.title"),
-                                LocaleManager.getBundle().getString("class.success.classDeleted"));
-                        SceneManager.loadHome();
-                    });
-                } else {
-                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
-                            MessageFormat.format(LocaleManager.getBundle().getString("class.error.classDeleteFailed"), response.statusCode())));
-                }
-            } catch (Exception e) {
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
-                        MessageFormat.format(LocaleManager.getBundle().getString("class.error.classDeleteFailedDetailed"), e.getMessage())));
-            }
-        });
+    if (confirmDialog.showAndWait().isEmpty() || confirmDialog.getResult() != ButtonType.OK) {
+      return;
     }
 
-    @FXML
-    private void handleLeaveClass() {
-        if (!isEnrolled || isCreator) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
-                    LocaleManager.getBundle().getString("class.error.notEnrolled"));
-            return;
+    runAsync(() -> {
+      try {
+        HttpRequest request = HttpRequest.newBuilder()
+          .uri(new URI("http://localhost:7700/api/courses/" + classId))
+          .header("Authorization", "Bearer " + token)
+          .DELETE()
+          .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200 || response.statusCode() == 204) {
+          Platform.runLater(() -> {
+            showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString("home.success.title"),
+                LocaleManager.getBundle().getString("class.success.classDeleted"));
+            SceneManager.loadHome();
+          });
+        } else {
+          Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+          MessageFormat.format(LocaleManager.getBundle().getString("class.error.classDeleteFailed"), response.statusCode())));
         }
+      } catch (Exception e) {
+        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+        MessageFormat.format(LocaleManager.getBundle().getString("class.error.classDeleteFailedDetailed"), e.getMessage())));
+      }
+    });
+  }
 
-        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmDialog.setTitle(LocaleManager.getBundle().getString("class.confirm.leave.title"));
-        confirmDialog.setHeaderText(LocaleManager.getBundle().getString("class.confirm.leave.header"));
-        confirmDialog.setContentText(LocaleManager.getBundle().getString("class.confirm.leave.content"));
-        if (confirmDialog.showAndWait().isEmpty() || confirmDialog.getResult() != ButtonType.OK) {
-            return;
+  @FXML
+  private void handleLeaveClass() {
+    if (!isEnrolled || isCreator) {
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+          LocaleManager.getBundle().getString("class.error.notEnrolled"));
+      return;
+    }
+
+    Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+      confirmDialog.setTitle(LocaleManager.getBundle().getString("class.confirm.leave.title"));
+      confirmDialog.setHeaderText(LocaleManager.getBundle().getString("class.confirm.leave.header"));
+      confirmDialog.setContentText(LocaleManager.getBundle().getString("class.confirm.leave.content"));
+    if (confirmDialog.showAndWait().isEmpty() || confirmDialog.getResult() != ButtonType.OK) {
+      return;
+    }
+
+    runAsync(() -> {
+      try {
+        JsonObject unenrollData = new JsonObject();
+        unenrollData.addProperty("userId", userId);
+        unenrollData.addProperty("classId", classId);
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(new URI("http://localhost:7700/api/participants/unenroll"))
+            .header("Authorization", "Bearer " + token)
+            .header("Content-Type", "application/json")
+            .method("DELETE", HttpRequest.BodyPublishers.ofString(unenrollData.toString()))
+            .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200 || response.statusCode() == 204) {
+          Platform.runLater(() -> {
+            showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString("home.success.title"),
+                LocaleManager.getBundle().getString("class.success.leftClass"));
+            SceneManager.loadHome();
+          });
+        } else {
+          Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle()
+                          .getString("class.error.title"),
+              MessageFormat.format(LocaleManager.getBundle().getString(
+                      "class.error.leaveFailed"), response.statusCode())));
         }
-
-        runAsync(() -> {
-            try {
-                JsonObject unenrollData = new JsonObject();
-                unenrollData.addProperty("userId", userId);
-                unenrollData.addProperty("classId", classId);
-
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI("http://localhost:7700/api/participants/unenroll"))
-                        .header("Authorization", "Bearer " + token)
-                        .header("Content-Type", "application/json")
-                        .method("DELETE", HttpRequest.BodyPublishers.ofString(unenrollData.toString()))
-                        .build();
-
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-                if (response.statusCode() == 200 || response.statusCode() == 204) {
-                    Platform.runLater(() -> {
-                        showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString("home.success.title"),
-                                LocaleManager.getBundle().getString("class.success.leftClass"));
-                        SceneManager.loadHome();
-                    });
-                } else {
-                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
-                            MessageFormat.format(LocaleManager.getBundle().getString("class.error.leaveFailed"), response.statusCode())));
-                }
-          } catch (Exception e) {
-            Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
-              MessageFormat.format(LocaleManager.getBundle().getString("class.error.leaveFailedDetailed"), e.getMessage())));
-          }
-      });
+      } catch (Exception e) {
+        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle()
+                        .getString("class.error.title"),
+            MessageFormat.format(LocaleManager.getBundle().getString(
+                    "class.error.leaveFailedDetailed"), e.getMessage())));
+      }
+    });
   }
 
   private void showAlert(Alert.AlertType type, String title, String message) {
-      Alert alert = new Alert(type);
-      alert.setTitle(title);
-      alert.setHeaderText(null);
-      alert.setContentText(message);
-      alert.showAndWait();
+    Alert alert = new Alert(type);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    alert.setContentText(message);
+    alert.showAndWait();
   }
 
-    private record ReviewSubmitResult(boolean success, String message) {}
-    private record ReviewsFetchResult(String message, List<String> reviewLines) {}
+  private record ReviewSubmitResult(boolean success, String message) {}
+
+  private record ReviewsFetchResult(String message, List<String> reviewLines) {}
 }
 
 class ClassContextHolder {
   private static Integer classId;
-  public static void setClassId(Integer id) { classId = id; }
-  public static Integer getClassId() { return classId; }
+
+  public static void setClassId(Integer id) {
+    classId = id;
+  }
+
+  public static Integer getClassId() {
+    return classId;
+  }
 }
