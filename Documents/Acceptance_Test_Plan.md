@@ -87,6 +87,7 @@ This maps each test case to the criteria and shows which parts of the code it to
 - **Setup:** testuser1 is logged in (has valid JWT).
 - **Steps:** POST `/api/courses` with JWT in header, body: `{ "className": "Math 101", "topic": "Mathematics" }`
 - **Expected:** 201. New row in `classes` table with testuser1 as `creator_id`. Also a row in `participants` since the creator gets auto-enrolled.
+- **EXTRA might need to store the class id so other user can test joining class.
 
 **Create class with a name that's already used**
 
@@ -111,6 +112,7 @@ This maps each test case to the criteria and shows which parts of the code it to
 - **Setup:** testuser2 is logged in. Math 101 exists. testuser2 isn't enrolled yet.
 - **Steps:** POST `/api/participants` with `{ "userId": <testuser2_id>, "classId": <math101_id> }`
 - **Expected:** 200/201. New row in `participants` linking testuser2 to the class.
+- **EXTRA use the id gotten from create class test
 
 **Download material as enrolled user**
 
