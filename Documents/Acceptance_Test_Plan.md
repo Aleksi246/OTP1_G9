@@ -28,31 +28,31 @@ These come from the 11 main user stories we've been working with throughout the 
 
 This maps each test case to the criteria and shows which parts of the code it touches:
 
-| Test | Criteria | What's being tested | Priority |
-|------|----------|---------------------|----------|
-| Register (happy path) | 1 | New user signs up successfully | High |
-| Register (duplicate) | 1 | Try registering with taken username/email | High |
-| Login (happy path) | 2 | User logs in with correct credentials | High |
-| Login (bad password) | 2 | Wrong password gets rejected | High |
-| Create class | 3 | Make a new class | High |
-| Create class (duplicate name) | 3 | Try making a class with a name that exists | Medium |
-| Upload material | 4 | Creator uploads a file | High |
-| Upload (non-creator) | 4 | Someone who isn't the creator tries to upload | High |
-| Join class | 5 | User joins an existing class | High |
-| Download (enrolled) | 6 | Enrolled user downloads a file | High |
-| Download (not enrolled) | 6 | Non-member tries to download | High |
-| Submit review | 7 | Leave a review + rating | High |
-| Review (bad rating) | 7 | Rating outside 0–5 | Medium |
-| View reviews | 8 | See all reviews for a material | Medium |
-| Delete material | 9 | Creator removes a file | High |
-| Delete class | 10 | Creator deletes class (cascade) | High |
-| Logout | 11 | Log out and lose access | Medium |
-| Registration & login UI | 1, 2 | UI flow for register + login | Medium |
-| Class + material workflow UI | 3–10 | Full workflow in the GUI | Medium |
-| Review dialog UI | 7, 8 | Usability of review screens | Medium |
-| API response times | All | Speed under load | Low |
-| Big file upload/download | 4, 6 | Large files don't break things | Low |
-| Concurrent users | All | Multiple users at the same time | Low |
+| Test | Criteria | What's being tested |
+|------|----------|---------------------|
+| Register (valid input) | 1 | New user signs up successfully |
+| Register (duplicate) | 1 | Try registering with taken username/email |
+| Login (correct credentials) | 2 | User logs in and gets a token |
+| Login (wrong password) | 2 | Wrong password gets rejected |
+| Create class | 3 | Make a new class |
+| Create class (duplicate name) | 3 | Try making a class with a name that exists |
+| Upload material | 4 | Creator uploads a file |
+| Upload (non-creator) | 4 | Someone who isn't the creator tries to upload |
+| Join class | 5 | User joins an existing class |
+| Download (enrolled) | 6 | Enrolled user downloads a file |
+| Download (not enrolled) | 6 | Non-member tries to download |
+| Submit review | 7 | Leave a review + rating |
+| Review (bad rating) | 7 | Rating outside 0–5 |
+| View reviews | 8 | See all reviews for a material |
+| Delete material | 9 | Creator removes a file |
+| Delete class | 10 | Creator deletes class (cascade) |
+| Logout | 11 | Log out and lose access |
+| Registration & login UI | 1, 2 | UI flow for register + login |
+| Class + material workflow UI | 3–10 | Full workflow in the GUI |
+| Review dialog UI | 7, 8 | Usability of review screens |
+| API response times | All | Speed under load |
+| Big file upload/download | 4, 6 | Large files don't break things |
+| Concurrent users | All | Multiple users at the same time |
 
 ## Test Cases
 
@@ -238,8 +238,7 @@ We're running tests against this setup:
 - Server starts up and responds
 
 **We're done when:**
-- All the High-priority functional tests pass
-- Medium-priority tests either pass or we've documented why not
+- All the functional tests pass
 - No showstopper bugs left open
 - A new user can go through the whole flow (register → create class → upload → join → download → review → delete) without needing help
 - Performance numbers look reasonable (under 500ms, big files work)
