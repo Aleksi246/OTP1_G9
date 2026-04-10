@@ -22,6 +22,18 @@ public class SceneManager {
 
     private static void loadScene(String name, boolean addToHistory) {
         try {
+            var resource = SceneManager.class.getResource("/com/example/app/" + name + ".fxml");
+            if (resource == null) {
+                throw new IllegalStateException("Scene FXML not found: " + name);
+            }
+
+            FXMLLoader loader = new FXMLLoader(resource);
+            loader.setCharset(StandardCharsets.UTF_8);
+            loader.setResources(LocaleManager.getBundle());
+            Scene scene = new Scene(loader.load());
+            scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
+
+            // Commit navigation state only after successful scene construction.
             currentSceneName = name;
             if (addToHistory) {
                 if (currentIndex < navigationHistory.size() - 1) {
@@ -30,14 +42,11 @@ public class SceneManager {
                 navigationHistory.add(name);
                 currentIndex++;
             }
-            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/com/example/app/" + name + ".fxml"));
-            loader.setCharset(StandardCharsets.UTF_8);
-            loader.setResources(LocaleManager.getBundle());
-            Scene scene = new Scene(loader.load());
-            scene.setNodeOrientation(LocaleManager.isRightToLeft() ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT);
-            applyScene(scene, LocaleManager.getBundle().getString("app.title") + " - " + name);
+
+            applyScene(scene, LocaleManager.getString("app.title") + " - " + name);
         } catch (Exception e) {
             System.err.println("Error loading " + name + " scene: " + e.getMessage());
+            System.err.println("Full stack trace:");
             e.printStackTrace();
         }
     }

@@ -6,7 +6,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -26,7 +25,7 @@ public class ProfileController {
 
     @FXML
     public void initialize() {
-        var unknown = LocaleManager.getBundle().getString("profile.unknown");
+        var unknown = LocaleManager.getString("profile.unknown");
         usernameLabel.setText(SessionManager.getUsername() != null ? SessionManager.getUsername() : unknown);
         emailLabel.setText(SessionManager.getEmail() != null ? SessionManager.getEmail() : unknown);
     }
@@ -36,14 +35,13 @@ public class ProfileController {
         String current = currentPasswordField.getText();
         String newPass = newPasswordField.getText();
         String confirm = confirmPasswordField.getText();
-        var bundle = LocaleManager.getBundle();
 
-        if (current.isEmpty()) { showMessage(bundle.getString("profile.error.currentPasswordRequired"), true); return; }
-        if (newPass.isEmpty()) { showMessage(bundle.getString("profile.error.newPasswordRequired"), true); return; }
-        if (confirm.isEmpty()) { showMessage(bundle.getString("profile.error.confirmPasswordRequired"), true); return; }
-        if (!newPass.equals(confirm)) { showMessage(bundle.getString("profile.error.passwordMismatch"), true); return; }
-        if (newPass.equals(current)) { showMessage(bundle.getString("profile.error.passwordDifferent"), true); return; }
-        if (newPass.length() < 6) { showMessage(bundle.getString("profile.error.passwordMinLength"), true); return; }
+        if (current.isEmpty()) { showMessage(LocaleManager.getString("profile.error.currentPasswordRequired"), true); return; }
+        if (newPass.isEmpty()) { showMessage(LocaleManager.getString("profile.error.newPasswordRequired"), true); return; }
+        if (confirm.isEmpty()) { showMessage(LocaleManager.getString("profile.error.confirmPasswordRequired"), true); return; }
+        if (!newPass.equals(confirm)) { showMessage(LocaleManager.getString("profile.error.passwordMismatch"), true); return; }
+        if (newPass.equals(current)) { showMessage(LocaleManager.getString("profile.error.passwordDifferent"), true); return; }
+        if (newPass.length() < 6) { showMessage(LocaleManager.getString("profile.error.passwordMinLength"), true); return; }
 
         changePassword(current, newPass);
     }
@@ -62,19 +60,18 @@ public class ProfileController {
                             .PUT(HttpRequest.BodyPublishers.ofString(data.toString())).build(),
                     HttpResponse.BodyHandlers.ofString());
 
-            var bundle = LocaleManager.getBundle();
             if (response.statusCode() == 200) {
-                showMessage(bundle.getString("profile.success.passwordChanged"), false);
+                showMessage(LocaleManager.getString("profile.success.passwordChanged"), false);
                 currentPasswordField.clear();
                 newPasswordField.clear();
                 confirmPasswordField.clear();
             } else if (response.statusCode() == 401) {
-                showMessage(bundle.getString("profile.error.currentPasswordIncorrect"), true);
+                showMessage(LocaleManager.getString("profile.error.currentPasswordIncorrect"), true);
             } else {
-                showMessage(MessageFormat.format(bundle.getString("profile.error.passwordChangeFailed"), response.statusCode()), true);
+                showMessage(LocaleManager.getString("profile.error.passwordChangeFailed", response.statusCode()), true);
             }
         } catch (IOException | InterruptedException ex) {
-            showMessage(MessageFormat.format(LocaleManager.getBundle().getString("profile.error.connection"), ex.getMessage()), true);
+            showMessage(LocaleManager.getString("profile.error.connection", ex.getMessage()), true);
         }
     }
 

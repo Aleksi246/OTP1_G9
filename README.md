@@ -141,12 +141,41 @@ The application supports **4 languages** that can be switched seamlessly within 
 ### Localization Implementation
 
 - Localization and translation work was assisted with GitHub Copilot during development.
-- UI text is externalized with Java `ResourceBundle` property files in `src/main/resources/com/example/app/`:
-  - `messages.properties` (default)
-  - `messages_fr.properties`
-  - `messages_ru.properties`
-  - `messages_fa.properties`
-- Bundles are loaded through `LocaleManager.getBundle()` in `src/main/java/com/example/app/LocaleManager.java` using UTF-8 support.
+- UI text is externalized to the database table `localization_strings` (see `init.sql`).
+- `LocaleManager` loads translations through `LocalizationDao` and serves them via a `ResourceBundle` adapter:
+  - `src/main/java/com/example/app/LocaleManager.java`
+  - `src/main/java/com/example/otp/dao/LocalizationDao.java`
+- Translation rows are keyed by `(translation_key, language)` and seeded for `en`, `fa`, `fr`, and `ru`.
+- Non-default languages use English fallback for missing keys in `LocaleManager`.
+
+### Database Localization Strategy (ERD + Data Model)
+
+- Localization method: **key-value translation table** (`localization_strings`) with one row per key/language.
+- Schema (from `init.sql`):
+  - `translation_key VARCHAR(100) NOT NULL`
+  - `value VARCHAR(500) NOT NULL`
+  - `language VARCHAR(10) NOT NULL`
+  - `UNIQUE (translation_key, language)`
+- Character encoding: `utf8mb4` with `utf8mb4_unicode_ci` collation for multilingual text storage.
+- ERD impact: `localization_strings` is a shared lookup table used by UI localization code (no FK to domain tables).
+
+### Localization Validation Checklist
+
+1. Seed localization data:
+   ```sql
+   USE otptestdb;
+   SOURCE /path/to/init.sql;
+   ```
+2. Switch language from the top bar (`en`, `fa`, `fr`, `ru`).
+3. Verify key screens (Login, Home, Class, Review dialogs) render translated labels/messages.
+4. Verify fallback behavior by temporarily removing a non-English key: app should fall back to English.
+5. Confirm UTF-8 retrieval in DB:
+   ```sql
+   SELECT translation_key, value, language
+   FROM localization_strings
+   WHERE language IN ('fa','fr','ru')
+   LIMIT 20;
+   ```
 
 ### Selecting a Language at Runtime
 
@@ -174,13 +203,9 @@ The application supports **4 languages** that can be switched seamlessly within 
 
 To add a new language to the application:
 
-1. **Create translation file:**
-   Create a new properties file in `src/main/resources/com/example/app/` with UTF-8 encoding:
-   ```
-   messages_<language-code>.properties
-   Example: messages_de.properties for German
-   ```
-   Copy all keys from `messages.properties` and provide translations.
+1. **Insert translation rows:**
+   Add new rows to `localization_strings` for the new language code.
+   Use the same `translation_key` set as English.
 
 2. **Update TopBarController.java:**
    Modify the initialize method to include the new locale:
@@ -223,6 +248,7 @@ To add a new language to the application:
 
 - **Published JaCoCo Report:** https://users.metropolia.fi/~aleklap/Aleksi246%20OTP1_G9%20main%20target-site_jacoco/
 - **Database Initialization Guide:** See [DB_INIT_GUIDE.md](DB_INIT_GUIDE.md)
+- **Database Localization Report:** See [DATABASE_LOCALIZATION_REPORT.md](DATABASE_LOCALIZATION_REPORT.md)
 - **Project Management:** Trello Board - https://trello.com/b/JAtHGqiA/sprint5
 
 ## Troubleshooting
@@ -241,8 +267,8 @@ To add a new language to the application:
 
 **Issue: Language not changing**
 - Make sure you're logged in before accessing the language selector
-- Check that the .properties file exists for the selected language
-- Rebuild and restart the application if language files were modified
+- Ensure `init.sql` has been executed and includes rows in `localization_strings` for the selected language
+- Restart the app after reseeding translations, or trigger `LocaleManager.refresh()` in development
 
 ## Requirements
 

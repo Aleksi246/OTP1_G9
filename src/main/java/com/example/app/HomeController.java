@@ -13,11 +13,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
-import java.text.MessageFormat;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -25,6 +24,10 @@ import com.google.gson.JsonParser;
 public class HomeController {
 
     @FXML private Label welcomeLabel;
+    @FXML private Label subtitleLabel;
+    @FXML private MenuButton manageClassesMenuButton;
+    @FXML private MenuItem joinClassMenuItem;
+    @FXML private MenuItem createClassMenuItem;
     @FXML private FlowPane classesContainer;
     @FXML private Label loadingLabel;
 
@@ -32,27 +35,53 @@ public class HomeController {
 
     @FXML
     private void initialize() {
+        applyStaticTranslations();
         if (!SessionManager.isLoggedIn()) {
             Platform.runLater(SceneManager::loadLogin);
             return;
         }
-        welcomeLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("home.welcome"), SessionManager.getUsername()));
+        welcomeLabel.setText(LocaleManager.getString("home.welcome", SessionManager.getUsername()));
         loadUserClasses();
     }
 
+    private void applyStaticTranslations() {
+        if (welcomeLabel != null) {
+            welcomeLabel.setText(LocaleManager.getString("home.welcome", SessionManager.getUsername()));
+        }
+        if (subtitleLabel != null) {
+            subtitleLabel.setText(LocaleManager.getString("home.subtitle"));
+        }
+        if (manageClassesMenuButton != null) {
+            manageClassesMenuButton.setText(LocaleManager.getString("home.manageClasses"));
+        }
+        if (joinClassMenuItem != null) {
+            joinClassMenuItem.setText(LocaleManager.getString("home.joinClass"));
+        }
+        if (createClassMenuItem != null) {
+            createClassMenuItem.setText(LocaleManager.getString("home.createClass"));
+        }
+        if (loadingLabel != null) {
+            loadingLabel.setText(LocaleManager.getString("home.loadingClasses"));
+        }
+    }
+
     private void loadUserClasses() {
+        Platform.runLater(() -> {
+            loadingLabel.setText(LocaleManager.getString("home.loadingClasses"));
+            classesContainer.getChildren().clear();
+        });
         runAsync(() -> {
             try {
                 String token = SessionManager.getToken();
                 String email = SessionManager.getEmail();
                 if (token == null || email == null) {
-                    Platform.runLater(() -> loadingLabel.setText(LocaleManager.getBundle().getString("home.error.notAuthenticated")));
+                    Platform.runLater(() -> loadingLabel.setText(LocaleManager.getString("home.error.notAuthenticated")));
                     return;
                 }
 
                 Integer userId = fetchUserId(email, token);
                 if (userId == null) {
-                    Platform.runLater(() -> loadingLabel.setText(LocaleManager.getBundle().getString("home.error.fetchUser")));
+                    Platform.runLater(() -> loadingLabel.setText(LocaleManager.getString("home.error.fetchUser")));
                     return;
                 }
                 SessionManager.setUserId(userId);
@@ -60,7 +89,7 @@ public class HomeController {
                 List<Integer> classIds = fetchUserClasses(userId, token);
                 Platform.runLater(() -> {
                     if (classIds.isEmpty()) {
-                        loadingLabel.setText(LocaleManager.getBundle().getString("home.noClasses"));
+                        loadingLabel.setText(LocaleManager.getString("home.noClasses"));
                         classesContainer.getChildren().clear();
                     } else {
                         loadingLabel.setText("");
@@ -69,16 +98,17 @@ public class HomeController {
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> loadingLabel.setText(
-                        MessageFormat.format(LocaleManager.getBundle().getString("home.error.loadingClasses"), e.getMessage())));
+                        LocaleManager.getString("home.error.loadingClasses", e.getMessage())));
             }
         });
     }
 
     private Integer fetchUserId(String email, String token) {
         try {
+            String encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8);
             HttpResponse<String> response = httpClient.send(
                     HttpRequest.newBuilder()
-                            .uri(new URI("http://localhost:7700/api/users/by-email/" + email))
+                            .uri(new URI("http://localhost:7700/api/users/by-email/" + encodedEmail))
                             .header("Authorization", "Bearer " + token).GET().build(),
                     HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
@@ -108,19 +138,39 @@ public class HomeController {
     private void displayClasses(List<Integer> classIds, String token) {
         classesContainer.getChildren().clear();
         for (Integer classId : classIds) {
-            try {
-                HttpResponse<String> response = httpClient.send(
-                        HttpRequest.newBuilder()
-                                .uri(new URI("http://localhost:7700/api/courses/" + classId))
-                                .header("Authorization", "Bearer " + token).GET().build(),
-                        HttpResponse.BodyHandlers.ofString());
-                if (response.statusCode() == 200) {
-                    var course = JsonParser.parseString(response.body()).getAsJsonObject();
-                    String name = course.get("className").getAsString();
-                    String topic = course.has("topic") ? course.get("topic").getAsString() : LocaleManager.getBundle().getString("home.noTopic");
-                    Platform.runLater(() -> classesContainer.getChildren().add(createClassCard(name, topic, classId)));
+            runAsync(() -> fetchAndRenderClassCard(classId, token));
+        }
+    }
+
+    private void fetchAndRenderClassCard(Integer classId, String token) {
+        try {
+            HttpResponse<String> response = httpClient.send(
+                    HttpRequest.newBuilder()
+                            .uri(new URI("http://localhost:7700/api/courses/" + classId))
+                            .header("Authorization", "Bearer " + token).GET().build(),
+                    HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                return;
+            }
+
+            JsonObject course = JsonParser.parseString(response.body()).getAsJsonObject();
+            String name = course.has("className") && !course.get("className").isJsonNull()
+                    ? course.get("className").getAsString()
+                    : "Class " + classId;
+            String topic = LocaleManager.getString("home.noTopic");
+            if (course.has("topic") && !course.get("topic").isJsonNull()) {
+                String rawTopic = course.get("topic").getAsString();
+                if (rawTopic != null && !rawTopic.isBlank()) {
+                    topic = rawTopic;
                 }
-            } catch (Exception e) { e.printStackTrace(); }
+            }
+
+            final String finalName = name;
+            final String finalTopic = topic;
+            Platform.runLater(() -> classesContainer.getChildren().add(createClassCard(finalName, finalTopic, classId)));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -143,7 +193,7 @@ public class HomeController {
         idBadge.setStyle("-fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.75); -fx-font-family: 'Segoe UI'; -fx-font-weight: bold;");
         headerBox.getChildren().addAll(nameLabel, idBadge);
 
-        Label topicLabel = new Label(topic == null || topic.isEmpty() ? LocaleManager.getBundle().getString("home.noTopic") : topic);
+        Label topicLabel = new Label(topic == null || topic.isEmpty() ? LocaleManager.getString("home.noTopic") : topic);
         topicLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #475569; -fx-font-family: 'Segoe UI';");
         topicLabel.setWrapText(true);
         topicLabel.setMaxWidth(264);
@@ -151,7 +201,7 @@ public class HomeController {
         VBox spacer = new VBox();
         VBox.setVgrow(spacer, Priority.ALWAYS);
 
-        Button viewButton = new Button(LocaleManager.getBundle().getString("home.openClass"));
+        Button viewButton = new Button(LocaleManager.getString("home.openClass"));
         viewButton.setPrefWidth(264);
         viewButton.setPrefHeight(38);
         viewButton.setStyle("-fx-background-color: " + accent + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-family: 'Segoe UI';");
@@ -171,17 +221,18 @@ public class HomeController {
         card.setStyle(cardStyle);
         card.setOnMouseEntered(e -> card.setStyle(hoverStyle));
         card.setOnMouseExited(e -> card.setStyle(cardStyle));
+        card.setOnMouseClicked(e -> SceneManager.loadClass(classId));
         return card;
     }
 
     @FXML
     private void handleJoinClass() {
-        Dialog<String> dialog = new Dialog<>();
-        dialog.setTitle(LocaleManager.getBundle().getString("home.joinClass.title"));
-        dialog.setHeaderText(LocaleManager.getBundle().getString("home.joinClass.header"));
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(LocaleManager.getString("home.joinClass.title"));
+        dialog.setHeaderText(LocaleManager.getString("home.joinClass.header"));
 
         TextField classIdField = new TextField();
-        classIdField.setPromptText(LocaleManager.getBundle().getString("home.joinClass.prompt"));
+        classIdField.setPromptText(LocaleManager.getString("home.joinClass.prompt"));
 
         VBox content = new VBox(10, classIdField);
         content.setPadding(new Insets(20));
@@ -201,18 +252,18 @@ public class HomeController {
 
     @FXML
     private void handleCreateClass() {
-        Dialog<String> dialog = new Dialog<>();
-        dialog.setTitle(LocaleManager.getBundle().getString("home.createClass.title"));
-        dialog.setHeaderText(LocaleManager.getBundle().getString("home.createClass.header"));
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(LocaleManager.getString("home.createClass.title"));
+        dialog.setHeaderText(LocaleManager.getString("home.createClass.header"));
 
         TextField classNameField = new TextField();
-        classNameField.setPromptText(LocaleManager.getBundle().getString("home.createClass.namePrompt"));
+        classNameField.setPromptText(LocaleManager.getString("home.createClass.namePrompt"));
         TextField topicField = new TextField();
-        topicField.setPromptText(LocaleManager.getBundle().getString("home.createClass.topicPrompt"));
+        topicField.setPromptText(LocaleManager.getString("home.createClass.topicPrompt"));
 
         VBox content = new VBox(10,
-                new Label(LocaleManager.getBundle().getString("home.createClass.nameLabel")), classNameField,
-                new Label(LocaleManager.getBundle().getString("home.createClass.topicLabel")), topicField);
+                new Label(LocaleManager.getString("home.createClass.nameLabel")), classNameField,
+                new Label(LocaleManager.getString("home.createClass.topicLabel")), topicField);
         content.setPadding(new Insets(20));
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -240,17 +291,17 @@ public class HomeController {
 
                 Platform.runLater(() -> {
                     if (response.statusCode() == 201 || response.statusCode() == 200) {
-                        showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString("home.success.title"),
-                                LocaleManager.getBundle().getString("home.createClass.success"));
+                        showAlert(Alert.AlertType.INFORMATION, LocaleManager.getString("home.success.title"),
+                                LocaleManager.getString("home.createClass.success"));
                         loadUserClasses();
                     } else {
-                        showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("home.error.title"),
-                                MessageFormat.format(LocaleManager.getBundle().getString("home.error.createClass"), response.statusCode()));
+                        showAlert(Alert.AlertType.ERROR, LocaleManager.getString("home.error.title"),
+                                LocaleManager.getString("home.error.createClass", response.statusCode()));
                     }
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("home.error.title"),
-                        MessageFormat.format(LocaleManager.getBundle().getString("home.error.createClassException"), e.getMessage())));
+                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getString("home.error.title"),
+                        LocaleManager.getString("home.error.createClassException", e.getMessage())));
             }
         });
     }

@@ -5,7 +5,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -26,7 +25,7 @@ public class LoginController {
         String password = passwordField.getText().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            errorLabel.setText(LocaleManager.getBundle().getString("login.error.required"));
+            errorLabel.setText(LocaleManager.getString("login.error.required"));
             return;
         }
 
@@ -59,7 +58,7 @@ public class LoginController {
                 String responseBody = response.body();
                 String token = extractJsonField(responseBody, "token");
                 if (token != null) {
-                    errorLabel.setText(LocaleManager.getBundle().getString("login.success.login"));
+                    errorLabel.setText(LocaleManager.getString("login.success.login"));
                     String userType = JWTHelper.getUserTypeFromToken(token);
                     String email = extractJsonField(responseBody, "email");
                     if (email == null || email.isBlank()) {
@@ -72,13 +71,13 @@ public class LoginController {
                     SessionManager.setSession(username, email, token, userType);
                     SceneManager.loadHome();
                 } else {
-                    errorLabel.setText(LocaleManager.getBundle().getString("login.error.token"));
+                    errorLabel.setText(LocaleManager.getString("login.error.token"));
                 }
             } else {
-                errorLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("login.error.failed"), response.statusCode()));
+                errorLabel.setText(LocaleManager.getString("login.error.failed", response.statusCode()));
             }
         } catch (IOException | InterruptedException ex) {
-            errorLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString("login.error.connection"), ex.getMessage()));
+            errorLabel.setText(LocaleManager.getString("login.error.connection", ex.getMessage()));
         }
     }
 
