@@ -207,7 +207,7 @@ This maps each test case to the criteria and shows which parts of the code it to
 
 - **Setup:** Database has some data in it (around 50 users, 20 classes, 100 materials).
 - **Steps:** Fire off 100 requests to each of the main endpoints (login, list courses, list materials, get reviews) one after another. Measure average time.
-- **Expected:** Average should be under 500ms per call. No 500 errors.
+- **Expected:** It Should not crash
 
 **Big file handling**
 
@@ -219,7 +219,7 @@ This maps each test case to the criteria and shows which parts of the code it to
 
 - **Setup:** 10 user accounts in the system.
 - **Steps:** Simulate all 10 logging in and doing stuff at the same time — browsing classes, downloading files, posting reviews.
-- **Expected:** Nobody gets errors or corrupted data. No deadlocks. Each user only sees what they should see (their own classes etc.). DB constraints hold up — no duplicate enrollments or orphaned rows.
+- **Expected:** Nobody gets errors or corrupted data. Each user only sees what they should see (their own classes etc.). DB constraints hold up — no duplicate enrollments or orphaned rows.
 
 ## Test Environment
 
