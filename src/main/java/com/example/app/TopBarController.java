@@ -76,7 +76,7 @@ public class TopBarController {
   private void updateButtonStates() {
     if (profileButton != null) {
       String key = SessionManager.isLoggedIn() ? "topbar.profile" : "topbar.login";
-      profileButton.setText(LocaleManager.getBundle().getString(key));
+      profileButton.setText(LocaleManager.getString(key));
     }
   }
 }

@@ -66,6 +66,11 @@ public class ClassController {
   private File selectedFile;
   private final HttpClient httpClient = HttpClient.newHttpClient();
   private static final int REVIEW_COMMENT_MAX_LENGTH = 500;
+  private static final String MATERIAL_LECTURE_NOTES = "Lecture Notes";
+  private static final String MATERIAL_ASSIGNMENT = "Assignment";
+  private static final String MATERIAL_SLIDES = "Slides";
+  private static final String MATERIAL_REFERENCE = "Reference";
+  private static final String MATERIAL_OTHER = "Other";
 
   @FXML
   private void initialize() {
@@ -78,17 +83,21 @@ public class ClassController {
     userId = SessionManager.getUserId();
     classId = ClassContextHolder.getClassId();
 
-    materialTypeCombo.getItems().setAll("Lecture Notes", "Assignment", "Slides",
-            "Reference", "Other");
+    materialTypeCombo.getItems().setAll(
+        LocaleManager.getString("class.materialType.lectureNotes"),
+        LocaleManager.getString("class.materialType.assignment"),
+        LocaleManager.getString("class.materialType.slides"),
+        LocaleManager.getString("class.materialType.reference"),
+        LocaleManager.getString("class.materialType.other")
+    );
     materialTypeCombo.getSelectionModel().selectFirst();
 
     setUploadSectionVisible(false);
     setUploadProgressVisible(false, "");
 
     if (classId == null) {
-      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(
-              "class.error.title"),
-          LocaleManager.getBundle().getString("class.error.missingId"));
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getString("class.error.title"),
+          LocaleManager.getString("class.error.missingId"));
       return;
     }
 
@@ -116,16 +125,16 @@ public class ClassController {
 
         if (response.statusCode() != 200) {
           Platform.runLater(() -> showAlert(Alert.AlertType.ERROR,
-                  LocaleManager.getBundle().getString("class.error.title"),
-                  LocaleManager.getBundle().getString("class.error.loadDetails")));
+                  LocaleManager.getString("class.error.title"),
+                  LocaleManager.getString("class.error.loadDetails")));
           return;
         }
 
         JsonObject courseJson = JsonParser.parseString(response.body()).getAsJsonObject();
         String className = getStringOrDefault(courseJson, "className",
-                LocaleManager.getBundle().getString("class.unknown"));
+                LocaleManager.getString("class.unknown"));
         String topic = getStringOrDefault(courseJson, "topic",
-                LocaleManager.getBundle().getString("class.noTopic"));
+                LocaleManager.getString("class.noTopic"));
         creatorId = courseJson.has("creatorId") && !courseJson.get("creatorId").isJsonNull()
                         ? courseJson.get("creatorId").getAsInt()
                         : null;
@@ -135,22 +144,18 @@ public class ClassController {
 
         Platform.runLater(() -> {
           classNameLabel.setText(className);
-          classIdLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString(
-                  "class.classId"), classId));
-          topicLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString(
-                  "class.topic"), topic));
-          creatorLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString(
-                  "class.creator"), creatorId == null ? LocaleManager.getBundle().getString(
-                          "class.creatorUnknown") : creatorId));
+          classIdLabel.setText(LocaleManager.getString("class.classId", classId));
+          topicLabel.setText(LocaleManager.getString("class.topic", topic));
+          creatorLabel.setText(LocaleManager.getString("class.creator", 
+                  creatorId == null ? LocaleManager.getString("class.creatorUnknown") : creatorId));
           updateAccessUi();
         });
 
 
         loadMaterials();
       } catch (Exception e) {
-        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle()
-                        .getString("class.error.title"), MessageFormat.format(LocaleManager
-                .getBundle().getString("class.error.failedLoad"), e.getMessage())));
+        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getString("class.error.title"), 
+                LocaleManager.getString("class.error.failedLoad", e.getMessage())));
       }
     });
   }
@@ -253,7 +258,7 @@ public class ClassController {
     runAsync(() -> {
       try {
         Platform.runLater(() -> {
-          materialsStatusLabel.setText(LocaleManager.getBundle().getString("class.loadingFiles"));
+          materialsStatusLabel.setText(LocaleManager.getString("class.loadingFiles"));
           materialsContainer.getChildren().clear();
         });
 
@@ -267,7 +272,7 @@ public class ClassController {
                 .ofString());
 
         if (response.statusCode() != 200) {
-          Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getBundle().getString(
+          Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getString(
                   "class.couldNotLoadFiles")));
           return;
         }
@@ -284,7 +289,7 @@ public class ClassController {
 
         Platform.runLater(() -> renderMaterials(rows));
       } catch (Exception e) {
-        Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getBundle().getString(
+        Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getString(
                 "class.couldNotLoadFilesShort")));
       }
     });
@@ -294,12 +299,11 @@ public class ClassController {
     materialsContainer.getChildren().clear();
 
     if (materials.isEmpty()) {
-      materialsStatusLabel.setText(LocaleManager.getBundle().getString("class.noFilesUploadedYet"));
+      materialsStatusLabel.setText(LocaleManager.getString("class.noFilesUploadedYet"));
       return;
     }
 
-    materialsStatusLabel.setText(MessageFormat.format(LocaleManager.getBundle().getString(
-            "class.filesAvailable"), materials.size()));
+    materialsStatusLabel.setText(LocaleManager.getString("class.filesAvailable", materials.size()));
 
     for (JsonObject material : materials) {
       materialsContainer.getChildren().add(createMaterialCard(material));
@@ -309,16 +313,18 @@ public class ClassController {
   private HBox createMaterialCard(JsonObject material) {
     Integer fileId = material.has("fileId") && !material.get("fileId").isJsonNull() ? material.get(
             "fileId").getAsInt() : null;
-    String filename = getStringOrDefault(material, "originalFilename", "Unnamed file");
-    String type = getStringOrDefault(material, "materialType", "Other");
-    String uploadedAt = getStringOrDefault(material, "uploadedAt", "Unknown date");
+    String filename = getStringOrDefault(material, "originalFilename",
+        LocaleManager.getString("class.unnamedFile"));
+    String type = getStringOrDefault(material, "materialType", MATERIAL_OTHER);
+    String localizedType = localizeMaterialType(type);
+    String uploadedAt = getStringOrDefault(material, "uploadedAt",
+        LocaleManager.getString("class.unknownDate"));
     String uploader = material.has("userId") && !material.get("userId").isJsonNull()
-            ? MessageFormat.format(LocaleManager.getBundle().getString("class.uploadedByUser"),
-            material.get("userId").getAsInt())
-            : LocaleManager.getBundle().getString("class.uploaderUnknown");
+            ? LocaleManager.getString("class.uploadedByUser", material.get("userId").getAsInt())
+            : LocaleManager.getString("class.uploaderUnknown");
 
     // File type badge color
-    String badgeColor = switch (type.toLowerCase()) {
+    String badgeColor = switch (normalizeMaterialType(type)) {
       case "lecture notes" -> "#3b82f6";
       case "assignment"    -> "#f59e0b";
       case "slides"        -> "#8b5cf6";
@@ -330,7 +336,7 @@ public class ClassController {
     nameLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;"
             + "-fx-text-fill: #0f172a; -fx-font-family: 'Segoe UI';");
 
-    Label typeBadge = new Label(type);
+    Label typeBadge = new Label(localizedType);
     typeBadge.setStyle(
         "-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: white;"
                 + " -fx-font-family: 'Segoe UI'; -fx-background-color: " + badgeColor
@@ -353,21 +359,21 @@ public class ClassController {
     String btnBase = "-fx-font-size: 12px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"
             + "-fx-padding: 7 14; -fx-background-radius: 7; -fx-cursor: hand;";
 
-    Button downloadButton = new Button(LocaleManager.getBundle().getString("class.download"));
+    Button downloadButton = new Button(LocaleManager.getString("class.download"));
     downloadButton.setStyle(btnBase + "-fx-background-color: #22c55e; -fx-text-fill: white;");
     downloadButton.setDisable(fileId == null);
 
-    Button viewReviewsButton = new Button(LocaleManager.getBundle().getString("class.reviews"));
+    Button viewReviewsButton = new Button(LocaleManager.getString("class.reviews"));
     viewReviewsButton.setStyle(btnBase + "-fx-background-color: #e2e8f0; -fx-text-fill: #334155;");
     viewReviewsButton.setDisable(fileId == null);
 
-    Button reviewButton = new Button(LocaleManager.getBundle().getString("class.review"));
+    Button reviewButton = new Button(LocaleManager.getString("class.review"));
     reviewButton.setStyle(btnBase + "-fx-background-color: #3b82f6; -fx-text-fill: white;");
     reviewButton.setDisable(fileId == null || !isEnrolled);
     reviewButton.setVisible(!isCreator);
     reviewButton.setManaged(!isCreator);
 
-    Button deleteButton = new Button(LocaleManager.getBundle().getString("class.delete"));
+    Button deleteButton = new Button(LocaleManager.getString("class.delete"));
     deleteButton.setStyle(btnBase + "-fx-background-color: #fee2e2; -fx-text-fill: #dc2626;");
     deleteButton.setDisable(fileId == null);
     deleteButton.setVisible(isCreator);
@@ -433,7 +439,10 @@ public class ClassController {
 
       HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
       if (response.statusCode() != 200) {
-        return new ReviewsFetchResult("Could not load reviews (" + response.statusCode() + ").", new ArrayList<>());
+        return new ReviewsFetchResult(
+            LocaleManager.getString("class.error.reviewsWithCode", response.statusCode()),
+            new ArrayList<>()
+        );
       }
 
             JsonArray reviewsArray = JsonParser.parseString(response.body()).getAsJsonArray();
@@ -586,13 +595,15 @@ public class ClassController {
 
       HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
       if (response.statusCode() == 200 || response.statusCode() == 201) {
-        return new ReviewSubmitResult(true, "Review submitted");
+        return new ReviewSubmitResult(true, LocaleManager.getString("class.success.reviewSubmitted"));
       }
 
-      String fallbackMessage = "Could not submit review right now (" + response.statusCode() + ").";
+      String fallbackMessage = LocaleManager.getString("class.error.reviewSubmitWithCode",
+          response.statusCode());
       return new ReviewSubmitResult(false, extractApiMessage(response.body(), fallbackMessage));
     } catch (Exception e) {
-      return new ReviewSubmitResult(false, "Review API unavailable. Connect backend endpoint /api/reviews. Details: " + e.getMessage());
+      return new ReviewSubmitResult(false,
+          LocaleManager.getString("class.error.reviewApiUnavailable", e.getMessage()));
     }
   }
 
@@ -662,12 +673,13 @@ public class ClassController {
             return;
         }
 
-        String materialType = materialTypeCombo.getValue();
-        if (materialType == null || materialType.isBlank()) {
+        String selectedMaterialType = materialTypeCombo.getValue();
+        if (selectedMaterialType == null || selectedMaterialType.isBlank()) {
             showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
                     LocaleManager.getBundle().getString("class.error.missingType"));
             return;
         }
+        String materialType = toApiMaterialType(selectedMaterialType);
 
         File fileToUpload = selectedFile;
         setUploadProgressVisible(true, MessageFormat.format(LocaleManager.getBundle().getString("class.status.uploadingFile"), fileToUpload.getName()));
@@ -840,6 +852,47 @@ public class ClassController {
     private String getStringOrDefault(JsonObject obj, String field, String fallback) {
         return obj.has(field) && !obj.get(field).isJsonNull() ? obj.get(field).getAsString() : fallback;
     }
+
+      private String normalizeMaterialType(String type) {
+        if (type == null || type.isBlank()) {
+          return "other";
+        }
+
+        String normalized = type.trim().toLowerCase().replace('_', ' ').replace('-', ' ');
+        if (normalized.contains("lecture") && normalized.contains("note")) {
+          return "lecture notes";
+        }
+        if (normalized.contains("assignment")) {
+          return "assignment";
+        }
+        if (normalized.contains("slides")) {
+          return "slides";
+        }
+        if (normalized.contains("reference")) {
+          return "reference";
+        }
+        return "other";
+      }
+
+      private String localizeMaterialType(String type) {
+        return switch (normalizeMaterialType(type)) {
+          case "lecture notes" -> LocaleManager.getString("class.materialType.lectureNotes");
+          case "assignment" -> LocaleManager.getString("class.materialType.assignment");
+          case "slides" -> LocaleManager.getString("class.materialType.slides");
+          case "reference" -> LocaleManager.getString("class.materialType.reference");
+          default -> LocaleManager.getString("class.materialType.other");
+        };
+      }
+
+      private String toApiMaterialType(String selectedType) {
+        return switch (normalizeMaterialType(selectedType)) {
+          case "lecture notes" -> MATERIAL_LECTURE_NOTES;
+          case "assignment" -> MATERIAL_ASSIGNMENT;
+          case "slides" -> MATERIAL_SLIDES;
+          case "reference" -> MATERIAL_REFERENCE;
+          default -> MATERIAL_OTHER;
+        };
+      }
 
     private void runAsync(Runnable task) {
         Thread thread = new Thread(task);
