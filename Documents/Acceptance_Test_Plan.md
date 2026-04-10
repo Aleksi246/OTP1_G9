@@ -229,7 +229,6 @@ We're running tests against this setup:
 - **Auth:** JWT via JJWT 0.12.6, passwords hashed with BCrypt 0.10.2
 - **Build:** Maven, Java 21
 - **CI:** Jenkins pipeline — runs tests and generates JaCoCo coverage reports
-- **Docker:** Used for packaging the app and spinning up MariaDB via docker-compose
 
 ## When to Start / When We're Done
 
@@ -241,9 +240,6 @@ We're running tests against this setup:
 
 **We're done when:**
 - All the functional tests pass
-- No showstopper bugs left open
-- A new user can go through the whole flow (register → create class → upload → join → download → review → delete) without needing help
-- Performance numbers look reasonable (under 500ms, big files work)
 
 ## Possible Issues
 
