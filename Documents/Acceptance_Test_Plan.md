@@ -249,7 +249,8 @@ We're running tests against this setup:
 
 | What could go wrong | How we deal with it |
 |---------------------|---------------------|
-| DB not running when we try to test | Use docker-compose to start MariaDB before the test run |
+| DB not running when we try to test | Start MariaDB before the test run |
+| DB filled with results from previous tests | Initialize the db again or delete all data |
 | File permission issues in `uploads/` | Check permissions on the directory before starting |
 | JWT tokens expiring mid-test | Generate a fresh token for each test case, don't reuse |
 | Cascade delete not working properly | Already have ON DELETE CASCADE in the schema, but we verify this in the "delete class" test |
