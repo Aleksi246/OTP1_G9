@@ -47,66 +47,70 @@ public class UserController {
         return;
       }
 
-            String hashedPassword = BCryptUtil.hashPassword(password);
-            User user = new User();
-            user.setUsername(username);
-            user.setPasswordHash(hashedPassword);
-            user.setEmail(email);
+      String hashedPassword = BCryptUtil.hashPassword(password);
+      User user = new User();
+      user.setUsername(username);
+      user.setPasswordHash(hashedPassword);
+      user.setEmail(email);
 
-            System.out.println("[REGISTRATION] Creating user in database: " + username);
-            User created = userDao.create(user);
-            if (created.getUserId() != null) {
-                System.out.println("[REGISTRATION] User created successfully with ID: " + created.getUserId());
-                created.setPasswordHash(null);
-                ctx.status(HttpStatus.CREATED).json(created);
-            } else {
-                System.out.println("[REGISTRATION] Failed to register user - no ID returned");
-                jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to register user");
-            }
-        } catch (Exception e) {
-            System.err.println("[REGISTRATION] Exception: " + e.getMessage());
-            e.printStackTrace();
-            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
-        }
+      System.out.println("[REGISTRATION] Creating user in database: " + username);
+      User created = userDao.create(user);
+      if (created.getUserId() != null) {
+        System.out.println("[REGISTRATION] User created successfully with ID: "
+                + created.getUserId());
+        created.setPasswordHash(null);
+        ctx.status(HttpStatus.CREATED).json(created);
+      } else {
+        System.out.println("[REGISTRATION] Failed to register user - no ID returned");
+        jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to register user");
+      }
+    } catch (Exception e) {
+      System.err.println("[REGISTRATION] Exception: " + e.getMessage());
+      e.printStackTrace();
+      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
     }
+  }
 
-    public void login(Context ctx) {
-        try {
-            JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
-            String email = body.has("email") ? body.get("email").getAsString() : null;
-            String username = body.has("username") ? body.get("username").getAsString() : null;
-            String password = body.has("password") ? body.get("password").getAsString() : null;
+  public void login(Context ctx) {
+    try {
+      JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
+      String email = body.has("email") ? body.get("email").getAsString() : null;
+      String username = body.has("username") ? body.get("username").getAsString() : null;
+      String password = body.has("password") ? body.get("password").getAsString() : null;
 
-            if ((email == null || email.isBlank()) && (username == null || username.isBlank())
-                    || password == null || password.isBlank()) {
-                jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
-                return;
-            }
+      if ((email == null
+              || email.isBlank()) && (username == null
+              || username.isBlank())
+              || password == null
+              || password.isBlank()) {
+        jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
+        return;
+      }
 
-            User user;
-            if (email != null && !email.isBlank()) {
-                user = userDao.findByEmail(email);
-            } else {
-                user = userDao.findByUsername(username);
-                if (user == null && username != null && username.contains("@")) {
-                    user = userDao.findByEmail(username);
-                }
-            }
-
-            if (user != null && BCryptUtil.verifyPassword(password, user.getPasswordHash())) {
-                String token = JWTUtil.generateToken(user.getEmail());
-                ctx.json(Map.of(
-                        "token", token,
-                        "username", user.getUsername(),
-                        "email", user.getEmail()
-                ));
-            } else {
-                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Invalid credentials");
-            }
-        } catch (Exception e) {
-            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+      User user;
+      if (email != null && !email.isBlank()) {
+        user = userDao.findByEmail(email);
+      } else {
+        user = userDao.findByUsername(username);
+        if (user == null && username != null && username.contains("@")) {
+          user = userDao.findByEmail(username);
         }
+      }
+
+      if (user != null && BCryptUtil.verifyPassword(password, user.getPasswordHash())) {
+        String token = JWTUtil.generateToken(user.getEmail());
+        ctx.json(Map.of(
+                     "token", token,
+                     "username", user.getUsername(),
+                     "email", user.getEmail()
+        ));
+      } else {
+        jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Invalid credentials");
+      }
+    } catch (Exception e) {
+      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
     }
+  }
 
     public void getAllUsers(Context ctx) {
         try {
