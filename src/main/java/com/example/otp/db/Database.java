@@ -9,8 +9,8 @@ public class Database {
     "DB_URL",
     "jdbc:mariadb://localhost:3306/otptestdb"
     );
-    private static final String USER = "otptestuser";
-    private static final String PASS = "testpass";
+    private static final String USER = System.getenv("DB_USER");
+    private static final String PASS = System.getenv("DB_PASS");
 
     // Call this to obtain a new connection. Forces driver load to avoid "Driver class not found" at runtime.
     public static Connection getConnection() throws SQLException {
