@@ -11,8 +11,8 @@ public class DatabaseInitializer {
     "DB_URL",
     "jdbc:mariadb://localhost:3306/otptestdb"
     );
-    private static final String USER = System.getenv("DB_USER");
-    private static final String PASS = System.getenv("DB_PASS");
+    private static final String USER = DatabaseConfig.get("db.user");
+    private static final String PASS = DatabaseConfig.get("db.pass");
 
     /**
      * Initialize the database with schema (idempotent, safe for production).

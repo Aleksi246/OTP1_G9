@@ -3,3 +3,4 @@ uploads/
 Dockerfile
 docker-compose.yml
 .env
+db.properties

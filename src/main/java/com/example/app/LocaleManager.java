@@ -46,7 +46,7 @@ public class LocaleManager {
         reloadCurrentTranslations();
     }
 
-    public static Locale getLocale() {
+    public static synchronized Locale getLocale() {
         return currentLocale;
     }
 

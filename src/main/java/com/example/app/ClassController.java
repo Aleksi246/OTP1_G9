@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -153,10 +154,17 @@ public class ClassController {
 
 
         loadMaterials();
+      } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          Platform.runLater(() -> showAlert(
+                  Alert.AlertType.ERROR,
+                  LocaleManager.getString("class.error.title"),
+                  LocaleManager.getString("class.error.failedLoad", e.getMessage())));
       } catch (Exception e) {
-        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager
-                        .getString("class.error.title"),
-                LocaleManager.getString("class.error.failedLoad", e.getMessage())));
+          Platform.runLater(() -> showAlert(
+                  Alert.AlertType.ERROR,
+                  LocaleManager.getString("class.error.title"),
+                  LocaleManager.getString("class.error.failedLoad", e.getMessage())));
       }
     });
   }
@@ -187,6 +195,7 @@ public class ClassController {
       }
       return userJson.get("userId").getAsInt();
     } catch (Exception e) {
+      Thread.currentThread().interrupt();
       return null;
     }
   }
@@ -217,6 +226,7 @@ public class ClassController {
       }
       return false;
     } catch (Exception e) {
+      Thread.currentThread().interrupt();
       return false;
     }
   }
@@ -729,6 +739,13 @@ public class ClassController {
                         showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.uploadFailed"),
                                 extractApiMessage(response.body(), MessageFormat.format(LocaleManager.getBundle().getString("class.error.serverResponse"), response.statusCode())));
                     }
+                });
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                Platform.runLater(() -> {
+                    uploadButton.setDisable(false);
+                    setUploadProgressVisible(false, "");
+                    showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.uploadFailed"), e.getMessage());
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
