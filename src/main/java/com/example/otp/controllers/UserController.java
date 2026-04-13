@@ -24,7 +24,7 @@ public class UserController {
       JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
       String username = body.has("username") ? body.get("username").getAsString() : null;
       String password = body.has("password") ? body.get("password").getAsString() : null;
-      String email = body.has("email") ? body.get("email").getAsString() : null;
+      String email =    body.has("email")    ? body.get("email").   getAsString() : null;
 
       System.out.println("[REGISTRATION] Username: " + username + ", Email: " + email);
 
@@ -112,80 +112,80 @@ public class UserController {
     }
   }
 
-    public void getAllUsers(Context ctx) {
-        try {
-            List<User> users = userDao.findAll();
-            for (User user : users) {
-                user.setPasswordHash(null);
-            }
-            ctx.json(users);
-        } catch (Exception e) {
-            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
-        }
+  public void getAllUsers(Context ctx) {
+    try {
+      List<User> users = userDao.findAll();
+      for (User user : users) {
+        user.setPasswordHash(null);
+      }
+      ctx.json(users);
+    } catch (Exception e) {
+      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
     }
+  }
 
-    public void getUserById(Context ctx) {
-        try {
-            int id = Integer.parseInt(ctx.pathParam("id"));
-            User user = userDao.findById(id);
-            if (user != null) {
-                user.setPasswordHash(null);
-                ctx.json(user);
-            } else {
-                jsonMessage(ctx, HttpStatus.NOT_FOUND, "User not found");
-            }
-        } catch (Exception e) {
-            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
-        }
+  public void getUserById(Context ctx) {
+    try {
+      int id = Integer.parseInt(ctx.pathParam("id"));
+      User user = userDao.findById(id);
+      if (user != null) {
+        user.setPasswordHash(null);
+        ctx.json(user);
+      } else {
+        jsonMessage(ctx, HttpStatus.NOT_FOUND, "User not found");
+      }
+    } catch (Exception e) {
+      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
     }
+  }
 
-    public void getUserByEmail(Context ctx) {
-        try {
-            String email = ctx.pathParam("email");
-            User user = userDao.findByEmail(email);
-            if (user != null) {
-                user.setPasswordHash(null);
-                ctx.json(user);
-            } else {
-                jsonMessage(ctx, HttpStatus.NOT_FOUND, "User not found");
-            }
-        } catch (Exception e) {
-            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
-        }
+  public void getUserByEmail(Context ctx) {
+    try {
+      String email = ctx.pathParam("email");
+      User user = userDao.findByEmail(email);
+      if (user != null) {
+        user.setPasswordHash(null);
+        ctx.json(user);
+      } else {
+        jsonMessage(ctx, HttpStatus.NOT_FOUND, "User not found");
+      }
+    } catch (Exception e) {
+      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
     }
+  }
 
-    public void changePassword(Context ctx) {
-        try {
-            String email = ctx.attribute("email");
-            if (email == null || email.isBlank()) {
-                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Unauthorized");
-                return;
-            }
+  public void changePassword(Context ctx) {
+    try {
+      String email = ctx.attribute("email");
+      if (email == null || email.isBlank()) {
+        jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Unauthorized");
+        return;
+      }
 
-            JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
-            String currentPassword = body.has("currentPassword") ? body.get("currentPassword").getAsString() : null;
-            String newPassword = body.has("newPassword") ? body.get("newPassword").getAsString() : null;
+      JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
+      String currentPassword = body.has("currentPassword") ? body.get("currentPassword").getAsString() : null;
+      String newPassword = body.has("newPassword") ? body.get("newPassword").getAsString() : null;
 
-            if (currentPassword == null || currentPassword.isBlank() || newPassword == null || newPassword.isBlank()) {
-                jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
-                return;
-            }
+      if (currentPassword == null || currentPassword.isBlank() || newPassword == null || newPassword.isBlank()) {
+        jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
+        return;
+      }
 
-            User user = userDao.findByEmail(email);
-            if (user == null) {
-                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Unauthorized");
-                return;
-            }
+      User user = userDao.findByEmail(email);
+      if (user == null) {
+        jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Unauthorized");
+        return;
+      }
 
-            if (!BCryptUtil.verifyPassword(currentPassword, user.getPasswordHash())) {
-                jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Current password is incorrect");
-                return;
-            }
+      if (!BCryptUtil.verifyPassword(currentPassword, user.getPasswordHash())) {
+        jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Current password is incorrect");
+        return;
+      }
 
-            String newHash = BCryptUtil.hashPassword(newPassword);
-            boolean updated = userDao.updatePassword(user.getUserId(), newHash);
+      String newHash = BCryptUtil.hashPassword(newPassword);
+      boolean updated = userDao.updatePassword(user.getUserId(), newHash);
 
-            if (updated) {
+      if (updated) {
                 jsonMessage(ctx, HttpStatus.OK, "Password changed successfully");
             } else {
                 jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to change password");
