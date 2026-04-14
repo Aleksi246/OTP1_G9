@@ -30,7 +30,7 @@ This document provides a review of the statistical code used in our project. The
 - Medium Risk: Reliability Rating
 - Low Risk: Maintainability
 
-![Security and Reliability Chart](Documents/charts/security_reliability_chart.png)
+![Security and Reliability Chart](charts/security_reliability_chart.png)
 
 Improving code security and fixing security hotspots should be a high priority as they will improve the overall security of the application. (Recommendation: Make DB pass an environment variable so it isn't compromised. Do not enable debugging features on production servers or applications distributed to end users.)
 The reliability of the code should be improved to ensure that the application is reliable and can handle unexpected errors with proper error handling.
@@ -80,4 +80,4 @@ The code is moderately duplicated, indicating that refactoring is needed to redu
 **Interpretation:**
 The code coverage is low, indicating that more tests should be implemented for a higher level of line coverage.
 
-![Code Coverage Chart](Documents/charts/coverage_pie_chart.png)
+![Code Coverage Chart](charts/coverage_pie_chart.png)
