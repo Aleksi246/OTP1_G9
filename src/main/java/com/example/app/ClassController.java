@@ -1,14 +1,11 @@
 package com.example.app;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -75,6 +72,18 @@ public class ClassController {
 
   // Error constants
   private static final String ERROR_UPLOAD_FAILED = "class.error.uploadFailed";
+  private static final String ERROR_TITLE = "class.error.title";
+  private static final String ERROR_REVIEW_TITLE = "class.error.review.title";
+  private static final String ERROR_JOINFAILED = "class.error.joinFailed";
+  private static final String ERROR_SERVER_RESPONSE = "class.error.serverResponse";
+
+  // Success constants
+  private static final String SUCCESS_TITLE = "home.success.title";
+
+  // Literals
+  private static final String USER_ID = "userId";
+  private static final String AUTHORIZATION = "Authorization";
+  private static final String BEARER = "Bearer ";
 
   @FXML
   private void initialize() {
@@ -100,7 +109,7 @@ public class ClassController {
     setUploadProgressVisible(false, "");
 
     if (classId == null) {
-      showAlert(Alert.AlertType.ERROR, LocaleManager.getString("class.error.title"),
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getString(ERROR_TITLE),
           LocaleManager.getString("class.error.missingId"));
       return;
     }
@@ -120,7 +129,7 @@ public class ClassController {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI("http://localhost:7700/api/courses/" + classId))
-                .header("Authorization", "Bearer " + token)
+                .header(AUTHORIZATION, BEARER + token)
                 .GET()
                 .build();
 
@@ -129,15 +138,15 @@ public class ClassController {
 
         if (response.statusCode() != 200) {
           Platform.runLater(() -> showAlert(Alert.AlertType.ERROR,
-                  LocaleManager.getString("class.error.title"),
+                  LocaleManager.getString(ERROR_TITLE),
                   LocaleManager.getString("class.error.loadDetails")));
           return;
         }
 
         JsonObject courseJson = JsonParser.parseString(response.body()).getAsJsonObject();
-        String className = getStringOrDefault(courseJson, "className",
+        String className = getStringOrDefault(courseJson,"className",
                 LocaleManager.getString("class.unknown"));
-        String topic = getStringOrDefault(courseJson, "topic",
+        String topic = getStringOrDefault(courseJson,"topic",
                 LocaleManager.getString("class.noTopic"));
         creatorId = courseJson.has("creatorId") && !courseJson.get("creatorId").isJsonNull()
                         ? courseJson.get("creatorId").getAsInt()
@@ -158,15 +167,15 @@ public class ClassController {
 
         loadMaterials();
       } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-          Platform.runLater(() -> showAlert(
-                  Alert.AlertType.ERROR,
-                  LocaleManager.getString("class.error.title"),
-                  LocaleManager.getString("class.error.failedLoad", e.getMessage())));
+        Thread.currentThread().interrupt();
+        Platform.runLater(() -> showAlert(
+                Alert.AlertType.ERROR,
+                LocaleManager.getString(ERROR_TITLE),
+                LocaleManager.getString("class.error.failedLoad", e.getMessage())));
       } catch (Exception e) {
           Platform.runLater(() -> showAlert(
                   Alert.AlertType.ERROR,
-                  LocaleManager.getString("class.error.title"),
+                  LocaleManager.getString(ERROR_TITLE),
                   LocaleManager.getString("class.error.failedLoad", e.getMessage())));
       }
     });
@@ -182,7 +191,7 @@ public class ClassController {
       String encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8);
       HttpRequest request = HttpRequest.newBuilder()
                   .uri(new URI("http://localhost:7700/api/users/by-email/" + encodedEmail))
-                  .header("Authorization", "Bearer " + token)
+                  .header(AUTHORIZATION, BEARER + token)
                   .GET()
                   .build();
 
@@ -193,10 +202,10 @@ public class ClassController {
       }
 
       JsonObject userJson = JsonParser.parseString(response.body()).getAsJsonObject();
-      if (!userJson.has("userId") || userJson.get("userId").isJsonNull()) {
+      if (!userJson.has(USER_ID) || userJson.get(USER_ID).isJsonNull()) {
         return null;
       }
-      return userJson.get("userId").getAsInt();
+      return userJson.get(USER_ID).getAsInt();
     } catch (Exception e) {
       Thread.currentThread().interrupt();
       return null;
@@ -211,7 +220,7 @@ public class ClassController {
     try {
       HttpRequest request = HttpRequest.newBuilder()
                   .uri(new URI("http://localhost:7700/api/participants/user/" + userId))
-                  .header("Authorization", "Bearer " + token)
+                  .header(AUTHORIZATION, BEARER + token)
                   .GET()
                   .build();
 
@@ -278,7 +287,7 @@ public class ClassController {
 
         HttpRequest request = HttpRequest.newBuilder()
             .uri(new URI("http://localhost:7700/api/materials/course/" + classId))
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, BEARER + token)
             .GET()
             .build();
 
@@ -302,7 +311,12 @@ public class ClassController {
                 Comparator.reverseOrder()));
 
         Platform.runLater(() -> renderMaterials(rows));
-      } catch (Exception e) {
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getString(
+                "class.couldNotLoadFilesShort")));
+      }
+      catch (Exception e) {
         Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getString(
                 "class.couldNotLoadFilesShort")));
       }
@@ -333,8 +347,8 @@ public class ClassController {
     String localizedType = localizeMaterialType(type);
     String uploadedAt = getStringOrDefault(material, "uploadedAt",
         LocaleManager.getString("class.unknownDate"));
-    String uploader = material.has("userId") && !material.get("userId").isJsonNull()
-            ? LocaleManager.getString("class.uploadedByUser", material.get("userId").getAsInt())
+    String uploader = material.has(USER_ID) && !material.get(USER_ID).isJsonNull()
+            ? LocaleManager.getString("class.uploadedByUser", material.get(USER_ID).getAsInt())
             : LocaleManager.getString("class.uploaderUnknown");
 
     // File type badge color
@@ -462,7 +476,7 @@ public class ClassController {
     try {
       HttpRequest request = HttpRequest.newBuilder()
           .uri(new URI("http://localhost:7700/api/reviews/material/" + fileId))
-          .header("Authorization", "Bearer " + token)
+          .header(AUTHORIZATION, BEARER + token)
           .GET()
           .build();
 
@@ -485,8 +499,8 @@ public class ClassController {
         String rating = review.has("rating") && !review.get("rating").isJsonNull()
             ? String.valueOf(review.get("rating").getAsInt())
                         : "-";
-        String reviewer = review.has("userId") && !review.get("userId").isJsonNull()
-                        ? MessageFormat.format(LocaleManager.getBundle().getString("class.reviewer"), review.get("userId").getAsInt())
+        String reviewer = review.has(USER_ID) && !review.get(USER_ID).isJsonNull()
+                        ? MessageFormat.format(LocaleManager.getBundle().getString("class.reviewer"), review.get(USER_ID).getAsInt())
                         : LocaleManager.getBundle().getString("class.unknownUser");
                 String comment = getStringOrDefault(review, "comment", getStringOrDefault(review, "review", ""));
                 if (comment.isBlank()) {
@@ -499,7 +513,11 @@ public class ClassController {
                     ? LocaleManager.getBundle().getString("class.noReviewsYet")
                     : MessageFormat.format(LocaleManager.getBundle().getString("class.reviewCount"), lines.size());
             return new ReviewsFetchResult(status, lines);
-    } catch (Exception e) {
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      return new ReviewsFetchResult(LocaleManager.getBundle().getString("class.error.reviewListUnavailable"), new ArrayList<>());
+    }
+    catch (Exception e) {
       return new ReviewsFetchResult(LocaleManager.getBundle().getString("class.error.reviewListUnavailable"), new ArrayList<>());
         }
     }
@@ -511,7 +529,7 @@ public class ClassController {
                                   Button reviewButton,
                                   Label rowStatusLabel) {
       if (isCreator) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
                     LocaleManager.getBundle().getString("class.error.forbiddenReview"));
             return;
         }
@@ -547,7 +565,7 @@ public class ClassController {
         );
       }
     } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.review.title"),
+            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_REVIEW_TITLE),
                     MessageFormat.format(LocaleManager.getBundle().getString("class.error.openReviewForm"), e.getMessage()));
         }
     }
@@ -560,7 +578,7 @@ public class ClassController {
                                     Button reviewButton,
                                     Label rowStatusLabel) {
         if (isCreator) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
                     LocaleManager.getBundle().getString("class.error.forbiddenReview"));
             return;
         }
@@ -568,12 +586,12 @@ public class ClassController {
         String trimmedComment = comment == null ? "" : comment.trim();
         if (rating == null || rating < 1 || rating > 5) {
             showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle()
-                            .getString("class.error.review.title"),
+                            .getString(ERROR_REVIEW_TITLE),
                     LocaleManager.getBundle().getString("class.error.invalidRating"));
             return;
         }
       if (trimmedComment.isBlank() || trimmedComment.length() > REVIEW_COMMENT_MAX_LENGTH) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.review.title"),
+            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_REVIEW_TITLE),
                     MessageFormat.format(LocaleManager.getBundle().getString("class.error.invalidComment"), REVIEW_COMMENT_MAX_LENGTH));
       return;
       }
@@ -601,7 +619,7 @@ public class ClassController {
         rowStatusLabel.setManaged(true);
 
                 if (result.success()) {
-                    showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString("home.success.title"),
+                    showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString(SUCCESS_TITLE),
                             LocaleManager.getBundle().getString("class.success.reviewSubmitted"));
                 } else {
                     showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.reviewFailed"), result.message());
@@ -619,7 +637,7 @@ public class ClassController {
 
       HttpRequest request = HttpRequest.newBuilder()
           .uri(new URI("http://localhost:7700/api/reviews"))
-          .header("Authorization", "Bearer " + token)
+          .header(AUTHORIZATION, BEARER + token)
           .header("Content-Type", "application/json")
           .POST(HttpRequest.BodyPublishers.ofString(reviewData.toString()))
           .build();
@@ -632,7 +650,12 @@ public class ClassController {
       String fallbackMessage = LocaleManager.getString("class.error.reviewSubmitWithCode",
           response.statusCode());
       return new ReviewSubmitResult(false, extractApiMessage(response.body(), fallbackMessage));
-    } catch (Exception e) {
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      return new ReviewSubmitResult(false,
+          LocaleManager.getString("class.error.reviewApiUnavailable", e.getMessage()));
+    }
+    catch (Exception e) {
       return new ReviewSubmitResult(false,
           LocaleManager.getString("class.error.reviewApiUnavailable", e.getMessage()));
     }
@@ -643,12 +666,12 @@ public class ClassController {
         runAsync(() -> {
             try {
                 JsonObject enrollData = new JsonObject();
-                enrollData.addProperty("userId", userId);
+                enrollData.addProperty(USER_ID, userId);
                 enrollData.addProperty("classId", classId);
 
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(new URI("http://localhost:7700/api/participants/enroll"))
-                        .header("Authorization", "Bearer " + token)
+                        .header(AUTHORIZATION, BEARER + token)
                         .header("Content-Type", "application/json")
                         .POST(HttpRequest.BodyPublishers.ofString(enrollData.toString()))
                         .build();
@@ -660,16 +683,21 @@ public class ClassController {
                         isEnrolled = true;
                         updateAccessUi();
                         loadMaterials();
-                        showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString("home.success.title"),
+                        showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString(SUCCESS_TITLE),
                                 LocaleManager.getBundle().getString("class.success.joined"));
                     } else {
-                        showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
-                                MessageFormat.format(LocaleManager.getBundle().getString("class.error.joinFailed"), response.statusCode()));
+                        showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
+                                MessageFormat.format(LocaleManager.getBundle().getString(ERROR_JOINFAILED), response.statusCode()));
                     }
                 });
-            } catch (Exception e) {
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
-                        MessageFormat.format(LocaleManager.getBundle().getString("class.error.joinFailed"), e.getMessage())));
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+              showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
+                      MessageFormat.format(LocaleManager.getBundle().getString(ERROR_JOINFAILED), e.getMessage()));
+            }
+            catch (Exception e) {
+                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
+                        MessageFormat.format(LocaleManager.getBundle().getString(ERROR_JOINFAILED), e.getMessage())));
             }
         });
     }
@@ -677,7 +705,7 @@ public class ClassController {
     @FXML
     private void handleChooseFile() {
       if (!isCreator) {
-        showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+        showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
             LocaleManager.getBundle().getString("class.error.onlyCreatorUpload"));
         return;
       }
@@ -694,19 +722,19 @@ public class ClassController {
     @FXML
     private void handleUploadMaterial() {
         if (!isCreator) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
                     LocaleManager.getBundle().getString("class.error.onlyCreatorUpload"));
             return;
         }
         if (selectedFile == null) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
                     LocaleManager.getBundle().getString("class.error.missingFile"));
             return;
         }
 
         String selectedMaterialType = materialTypeCombo.getValue();
         if (selectedMaterialType == null || selectedMaterialType.isBlank()) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
                     LocaleManager.getBundle().getString("class.error.missingType"));
             return;
         }
@@ -722,7 +750,7 @@ public class ClassController {
 
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(new URI("http://localhost:7700/api/materials"))
-                        .header("Authorization", "Bearer " + token)
+                        .header(AUTHORIZATION, BEARER + token)
                         .header("Content-Type", "multipart/form-data; boundary=" + boundary)
                         .POST(HttpRequest.BodyPublishers.ofByteArray(body))
                         .build();
@@ -735,12 +763,12 @@ public class ClassController {
                     if (response.statusCode() == 201 || response.statusCode() == 200) {
                         selectedFile = null;
                         selectedFileLabel.setText(LocaleManager.getBundle().getString("class.noFileSelected"));
-                        showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString("home.success.title"),
+                        showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString(SUCCESS_TITLE),
                                 LocaleManager.getBundle().getString("class.success.uploaded"));
                         loadMaterials();
                     } else {
                         showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_UPLOAD_FAILED),
-                                extractApiMessage(response.body(), MessageFormat.format(LocaleManager.getBundle().getString("class.error.serverResponse"), response.statusCode())));
+                                extractApiMessage(response.body(), MessageFormat.format(LocaleManager.getBundle().getString(ERROR_SERVER_RESPONSE), response.statusCode())));
                     }
                 });
             } catch (InterruptedException e) {
@@ -811,7 +839,7 @@ public class ClassController {
             try {
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(new URI("http://localhost:7700/api/materials/" + fileId + "/download"))
-                        .header("Authorization", "Bearer " + token)
+                        .header(AUTHORIZATION, BEARER + token)
                         .GET()
                         .build();
 
@@ -831,12 +859,15 @@ public class ClassController {
                                 MessageFormat
                                         .format(LocaleManager
                                                 .getBundle()
-                                                .getString("class.error.serverResponse"),
+                                                .getString(ERROR_SERVER_RESPONSE),
                                                 response
                                                         .statusCode()));
                     });
             }
-          } catch (Exception e) {
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
+            catch (Exception e) {
             Platform.runLater(() -> {
               setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
               showAlert(Alert.AlertType.ERROR,
@@ -864,7 +895,7 @@ public class ClassController {
       try {
         HttpRequest request = HttpRequest.newBuilder()
                         .uri(new URI("http://localhost:7700/api/materials/" + fileId))
-                        .header("Authorization", "Bearer " + token)
+                        .header(AUTHORIZATION, BEARER + token)
                         .DELETE()
                         .build();
 
@@ -875,7 +906,7 @@ public class ClassController {
           setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
           if (response.statusCode() == 200) {
             showAlert(Alert.AlertType.INFORMATION, LocaleManager
-                                .getBundle().getString("home.success.title"),
+                                .getBundle().getString(SUCCESS_TITLE),
                             MessageFormat.format(LocaleManager
                                     .getBundle().getString("class.success.deleted"), filename));
             loadMaterials();
@@ -884,11 +915,14 @@ public class ClassController {
                                     .getString("class.error.deleteFailed"),
                             extractApiMessage(response.body(), MessageFormat
                                    .format(LocaleManager.getBundle()
-                                            .getString("class.error.serverResponse"), response
+                                            .getString(ERROR_SERVER_RESPONSE), response
                                             .statusCode())));
           }
         });
-      } catch (Exception e) {
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+      catch (Exception e) {
         Platform.runLater(() -> {
           setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
           showAlert(Alert.AlertType.ERROR, LocaleManager
@@ -992,7 +1026,8 @@ public class ClassController {
           return obj.get("message").getAsString();
         }
       }
-    } catch (Exception ignored) {
+    } catch (JsonSyntaxException e) {
+      // handle JSON parsing issue only
     }
     return fallback;
   }
@@ -1000,7 +1035,7 @@ public class ClassController {
   @FXML
   private void handleDeleteClass() {
     if (!isCreator) {
-      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
           LocaleManager.getBundle().getString("class.error.onlyCreatorDelete"));
       return;
     }
@@ -1021,7 +1056,7 @@ public class ClassController {
       try {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(new URI("http://localhost:7700/api/courses/" + classId))
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, BEARER + token)
             .DELETE()
             .build();
 
@@ -1031,21 +1066,24 @@ public class ClassController {
         if (response.statusCode() == 200 || response.statusCode() == 204) {
           Platform.runLater(() -> {
             showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle()
-                            .getString("home.success.title"),
+                            .getString(SUCCESS_TITLE),
                 LocaleManager.getBundle().getString("class.success.classDeleted"));
             SceneManager.loadHome();
           });
         } else {
           Platform.runLater(() -> showAlert(Alert
                           .AlertType.ERROR, LocaleManager
-                          .getBundle().getString("class.error.title"),
+                          .getBundle().getString(ERROR_TITLE),
               MessageFormat.format(LocaleManager.getBundle()
                       .getString("class.error.classDeleteFailed"), response.statusCode())));
         }
-      } catch (Exception e) {
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+      catch (Exception e) {
         Platform.runLater(() -> showAlert(Alert
                         .AlertType.ERROR, LocaleManager.getBundle()
-                        .getString("class.error.title"),
+                        .getString(ERROR_TITLE),
             MessageFormat.format(LocaleManager.getBundle()
                     .getString("class.error.classDeleteFailedDetailed"), e.getMessage())));
       }
@@ -1055,7 +1093,7 @@ public class ClassController {
   @FXML
   private void handleLeaveClass() {
     if (!isEnrolled || isCreator) {
-      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.title"),
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
           LocaleManager.getBundle().getString("class.error.notEnrolled"));
       return;
     }
@@ -1074,12 +1112,12 @@ public class ClassController {
     runAsync(() -> {
       try {
         JsonObject unenrollData = new JsonObject();
-        unenrollData.addProperty("userId", userId);
+        unenrollData.addProperty(USER_ID, userId);
         unenrollData.addProperty("classId", classId);
 
         HttpRequest request = HttpRequest.newBuilder()
             .uri(new URI("http://localhost:7700/api/participants/unenroll"))
-            .header("Authorization", "Bearer " + token)
+            .header(AUTHORIZATION, BEARER + token)
             .header("Content-Type", "application/json")
             .method("DELETE", HttpRequest.BodyPublishers.ofString(unenrollData.toString()))
             .build();
@@ -1090,19 +1128,22 @@ public class ClassController {
         if (response.statusCode() == 200 || response.statusCode() == 204) {
           Platform.runLater(() -> {
             showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle()
-                            .getString("home.success.title"),
+                            .getString(SUCCESS_TITLE),
                 LocaleManager.getBundle().getString("class.success.leftClass"));
             SceneManager.loadHome();
           });
         } else {
           Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle()
-                          .getString("class.error.title"),
+                          .getString(ERROR_TITLE),
               MessageFormat.format(LocaleManager.getBundle().getString(
                       "class.error.leaveFailed"), response.statusCode())));
         }
-      } catch (Exception e) {
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+      catch (Exception e) {
         Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle()
-                        .getString("class.error.title"),
+                        .getString(ERROR_TITLE),
             MessageFormat.format(LocaleManager.getBundle().getString(
                     "class.error.leaveFailedDetailed"), e.getMessage())));
       }
@@ -1117,12 +1158,14 @@ public class ClassController {
     alert.showAndWait();
   }
 
-  private record ReviewSubmitResult(boolean success, String message) {}
+  private record ReviewSubmitResult(boolean success, String message) { }
 
-  private record ReviewsFetchResult(String message, List<String> reviewLines) {}
+  private record ReviewsFetchResult(String message, List<String> reviewLines) { }
 }
 
 class ClassContextHolder {
+  private ClassContextHolder() {}
+
   private static Integer classId;
 
   public static void setClassId(Integer id) {

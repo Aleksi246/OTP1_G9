@@ -22,18 +22,24 @@ public class UserController {
     ctx.status(status).json(Map.of("message", message));
   }
 
+  private static final String EMAIL = "email";
+  private static final String PASSWORD = "password";
+  private static final String USERNAME = "username";
+  private static final String ERROR = "Error: ";
+  private static final String MISSING_PARAMETERS = "Missing parameters";
+
   public void register(Context ctx) {
     try {
       System.out.println("[REGISTRATION] Received registration request");
       JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
-      String username = body.has("username") ? body.get("username").getAsString() : null;
-      String password = body.has("password") ? body.get("password").getAsString() : null;
-      String email =    body.has("email")    ? body.get("email").   getAsString() : null;
+      String username = body.has(USERNAME) ? body.get(USERNAME).getAsString() : null;
+      String password = body.has(PASSWORD) ? body.get(PASSWORD).getAsString() : null;
+      String email =    body.has(EMAIL)    ? body.get(EMAIL).   getAsString() : null;
 
       System.out.println("[REGISTRATION] Username: " + username + ", Email: " + email);
 
       if (username == null || password == null || email == null) {
-        jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
+        jsonMessage(ctx, HttpStatus.BAD_REQUEST, MISSING_PARAMETERS);
         return;
       }
 
@@ -70,23 +76,23 @@ public class UserController {
       }
     } catch (Exception e) {
       logger.log(Level.SEVERE, e, () -> "[REGISTRATION] Exception: " + e.getMessage());
-      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, ERROR + e.getMessage());
     }
   }
 
   public void login(Context ctx) {
     try {
       JsonObject body = JsonParser.parseString(ctx.body()).getAsJsonObject();
-      String email = body.has("email") ? body.get("email").getAsString() : null;
-      String username = body.has("username") ? body.get("username").getAsString() : null;
-      String password = body.has("password") ? body.get("password").getAsString() : null;
+      String email = body.has(EMAIL) ? body.get(EMAIL).getAsString() : null;
+      String username = body.has(USERNAME) ? body.get(USERNAME).getAsString() : null;
+      String password = body.has(PASSWORD) ? body.get(PASSWORD).getAsString() : null;
 
       if ((email == null
               || email.isBlank()) && (username == null
               || username.isBlank())
               || password == null
               || password.isBlank()) {
-        jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
+        jsonMessage(ctx, HttpStatus.BAD_REQUEST, MISSING_PARAMETERS);
         return;
       }
 
@@ -104,14 +110,14 @@ public class UserController {
         String token = JWTUtil.generateToken(user.getEmail());
         ctx.json(Map.of(
                      "token", token,
-                     "username", user.getUsername(),
-                     "email", user.getEmail()
+                     USERNAME, user.getUsername(),
+                     EMAIL, user.getEmail()
         ));
       } else {
         jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Invalid credentials");
       }
     } catch (Exception e) {
-      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, ERROR + e.getMessage());
     }
   }
 
@@ -123,7 +129,7 @@ public class UserController {
       }
       ctx.json(users);
     } catch (Exception e) {
-      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, ERROR + e.getMessage());
     }
   }
 
@@ -138,13 +144,13 @@ public class UserController {
         jsonMessage(ctx, HttpStatus.NOT_FOUND, "User not found");
       }
     } catch (Exception e) {
-      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, ERROR + e.getMessage());
     }
   }
 
   public void getUserByEmail(Context ctx) {
     try {
-      String email = ctx.pathParam("email");
+      String email = ctx.pathParam(EMAIL);
       User user = userDao.findByEmail(email);
       if (user != null) {
         user.setPasswordHash(null);
@@ -153,13 +159,13 @@ public class UserController {
         jsonMessage(ctx, HttpStatus.NOT_FOUND, "User not found");
       }
     } catch (Exception e) {
-      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+      jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, ERROR + e.getMessage());
     }
   }
 
   public void changePassword(Context ctx) {
     try {
-      String email = ctx.attribute("email");
+      String email = ctx.attribute(EMAIL);
       if (email == null || email.isBlank()) {
         jsonMessage(ctx, HttpStatus.UNAUTHORIZED, "Unauthorized");
         return;
@@ -170,7 +176,7 @@ public class UserController {
       String newPassword = body.has("newPassword") ? body.get("newPassword").getAsString() : null;
 
       if (currentPassword == null || currentPassword.isBlank() || newPassword == null || newPassword.isBlank()) {
-        jsonMessage(ctx, HttpStatus.BAD_REQUEST, "Missing parameters");
+        jsonMessage(ctx, HttpStatus.BAD_REQUEST, MISSING_PARAMETERS);
         return;
       }
 
@@ -194,7 +200,7 @@ public class UserController {
                 jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to change password");
             }
         } catch (Exception e) {
-            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, ERROR + e.getMessage());
         }
     }
 }

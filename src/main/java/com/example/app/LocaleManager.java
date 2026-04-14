@@ -18,6 +18,8 @@ public class LocaleManager {
     private static volatile Map<String, String> currentTranslations = Collections.emptyMap();
     private static Locale currentLocale = DEFAULT_LOCALE;
 
+    private LocaleManager() {}
+
     // Single bundle instance that always resolves values from the active cache.
     private static final ResourceBundle BUNDLE = new ResourceBundle() {
         @Override

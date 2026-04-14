@@ -6,6 +6,10 @@ import java.util.Base64;
 
 public class JWTHelper {
 
+    private JWTHelper() {
+          throw new UnsupportedOperationException("Utility class");
+      }
+
     private static JsonObject decodePayload(String token) {
         try {
             String[] parts = token.split("\\.");

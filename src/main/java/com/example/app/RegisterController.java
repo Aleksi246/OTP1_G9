@@ -89,8 +89,11 @@ public class RegisterController {
             } else {
                 messageLabel.setText("Registration failed: " + response.statusCode());
             }
-        } catch (IOException | InterruptedException ex) {
-            messageLabel.setText("Connection error: " + ex.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            messageLabel.setText("Registration interrupted");
+        } catch (IOException e) {
+            messageLabel.setText("Connection error: " + e.getMessage());
         }
     }
 
@@ -119,8 +122,11 @@ public class RegisterController {
             } else {
                 messageLabel.setText("Login failed: " + response.statusCode());
             }
-        } catch (IOException | InterruptedException ex) {
-            messageLabel.setText("Connection error: " + ex.getMessage());
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          messageLabel.setText("Login interrupted");
+        } catch (IOException e) {
+            messageLabel.setText("Connection error: " + e.getMessage());
         }
     }
 

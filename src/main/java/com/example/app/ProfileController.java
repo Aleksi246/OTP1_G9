@@ -70,8 +70,12 @@ public class ProfileController {
             } else {
                 showMessage(LocaleManager.getString("profile.error.passwordChangeFailed", response.statusCode()), true);
             }
-        } catch (IOException | InterruptedException ex) {
-            showMessage(LocaleManager.getString("profile.error.connection", ex.getMessage()), true);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            showMessage(LocaleManager.getString("profile.error.interrupted", e.getMessage()), true);
+        }
+        catch (IOException e) {
+            showMessage(LocaleManager.getString("profile.error.connection", e.getMessage()), true);
         }
     }
 

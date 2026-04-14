@@ -7,6 +7,8 @@ public class SessionManager {
   private static String currentUserType;
   private static Integer currentUserId;
 
+  private SessionManager() {}
+
   public static void setSession(String username, String email, String token, String userType) {
     currentUsername = username;
     currentEmail = email;

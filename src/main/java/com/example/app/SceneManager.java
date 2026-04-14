@@ -21,6 +21,8 @@ public class SceneManager {
 
     private static final Logger logger = Logger.getLogger(SceneManager.class.getName());
 
+    private SceneManager() {}
+
     public static void setPrimaryStage(Stage stage) {
         primaryStage = stage;
     }
@@ -57,8 +59,11 @@ public class SceneManager {
     private static void applyScene(Scene scene, String title) {
         boolean wasFullScreen = primaryStage.isFullScreen();
         boolean wasMaximized = primaryStage.isMaximized();
-        double prevX = primaryStage.getX(), prevY = primaryStage.getY();
-        double prevW = primaryStage.getWidth(), prevH = primaryStage.getHeight();
+
+        double prevX = primaryStage.getX();
+        double prevY = primaryStage.getY();
+        double prevW = primaryStage.getWidth();
+        double prevH = primaryStage.getHeight();
 
         primaryStage.setTitle(title);
         primaryStage.setScene(scene);

@@ -1,14 +1,13 @@
 package com.example.app;
 
+import com.example.service.AuthService;
+import com.example.service.LoginResult;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
 public class LoginController {
 
@@ -17,7 +16,9 @@ public class LoginController {
     @FXML private Label errorLabel;
 
     private static final String API_URL = "http://localhost:7700";
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+
+    private final AuthService authService =
+            new AuthService(HttpClient.newHttpClient(), API_URL);
 
     @FXML
     public void handlePrimaryAction() {
@@ -25,7 +26,7 @@ public class LoginController {
         String password = passwordField.getText().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            errorLabel.setText(LocaleManager.getString("login.error.required"));
+            showError("login.error.required");
             return;
         }
 
@@ -39,58 +40,37 @@ public class LoginController {
 
     private void doLogin(String loginInput, String password) {
         try {
-            boolean isEmailLogin = loginInput.contains("@");
-            String json;
-            if (isEmailLogin) {
-                json = "{\"email\":\"" + escapeJson(loginInput) + "\",\"password\":\"" + escapeJson(password) + "\"}";
-            } else {
-                json = "{\"username\":\"" + escapeJson(loginInput) + "\",\"password\":\"" + escapeJson(password) + "\"}";
-            }
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(API_URL + "/api/auth/login"))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
+            LoginResult result = authService.login(loginInput, password);
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                String responseBody = response.body();
-                String token = extractJsonField(responseBody, "token");
-                if (token != null) {
-                    errorLabel.setText(LocaleManager.getString("login.success.login"));
-                    String userType = JWTHelper.getUserTypeFromToken(token);
-                    String email = extractJsonField(responseBody, "email");
-                    if (email == null || email.isBlank()) {
-                        email = JWTHelper.getEmailFromToken(token);
-                    }
-                    String username = extractJsonField(responseBody, "username");
-                    if (username == null || username.isBlank()) {
-                        username = loginInput;
-                    }
-                    SessionManager.setSession(username, email, token, userType);
-                    SceneManager.loadHome();
-                } else {
-                    errorLabel.setText(LocaleManager.getString("login.error.token"));
-                }
-            } else {
-                errorLabel.setText(LocaleManager.getString("login.error.failed", response.statusCode()));
+            if (!result.isSuccess()) {
+                showError(result.getErrorKey(), result.getErrorArgs());
+                return;
             }
-        } catch (IOException | InterruptedException ex) {
-            errorLabel.setText(LocaleManager.getString("login.error.connection", ex.getMessage()));
+
+            showMessage("login.success.login");
+
+            SessionManager.setSession(
+                    result.getUsername(),
+                    result.getEmail(),
+                    result.getToken(),
+                    result.getUserType()
+            );
+
+            SceneManager.loadHome();
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            showError("login.error.interrupted", e.getMessage());
+        } catch (IOException e) {
+            showError("login.error.connection", e.getMessage());
         }
     }
 
-    private String extractJsonField(String response, String fieldName) {
-        String fieldPattern = "\"" + fieldName + "\":\"";
-        int start = response.indexOf(fieldPattern);
-        if (start == -1) return null;
-        start += fieldPattern.length();
-        int end = response.indexOf("\"", start);
-        return end > start ? response.substring(start, end) : null;
+    private void showError(String key, Object... args) {
+        errorLabel.setText(LocaleManager.getString(key, args));
     }
 
-    private String escapeJson(String str) {
-        return str.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
+    private void showMessage(String key, Object... args) {
+        errorLabel.setText(LocaleManager.getString(key, args));
     }
 }

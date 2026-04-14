@@ -176,7 +176,10 @@ public class HomeController {
             final String finalName = name;
             final String finalTopic = topic;
             Platform.runLater(() -> classesContainer.getChildren().add(createClassCard(finalName, finalTopic, classId)));
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
+        catch (Exception e) {
             logger.log(Level.SEVERE, "Error fetching class card", e);
         }
     }
@@ -306,7 +309,10 @@ public class HomeController {
                                 LocaleManager.getString("home.error.createClass", response.statusCode()));
                     }
                 });
-            } catch (Exception e) {
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+            }
+            catch (Exception e) {
                 Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getString("home.error.title"),
                         LocaleManager.getString("home.error.createClassException", e.getMessage())));
             }

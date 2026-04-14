@@ -27,6 +27,8 @@ public class MaterialController {
     private ParticipantDao participantDao = new ParticipantDao();
     private static final Path UPLOAD_DIR = Paths.get("uploads").toAbsolutePath();
 
+    private static final String ERROR = "Error: ";
+
     private void jsonMessage(Context ctx, HttpStatus status, String message) {
         ctx.status(status).json(Map.of("message", message));
     }
@@ -41,7 +43,7 @@ public class MaterialController {
             List<Material> materials = materialDao.findByClassId(classId);
             ctx.json(materials);
         } catch (Exception e) {
-            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, ERROR + e.getMessage());
         }
     }
 
@@ -55,7 +57,7 @@ public class MaterialController {
                 jsonMessage(ctx, HttpStatus.NOT_FOUND, "Material not found");
             }
         } catch (Exception e) {
-            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, ERROR + e.getMessage());
         }
     }
 
@@ -96,7 +98,7 @@ public class MaterialController {
             ctx.contentType(contentType);
             ctx.result(Files.newInputStream(filePath));
         } catch (Exception e) {
-            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, ERROR + e.getMessage());
         }
     }
 
@@ -158,7 +160,7 @@ public class MaterialController {
                 jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload material");
             }
         } catch (Exception e) {
-            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, ERROR + e.getMessage());
         }
     }
 
@@ -205,7 +207,7 @@ public class MaterialController {
                 jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update material");
             }
         } catch (Exception e) {
-            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, ERROR + e.getMessage());
         }
     }
 
@@ -241,7 +243,7 @@ public class MaterialController {
                 jsonMessage(ctx, HttpStatus.NOT_FOUND, "Material not found");
             }
         } catch (Exception e) {
-            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+            jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, ERROR + e.getMessage());
         }
     }
 }
