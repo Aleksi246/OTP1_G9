@@ -10,11 +10,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class SceneManager {
     private static Stage primaryStage;
     private static List<String> navigationHistory = new ArrayList<>();
     private static int currentIndex = -1;
     private static String currentSceneName = "main";
+
+    private static final Logger logger = Logger.getLogger(SceneManager.class.getName());
 
     public static void setPrimaryStage(Stage stage) {
         primaryStage = stage;
@@ -45,9 +50,7 @@ public class SceneManager {
 
             applyScene(scene, LocaleManager.getString("app.title") + " - " + name);
         } catch (Exception e) {
-            System.err.println("Error loading " + name + " scene: " + e.getMessage());
-            System.err.println("Full stack trace:");
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e, () -> "Error loading " + name + " scene");
         }
     }
 

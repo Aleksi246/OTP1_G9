@@ -21,6 +21,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class HomeController {
 
     @FXML private Label welcomeLabel;
@@ -32,6 +35,8 @@ public class HomeController {
     @FXML private Label loadingLabel;
 
     private final HttpClient httpClient = HttpClient.newHttpClient();
+
+    private static final Logger logger = Logger.getLogger(HomeController.class.getName());
 
     @FXML
     private void initialize() {
@@ -114,7 +119,7 @@ public class HomeController {
             if (response.statusCode() == 200) {
                 return JsonParser.parseString(response.body()).getAsJsonObject().get("userId").getAsInt();
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { logger.log(Level.SEVERE, "Error fetching user ID", e); }
         return null;
     }
 
@@ -131,7 +136,7 @@ public class HomeController {
                     classIds.add(el.getAsInt());
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { logger.log(Level.SEVERE, "Error fetching user classes", e); }
         return classIds;
     }
 
@@ -170,7 +175,7 @@ public class HomeController {
             final String finalTopic = topic;
             Platform.runLater(() -> classesContainer.getChildren().add(createClassCard(finalName, finalTopic, classId)));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error fetching class card", e);
         }
     }
 

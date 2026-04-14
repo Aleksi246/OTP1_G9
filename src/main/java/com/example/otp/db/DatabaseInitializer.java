@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DatabaseInitializer {
     private static final String URL = System.getenv().getOrDefault(
@@ -13,6 +15,8 @@ public class DatabaseInitializer {
     );
     private static final String USER = DatabaseConfig.get("db.user");
     private static final String PASS = DatabaseConfig.get("db.pass");
+
+    private static final Logger logger = Logger.getLogger(DatabaseInitializer.class.getName());
 
     /**
      * Initialize the database with schema (idempotent, safe for production).
@@ -67,11 +71,10 @@ public class DatabaseInitializer {
                         }
                     }
                 }
-                System.out.println("[DB Init] Database initialization completed successfully!");
+                logger.log(Level.INFO, "[DB Init] Database initialization completed successfully!");
             }
         } catch (Exception e) {
-            System.err.println("[DB Init] Database initialization failed: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, e, () -> "[DB Init] Exception: " + e.getMessage());
         }
     }
 }

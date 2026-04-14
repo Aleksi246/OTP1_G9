@@ -10,9 +10,13 @@ import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UserController {
   private UserDao userDao = new UserDao();
+
+  private static final Logger logger = Logger.getLogger(UserController.class.getName());
 
   private void jsonMessage(Context ctx, HttpStatus status, String message) {
     ctx.status(status).json(Map.of("message", message));
@@ -65,8 +69,7 @@ public class UserController {
         jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Failed to register user");
       }
     } catch (Exception e) {
-      System.err.println("[REGISTRATION] Exception: " + e.getMessage());
-      e.printStackTrace();
+      logger.log(Level.SEVERE, e, () -> "[REGISTRATION] Exception: " + e.getMessage());
       jsonMessage(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
     }
   }
