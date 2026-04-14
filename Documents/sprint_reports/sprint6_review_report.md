@@ -35,7 +35,7 @@ All deliverables committed: localization code, refactored codebase, test plan, d
 | Elias Eide | DB localization, code review, test planning | 20 | Submitted |
 | Aleksi Lappalainen | DB localization, clean-up, architecture docs | 20 | Submitted |
 | Arttu Salo | Code review, refactoring, test planning | 20 | Submitted |
-| Eero Koivukoski | Clean-up, diagrams, backlog updates | | Submitted |
+| Eero Koivukoski | Clean-up, diagrams, backlog updates | 5 | Not Submitted |
 
 ## What Went Well
 
