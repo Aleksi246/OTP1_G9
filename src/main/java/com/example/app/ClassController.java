@@ -73,6 +73,9 @@ public class ClassController {
   private static final String MATERIAL_REFERENCE = "Reference";
   private static final String MATERIAL_OTHER = "Other";
 
+  // Error constants
+  private static final String ERROR_UPLOAD_FAILED = "class.error.uploadFailed";
+
   @FXML
   private void initialize() {
     if (!SessionManager.isLoggedIn()) {
@@ -736,7 +739,7 @@ public class ClassController {
                                 LocaleManager.getBundle().getString("class.success.uploaded"));
                         loadMaterials();
                     } else {
-                        showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.uploadFailed"),
+                        showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_UPLOAD_FAILED),
                                 extractApiMessage(response.body(), MessageFormat.format(LocaleManager.getBundle().getString("class.error.serverResponse"), response.statusCode())));
                     }
                 });
@@ -745,13 +748,13 @@ public class ClassController {
                 Platform.runLater(() -> {
                     uploadButton.setDisable(false);
                     setUploadProgressVisible(false, "");
-                    showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.uploadFailed"), e.getMessage());
+                    showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_UPLOAD_FAILED), e.getMessage());
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     uploadButton.setDisable(false);
                     setUploadProgressVisible(false, "");
-                    showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.uploadFailed"), e.getMessage());
+                    showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_UPLOAD_FAILED), e.getMessage());
                 });
             }
         });

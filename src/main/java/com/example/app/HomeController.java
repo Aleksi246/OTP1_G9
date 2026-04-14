@@ -110,16 +110,17 @@ public class HomeController {
 
     private Integer fetchUserId(String email, String token) {
         try {
-            String encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8);
-            HttpResponse<String> response = httpClient.send(
-                    HttpRequest.newBuilder()
-                            .uri(new URI("http://localhost:7700/api/users/by-email/" + encodedEmail))
-                            .header("Authorization", "Bearer " + token).GET().build(),
-                    HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                return JsonParser.parseString(response.body()).getAsJsonObject().get("userId").getAsInt();
-            }
-        } catch (Exception e) { logger.log(Level.SEVERE, "Error fetching user ID", e); }
+          String encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8);
+          HttpResponse<String> response = httpClient.send(
+                  HttpRequest.newBuilder()
+                          .uri(new URI("http://localhost:7700/api/users/by-email/" + encodedEmail))
+                          .header("Authorization", "Bearer " + token).GET().build(),
+                  HttpResponse.BodyHandlers.ofString());
+          if (response.statusCode() == 200) {
+            return JsonParser.parseString(response.body()).getAsJsonObject().get("userId").getAsInt();
+          }
+        }  catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+          catch (Exception e) { logger.log(Level.SEVERE, "Error fetching user ID", e); }
         return null;
     }
 
@@ -136,7 +137,8 @@ public class HomeController {
                     classIds.add(el.getAsInt());
                 }
             }
-        } catch (Exception e) { logger.log(Level.SEVERE, "Error fetching user classes", e); }
+        } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+        catch (Exception e) { logger.log(Level.SEVERE, "Error fetching user classes", e); }
         return classIds;
     }
 
