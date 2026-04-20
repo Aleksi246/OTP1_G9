@@ -78,6 +78,23 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <excludes>
+            <exclude>com/example/app/ClassController*</exclude>
+            <exclude>com/example/app/HomeController*</exclude>
+            <exclude>com/example/app/LoginController*</exclude>
+            <exclude>com/example/app/RegisterController*</exclude>
+            <exclude>com/example/app/ProfileController*</exclude>
+            <exclude>com/example/app/TopBarController*</exclude>
+            <exclude>com/example/app/MainController*</exclude>
+            <exclude>com/example/app/ReviewDialogController*</exclude>
+            <exclude>com/example/app/ViewReviewsDialogController*</exclude>
+            <exclude>com/example/app/SceneManager*</exclude>
+            <exclude>com/example/app/Main*</exclude>
+            <exclude>com/example/app/Launcher*</exclude>
+            <exclude>com/example/App*</exclude>
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

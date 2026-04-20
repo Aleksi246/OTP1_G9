@@ -196,6 +196,25 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.11</version>
+                <configuration>
+                    <excludes>
+                        <!-- JavaFX UI controllers (require GUI toolkit, untestable without TestFX) -->
+                        <exclude>com/example/app/ClassController*</exclude>
+                        <exclude>com/example/app/HomeController*</exclude>
+                        <exclude>com/example/app/LoginController*</exclude>
+                        <exclude>com/example/app/RegisterController*</exclude>
+                        <exclude>com/example/app/ProfileController*</exclude>
+                        <exclude>com/example/app/TopBarController*</exclude>
+                        <exclude>com/example/app/MainController*</exclude>
+                        <exclude>com/example/app/ReviewDialogController*</exclude>
+                        <exclude>com/example/app/ViewReviewsDialogController*</exclude>
+                        <!-- JavaFX bootstrapping classes -->
+                        <exclude>com/example/app/SceneManager*</exclude>
+                        <exclude>com/example/app/Main*</exclude>
+                        <exclude>com/example/app/Launcher*</exclude>
+                        <exclude>com/example/App*</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
