@@ -63,6 +63,7 @@ public class ClassController {
   private boolean isEnrolled;
   private File selectedFile;
   private final HttpClient httpClient = HttpClient.newHttpClient();
+  private final String apiBaseUrl = System.getProperty("otp.api.base-url", "http://localhost:7700");
   private static final int REVIEW_COMMENT_MAX_LENGTH = 500;
   private static final String MATERIAL_LECTURE_NOTES = "Lecture Notes";
   private static final String MATERIAL_ASSIGNMENT = "Assignment";
@@ -84,6 +85,10 @@ public class ClassController {
   private static final String USER_ID = "userId";
   private static final String AUTHORIZATION = "Authorization";
   private static final String BEARER = "Bearer ";
+
+  private URI apiUri(String path) {
+    return URI.create(apiBaseUrl + path);
+  }
 
   @FXML
   private void initialize() {
@@ -128,7 +133,7 @@ public class ClassController {
         }
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI("http://localhost:7700/api/courses/" + classId))
+          .uri(apiUri("/api/courses/" + classId))
                 .header(AUTHORIZATION, BEARER + token)
                 .GET()
                 .build();
@@ -190,7 +195,7 @@ public class ClassController {
 
       String encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8);
       HttpRequest request = HttpRequest.newBuilder()
-                  .uri(new URI("http://localhost:7700/api/users/by-email/" + encodedEmail))
+          .uri(apiUri("/api/users/by-email/" + encodedEmail))
                   .header(AUTHORIZATION, BEARER + token)
                   .GET()
                   .build();
@@ -219,7 +224,7 @@ public class ClassController {
 
     try {
       HttpRequest request = HttpRequest.newBuilder()
-                  .uri(new URI("http://localhost:7700/api/participants/user/" + userId))
+          .uri(apiUri("/api/participants/user/" + userId))
                   .header(AUTHORIZATION, BEARER + token)
                   .GET()
                   .build();
@@ -286,7 +291,7 @@ public class ClassController {
         });
 
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(new URI("http://localhost:7700/api/materials/course/" + classId))
+          .uri(apiUri("/api/materials/course/" + classId))
             .header(AUTHORIZATION, BEARER + token)
             .GET()
             .build();
@@ -474,8 +479,8 @@ public class ClassController {
 
   private ReviewsFetchResult fetchMaterialReviews(Integer fileId) {
     try {
-      HttpRequest request = HttpRequest.newBuilder()
-          .uri(new URI("http://localhost:7700/api/reviews/material/" + fileId))
+        HttpRequest request = HttpRequest.newBuilder()
+          .uri(apiUri("/api/reviews/material/" + fileId))
           .header(AUTHORIZATION, BEARER + token)
           .GET()
           .build();
@@ -635,8 +640,8 @@ public class ClassController {
       reviewData.addProperty("rating", rating);
       reviewData.addProperty("review", comment);
 
-      HttpRequest request = HttpRequest.newBuilder()
-          .uri(new URI("http://localhost:7700/api/reviews"))
+        HttpRequest request = HttpRequest.newBuilder()
+          .uri(apiUri("/api/reviews"))
           .header(AUTHORIZATION, BEARER + token)
           .header("Content-Type", "application/json")
           .POST(HttpRequest.BodyPublishers.ofString(reviewData.toString()))
@@ -670,7 +675,7 @@ public class ClassController {
                 enrollData.addProperty("classId", classId);
 
                 HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI("http://localhost:7700/api/participants/enroll"))
+                  .uri(apiUri("/api/participants/enroll"))
                         .header(AUTHORIZATION, BEARER + token)
                         .header("Content-Type", "application/json")
                         .POST(HttpRequest.BodyPublishers.ofString(enrollData.toString()))
@@ -749,7 +754,7 @@ public class ClassController {
                 byte[] body = buildMultipartBody(fileToUpload, boundary, classId, materialType);
 
                 HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI("http://localhost:7700/api/materials"))
+                  .uri(apiUri("/api/materials"))
                         .header(AUTHORIZATION, BEARER + token)
                         .header("Content-Type", "multipart/form-data; boundary=" + boundary)
                         .POST(HttpRequest.BodyPublishers.ofByteArray(body))
@@ -838,7 +843,7 @@ public class ClassController {
         runAsync(() -> {
             try {
                 HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI("http://localhost:7700/api/materials/" + fileId + "/download"))
+                  .uri(apiUri("/api/materials/" + fileId + "/download"))
                         .header(AUTHORIZATION, BEARER + token)
                         .GET()
                         .build();
@@ -894,7 +899,7 @@ public class ClassController {
     runAsync(() -> {
       try {
         HttpRequest request = HttpRequest.newBuilder()
-                        .uri(new URI("http://localhost:7700/api/materials/" + fileId))
+            .uri(apiUri("/api/materials/" + fileId))
                         .header(AUTHORIZATION, BEARER + token)
                         .DELETE()
                         .build();
@@ -1055,7 +1060,7 @@ public class ClassController {
     runAsync(() -> {
       try {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(new URI("http://localhost:7700/api/courses/" + classId))
+          .uri(apiUri("/api/courses/" + classId))
             .header(AUTHORIZATION, BEARER + token)
             .DELETE()
             .build();
@@ -1116,7 +1121,7 @@ public class ClassController {
         unenrollData.addProperty("classId", classId);
 
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(new URI("http://localhost:7700/api/participants/unenroll"))
+          .uri(apiUri("/api/participants/unenroll"))
             .header(AUTHORIZATION, BEARER + token)
             .header("Content-Type", "application/json")
             .method("DELETE", HttpRequest.BodyPublishers.ofString(unenrollData.toString()))

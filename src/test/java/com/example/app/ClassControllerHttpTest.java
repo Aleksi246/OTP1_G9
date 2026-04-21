@@ -80,8 +80,9 @@ class ClassControllerHttpTest {
         app.get("/api/participants/user/{userId}", participantController::getClassesByUser);
         app.post("/api/participants/enroll", participantController::enrollUser);
 
-        app.start(7700);
-        baseUrl = "http://localhost:7700";
+        app.start(0);
+        baseUrl = "http://localhost:" + app.port();
+        System.setProperty("otp.api.base-url", baseUrl);
 
         // Seed data
         clearAllTables();
@@ -143,6 +144,7 @@ class ClassControllerHttpTest {
     @AfterAll
     static void tearDown() throws Exception {
         if (app != null) app.stop();
+        System.clearProperty("otp.api.base-url");
         clearAllTables();
     }
 
