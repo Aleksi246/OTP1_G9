@@ -50,6 +50,15 @@ pipeline {
                 jacoco()
             }
         }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQubeServer') {
+                bat """
+                ${tool 'SonarScanner'}\\bin\\sonar-scanner ^
+                """
+                }
+            }
+        }
 
         stage('build docker image') {
             steps{
