@@ -1,7 +1,6 @@
 package com.example.app;
 
 import com.google.gson.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -133,7 +132,7 @@ public class ClassController {
         }
 
         HttpRequest request = HttpRequest.newBuilder()
-          .uri(apiUri("/api/courses/" + classId))
+            .uri(apiUri("/api/courses/" + classId))
                 .header(AUTHORIZATION, BEARER + token)
                 .GET()
                 .build();
@@ -149,9 +148,9 @@ public class ClassController {
         }
 
         JsonObject courseJson = JsonParser.parseString(response.body()).getAsJsonObject();
-        String className = getStringOrDefault(courseJson,"className",
+        String className = getStringOrDefault(courseJson, "className",
                 LocaleManager.getString("class.unknown"));
-        String topic = getStringOrDefault(courseJson,"topic",
+        String topic = getStringOrDefault(courseJson, "topic",
                 LocaleManager.getString("class.noTopic"));
         creatorId = courseJson.has("creatorId") && !courseJson.get("creatorId").isJsonNull()
                         ? courseJson.get("creatorId").getAsInt()
@@ -178,10 +177,10 @@ public class ClassController {
                 LocaleManager.getString(ERROR_TITLE),
                 LocaleManager.getString("class.error.failedLoad", e.getMessage())));
       } catch (Exception e) {
-          Platform.runLater(() -> showAlert(
-                  Alert.AlertType.ERROR,
-                  LocaleManager.getString(ERROR_TITLE),
-                  LocaleManager.getString("class.error.failedLoad", e.getMessage())));
+        Platform.runLater(() -> showAlert(
+            Alert.AlertType.ERROR,
+            LocaleManager.getString(ERROR_TITLE),
+            LocaleManager.getString("class.error.failedLoad", e.getMessage())));
       }
     });
   }
@@ -291,7 +290,7 @@ public class ClassController {
         });
 
         HttpRequest request = HttpRequest.newBuilder()
-          .uri(apiUri("/api/materials/course/" + classId))
+            .uri(apiUri("/api/materials/course/" + classId))
             .header(AUTHORIZATION, BEARER + token)
             .GET()
             .build();
@@ -320,8 +319,7 @@ public class ClassController {
         Thread.currentThread().interrupt();
         Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getString(
                 "class.couldNotLoadFilesShort")));
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         Platform.runLater(() -> materialsStatusLabel.setText(LocaleManager.getString(
                 "class.couldNotLoadFilesShort")));
       }
@@ -479,7 +477,7 @@ public class ClassController {
 
   private ReviewsFetchResult fetchMaterialReviews(Integer fileId) {
     try {
-        HttpRequest request = HttpRequest.newBuilder()
+      HttpRequest request = HttpRequest.newBuilder()
           .uri(apiUri("/api/reviews/material/" + fileId))
           .header(AUTHORIZATION, BEARER + token)
           .GET()
@@ -505,46 +503,72 @@ public class ClassController {
             ? String.valueOf(review.get("rating").getAsInt())
                         : "-";
         String reviewer = review.has(USER_ID) && !review.get(USER_ID).isJsonNull()
-                        ? MessageFormat.format(LocaleManager.getBundle().getString("class.reviewer"), review.get(USER_ID).getAsInt())
+                        ? MessageFormat.format(LocaleManager.getBundle()
+                        .getString("class.reviewer"),
+                        review.get(USER_ID).getAsInt())
                         : LocaleManager.getBundle().getString("class.unknownUser");
-                String comment = getStringOrDefault(review, "comment", getStringOrDefault(review, "review", ""));
-                if (comment.isBlank()) {
-                    comment = LocaleManager.getBundle().getString("class.noComment");
-                }
-                lines.add(MessageFormat.format(LocaleManager.getBundle().getString("class.reviewLine"), rating, reviewer, comment));
-            }
+        String comment = getStringOrDefault(review,
+                    "comment",
+                    getStringOrDefault(review,
+                    "review",
+                    ""));
+        if (comment.isBlank()) {
+          comment = LocaleManager.getBundle().getString("class.noComment");
+        }
+        lines
+            .add(MessageFormat
+            .format(LocaleManager
+            .getBundle()
+            .getString("class.reviewLine"),
+            rating,
+            reviewer,
+            comment));
+      }
 
-            String status = lines.isEmpty()
+      String status = lines.isEmpty()
                     ? LocaleManager.getBundle().getString("class.noReviewsYet")
-                    : MessageFormat.format(LocaleManager.getBundle().getString("class.reviewCount"), lines.size());
-            return new ReviewsFetchResult(status, lines);
+                    : MessageFormat
+                      .format(LocaleManager
+                      .getBundle()
+                      .getString("class.reviewCount"),
+                      lines
+                      .size());
+      return new ReviewsFetchResult(status, lines);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-      return new ReviewsFetchResult(LocaleManager.getBundle().getString("class.error.reviewListUnavailable"), new ArrayList<>());
+      return new ReviewsFetchResult(LocaleManager
+          .getBundle()
+          .getString("class.error.reviewListUnavailable"),
+          new ArrayList<>());
+    } catch (Exception e) {
+      return new ReviewsFetchResult(LocaleManager
+              .getBundle()
+              .getString("class.error.reviewListUnavailable"),
+              new ArrayList<>());
     }
-    catch (Exception e) {
-      return new ReviewsFetchResult(LocaleManager.getBundle().getString("class.error.reviewListUnavailable"), new ArrayList<>());
-        }
+  }
+
+  private void openReviewDialog(Integer fileId,
+                                String filename,
+                                Button downloadButton,
+                                Button deleteButton,
+                                Button reviewButton,
+                                Label rowStatusLabel) {
+    if (isCreator) {
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
+          LocaleManager.getBundle().getString("class.error.forbiddenReview"));
+      return;
+    }
+    if (fileId == null) {
+      return;
     }
 
-    private void openReviewDialog(Integer fileId,
-                                  String filename,
-                                  Button downloadButton,
-                                  Button deleteButton,
-                                  Button reviewButton,
-                                  Label rowStatusLabel) {
-      if (isCreator) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
-                    LocaleManager.getBundle().getString("class.error.forbiddenReview"));
-            return;
-        }
-        if (fileId == null) {
-            return;
-        }
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/app/review-dialog.fxml"));
-            loader.setResources(LocaleManager.getBundle());
+    try {
+      FXMLLoader loader = new FXMLLoader(getClass()
+          .getResource("/com/example/app/review-dialog.fxml"));
+      loader
+          .setResources(LocaleManager
+          .getBundle());
       Scene scene = new Scene(loader.load());
 
       ReviewDialogController dialogController = loader.getController();
@@ -570,36 +594,47 @@ public class ClassController {
         );
       }
     } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_REVIEW_TITLE),
-                    MessageFormat.format(LocaleManager.getBundle().getString("class.error.openReviewForm"), e.getMessage()));
-        }
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_REVIEW_TITLE),
+                    MessageFormat
+                            .format(LocaleManager
+                                    .getBundle()
+                                    .getString("class.error.openReviewForm"),
+                                    e
+                                            .getMessage()));
+    }
+  }
+
+  private void handleSubmitReview(Integer fileId,
+                                  Integer rating,
+                                  String comment,
+                                  Button downloadButton,
+                                  Button deleteButton,
+                                  Button reviewButton,
+                                  Label rowStatusLabel) {
+    if (isCreator) {
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
+          LocaleManager.getBundle().getString("class.error.forbiddenReview"));
+      return;
     }
 
-    private void handleSubmitReview(Integer fileId,
-                                    Integer rating,
-                                    String comment,
-                                    Button downloadButton,
-                                    Button deleteButton,
-                                    Button reviewButton,
-                                    Label rowStatusLabel) {
-        if (isCreator) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
-                    LocaleManager.getBundle().getString("class.error.forbiddenReview"));
-            return;
-        }
-
-        String trimmedComment = comment == null ? "" : comment.trim();
-        if (rating == null || rating < 1 || rating > 5) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle()
-                            .getString(ERROR_REVIEW_TITLE),
-                    LocaleManager.getBundle().getString("class.error.invalidRating"));
-            return;
-        }
-      if (trimmedComment.isBlank() || trimmedComment.length() > REVIEW_COMMENT_MAX_LENGTH) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_REVIEW_TITLE),
-                    MessageFormat.format(LocaleManager.getBundle().getString("class.error.invalidComment"), REVIEW_COMMENT_MAX_LENGTH));
+    String trimmedComment = comment == null ? "" : comment.trim();
+    if (rating == null || rating < 1 || rating > 5) {
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle()
+          .getString(ERROR_REVIEW_TITLE),
+          LocaleManager
+          .getBundle()
+          .getString("class.error.invalidRating"));
       return;
-      }
+    }
+    if (trimmedComment.isBlank() || trimmedComment.length() > REVIEW_COMMENT_MAX_LENGTH) {
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_REVIEW_TITLE),
+          MessageFormat
+              .format(LocaleManager
+              .getBundle()
+              .getString("class.error.invalidComment"),
+              REVIEW_COMMENT_MAX_LENGTH));
+      return;
+    }
 
     downloadButton.setDisable(true);
     reviewButton.setDisable(true);
@@ -623,15 +658,22 @@ public class ClassController {
         rowStatusLabel.setVisible(true);
         rowStatusLabel.setManaged(true);
 
-                if (result.success()) {
-                    showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString(SUCCESS_TITLE),
-                            LocaleManager.getBundle().getString("class.success.reviewSubmitted"));
-                } else {
-                    showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.reviewFailed"), result.message());
-                }
-            });
-        });
-    }
+        if (result.success()) {
+          showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString(SUCCESS_TITLE),
+              LocaleManager.getBundle().getString("class.success.reviewSubmitted"));
+        } else {
+          showAlert(Alert
+              .AlertType
+              .ERROR,
+              LocaleManager
+              .getBundle()
+              .getString("class.error.reviewFailed"),
+              result
+              .message());
+        }
+      });
+    });
+  }
 
   private ReviewSubmitResult submitMaterialReview(Integer fileId, Integer rating, String comment) {
     try {
@@ -640,16 +682,19 @@ public class ClassController {
       reviewData.addProperty("rating", rating);
       reviewData.addProperty("review", comment);
 
-        HttpRequest request = HttpRequest.newBuilder()
-          .uri(apiUri("/api/reviews"))
-          .header(AUTHORIZATION, BEARER + token)
-          .header("Content-Type", "application/json")
-          .POST(HttpRequest.BodyPublishers.ofString(reviewData.toString()))
-          .build();
+      HttpRequest request = HttpRequest.newBuilder()
+            .uri(apiUri("/api/reviews"))
+            .header(AUTHORIZATION, BEARER + token)
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(reviewData.toString()))
+            .build();
 
-      HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+      HttpResponse<String> response = httpClient.send(request,
+          HttpResponse.BodyHandlers.ofString());
       if (response.statusCode() == 200 || response.statusCode() == 201) {
-        return new ReviewSubmitResult(true, LocaleManager.getString("class.success.reviewSubmitted"));
+        return new ReviewSubmitResult(true,
+            LocaleManager
+            .getString("class.success.reviewSubmitted"));
       }
 
       String fallbackMessage = LocaleManager.getString("class.error.reviewSubmitWithCode",
@@ -659,230 +704,383 @@ public class ClassController {
       Thread.currentThread().interrupt();
       return new ReviewSubmitResult(false,
           LocaleManager.getString("class.error.reviewApiUnavailable", e.getMessage()));
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       return new ReviewSubmitResult(false,
-          LocaleManager.getString("class.error.reviewApiUnavailable", e.getMessage()));
+          LocaleManager
+          .getString("class.error.reviewApiUnavailable",
+          e
+          .getMessage()));
     }
   }
 
-    @FXML
-    private void handleJoinClass() {
-        runAsync(() -> {
-            try {
-                JsonObject enrollData = new JsonObject();
-                enrollData.addProperty(USER_ID, userId);
-                enrollData.addProperty("classId", classId);
+  @FXML
+  private void handleJoinClass() {
+    runAsync(() -> {
+      try {
+        JsonObject enrollData = new JsonObject();
+        enrollData.addProperty(USER_ID, userId);
+        enrollData.addProperty("classId", classId);
 
-                HttpRequest request = HttpRequest.newBuilder()
-                  .uri(apiUri("/api/participants/enroll"))
-                        .header(AUTHORIZATION, BEARER + token)
-                        .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString(enrollData.toString()))
-                        .build();
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(apiUri("/api/participants/enroll"))
+            .header(AUTHORIZATION, BEARER + token)
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(enrollData.toString()))
+            .build();
 
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-                Platform.runLater(() -> {
-                    if (response.statusCode() == 201 || response.statusCode() == 200) {
-                        isEnrolled = true;
-                        updateAccessUi();
-                        loadMaterials();
-                        showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString(SUCCESS_TITLE),
-                                LocaleManager.getBundle().getString("class.success.joined"));
-                    } else {
-                        showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
-                                MessageFormat.format(LocaleManager.getBundle().getString(ERROR_JOINFAILED), response.statusCode()));
-                    }
-                });
-            } catch (InterruptedException e) {
-              Thread.currentThread().interrupt();
-              showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
-                      MessageFormat.format(LocaleManager.getBundle().getString(ERROR_JOINFAILED), e.getMessage()));
-            }
-            catch (Exception e) {
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
-                        MessageFormat.format(LocaleManager.getBundle().getString(ERROR_JOINFAILED), e.getMessage())));
-            }
+        HttpResponse<String> response = httpClient
+            .send(request,
+            HttpResponse
+            .BodyHandlers
+            .ofString());
+        Platform.runLater(() -> {
+          if (response.statusCode() == 201 || response.statusCode() == 200) {
+            isEnrolled = true;
+            updateAccessUi();
+            loadMaterials();
+            showAlert(Alert
+                .AlertType
+                .INFORMATION,
+                LocaleManager
+                .getBundle()
+                .getString(SUCCESS_TITLE),
+                LocaleManager
+                .getBundle()
+                .getString("class.success.joined"));
+          } else {
+            showAlert(Alert
+                .AlertType
+                .ERROR,
+                LocaleManager
+                .getBundle()
+                .getString(ERROR_TITLE),
+                MessageFormat
+                .format(LocaleManager
+                .getBundle()
+                .getString(ERROR_JOINFAILED),
+                response
+                .statusCode()));
+          }
         });
-    }
-
-    @FXML
-    private void handleChooseFile() {
-      if (!isCreator) {
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
         showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
-            LocaleManager.getBundle().getString("class.error.onlyCreatorUpload"));
-        return;
+            MessageFormat.format(LocaleManager
+            .getBundle()
+            .getString(ERROR_JOINFAILED), e.getMessage()));
+      } catch (Exception e) {
+        Platform.runLater(() -> showAlert(Alert
+                        .AlertType
+                        .ERROR,
+                LocaleManager
+                        .getBundle()
+                        .getString(ERROR_TITLE),
+            MessageFormat
+            .format(LocaleManager
+            .getBundle()
+            .getString(ERROR_JOINFAILED),
+            e
+            .getMessage())));
       }
+    });
+  }
 
-      FileChooser chooser = new FileChooser();
-      chooser.setTitle(LocaleManager.getBundle().getString("class.dialog.selectMaterialFile"));
-      File file = chooser.showOpenDialog(classNameLabel.getScene().getWindow());
-      if (file != null) {
-        selectedFile = file;
-        selectedFileLabel.setText(file.getName());
-      }
+  @FXML
+  private void handleChooseFile() {
+    if (!isCreator) {
+      showAlert(Alert
+          .AlertType
+          .ERROR,
+          LocaleManager
+          .getBundle()
+          .getString(ERROR_TITLE),
+          LocaleManager
+          .getBundle()
+          .getString("class.error.onlyCreatorUpload"));
+      return;
     }
 
-    @FXML
-    private void handleUploadMaterial() {
-        if (!isCreator) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
-                    LocaleManager.getBundle().getString("class.error.onlyCreatorUpload"));
-            return;
-        }
-        if (selectedFile == null) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
-                    LocaleManager.getBundle().getString("class.error.missingFile"));
-            return;
-        }
+    FileChooser chooser = new FileChooser();
+    chooser.setTitle(LocaleManager.getBundle().getString("class.dialog.selectMaterialFile"));
+    File file = chooser.showOpenDialog(classNameLabel.getScene().getWindow());
+    if (file != null) {
+      selectedFile = file;
+      selectedFileLabel.setText(file.getName());
+    }
+  }
 
-        String selectedMaterialType = materialTypeCombo.getValue();
-        if (selectedMaterialType == null || selectedMaterialType.isBlank()) {
-            showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
+  @FXML
+  private void handleUploadMaterial() {
+    if (!isCreator) {
+      showAlert(Alert
+          .AlertType
+          .ERROR,
+          LocaleManager
+          .getBundle()
+          .getString(ERROR_TITLE),
+          LocaleManager
+          .getBundle()
+          .getString("class.error.onlyCreatorUpload"));
+      return;
+    }
+    if (selectedFile == null) {
+      showAlert(Alert
+          .AlertType
+          .ERROR,
+          LocaleManager
+          .getBundle()
+          .getString(ERROR_TITLE),
+          LocaleManager.getBundle().getString("class.error.missingFile"));
+      return;
+    }
+
+    String selectedMaterialType = materialTypeCombo.getValue();
+    if (selectedMaterialType == null || selectedMaterialType.isBlank()) {
+      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_TITLE),
                     LocaleManager.getBundle().getString("class.error.missingType"));
-            return;
-        }
-        String materialType = toApiMaterialType(selectedMaterialType);
+      return;
+    }
+    String materialType = toApiMaterialType(selectedMaterialType);
 
-        File fileToUpload = selectedFile;
-        setUploadProgressVisible(true, MessageFormat.format(LocaleManager.getBundle().getString("class.status.uploadingFile"), fileToUpload.getName()));
-        uploadButton.setDisable(true);
-        runAsync(() -> {
-            try {
-                String boundary = "----OTPBoundary" + System.currentTimeMillis();
-                byte[] body = buildMultipartBody(fileToUpload, boundary, classId, materialType);
+    File fileToUpload = selectedFile;
+    setUploadProgressVisible(true,
+        MessageFormat
+        .format(LocaleManager
+        .getBundle()
+        .getString("class.status.uploadingFile"),
+        fileToUpload
+        .getName()));
+    uploadButton.setDisable(true);
+    runAsync(() -> {
+      try {
+        String boundary = "----OTPBoundary" + System.currentTimeMillis();
+        byte[] body = buildMultipartBody(fileToUpload, boundary, classId, materialType);
 
-                HttpRequest request = HttpRequest.newBuilder()
-                  .uri(apiUri("/api/materials"))
+        HttpRequest request = HttpRequest.newBuilder()
+                    .uri(apiUri("/api/materials"))
                         .header(AUTHORIZATION, BEARER + token)
                         .header("Content-Type", "multipart/form-data; boundary=" + boundary)
                         .POST(HttpRequest.BodyPublishers.ofByteArray(body))
                         .build();
 
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient
+                    .send(request,
+                    HttpResponse
+                    .BodyHandlers
+                    .ofString());
 
-                Platform.runLater(() -> {
-                    uploadButton.setDisable(false);
-                    setUploadProgressVisible(false, "");
-                    if (response.statusCode() == 201 || response.statusCode() == 200) {
-                        selectedFile = null;
-                        selectedFileLabel.setText(LocaleManager.getBundle().getString("class.noFileSelected"));
-                        showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString(SUCCESS_TITLE),
-                                LocaleManager.getBundle().getString("class.success.uploaded"));
-                        loadMaterials();
-                    } else {
-                        showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_UPLOAD_FAILED),
-                                extractApiMessage(response.body(), MessageFormat.format(LocaleManager.getBundle().getString(ERROR_SERVER_RESPONSE), response.statusCode())));
-                    }
-                });
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                Platform.runLater(() -> {
-                    uploadButton.setDisable(false);
-                    setUploadProgressVisible(false, "");
-                    showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_UPLOAD_FAILED), e.getMessage());
-                });
-            } catch (Exception e) {
-                Platform.runLater(() -> {
-                    uploadButton.setDisable(false);
-                    setUploadProgressVisible(false, "");
-                    showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString(ERROR_UPLOAD_FAILED), e.getMessage());
-                });
-            }
+        Platform.runLater(() -> {
+          uploadButton.setDisable(false);
+          setUploadProgressVisible(false, "");
+          if (response.statusCode() == 201 || response.statusCode() == 200) {
+            selectedFile = null;
+            selectedFileLabel
+                .setText(LocaleManager
+                .getBundle()
+                .getString("class.noFileSelected"));
+            showAlert(Alert
+                .AlertType
+                .INFORMATION,
+                LocaleManager
+                .getBundle()
+                .getString(SUCCESS_TITLE),
+                LocaleManager
+                .getBundle()
+                .getString("class.success.uploaded"));
+            loadMaterials();
+          } else {
+            showAlert(Alert
+                .AlertType
+                .ERROR,
+                LocaleManager
+                .getBundle()
+                .getString(ERROR_UPLOAD_FAILED),
+                extractApiMessage(response
+                .body(),
+                MessageFormat
+                .format(LocaleManager
+                .getBundle()
+                .getString(ERROR_SERVER_RESPONSE),
+                response
+                .statusCode())));
+          }
         });
+      } catch (InterruptedException e) {
+        Thread
+        .currentThread().interrupt();
+        Platform.runLater(() -> {
+          uploadButton
+              .setDisable(false);
+          setUploadProgressVisible(false, "");
+          showAlert(Alert
+              .AlertType
+              .ERROR,
+              LocaleManager
+              .getBundle()
+              .getString(ERROR_UPLOAD_FAILED),
+              e
+              .getMessage());
+        });
+      } catch (Exception e) {
+        Platform.runLater(() -> {
+          uploadButton.setDisable(false);
+          setUploadProgressVisible(false, "");
+          showAlert(Alert
+                      .AlertType
+                      .ERROR,
+                      LocaleManager
+                      .getBundle()
+                      .getString(ERROR_UPLOAD_FAILED),
+                      e
+                      .getMessage());
+        });
+      }
+    });
+  }
+
+  private byte[] buildMultipartBody(File file,
+                                    String boundary,
+                                    Integer classId,
+                                    String materialType) throws IOException {
+    String crlf = "\r\n";
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    writeTextPart(output, boundary, "classId", String.valueOf(classId));
+    writeTextPart(output, boundary, "materialType", materialType);
+    String contentType = Files.probeContentType(file.toPath());
+    if (contentType == null) {
+      contentType = "application/octet-stream";
     }
+    output
+        .write(("--"
+        + boundary
+        + crlf)
+        .getBytes(StandardCharsets
+        .UTF_8));
+    output
+        .write(("Content-Disposition: form-data; name=\"file\"; filename=\""
+        + file
+        .getName()
+        + "\""
+        + crlf)
+        .getBytes(StandardCharsets.UTF_8));
+    output
+        .write(("Content-Type: "
+        + contentType
+        + crlf
+        + crlf)
+        .getBytes(StandardCharsets
+        .UTF_8));
+    output.write(Files.readAllBytes(file.toPath()));
+    output.write(crlf.getBytes(StandardCharsets.UTF_8));
+    output.write(("--" + boundary + "--" + crlf).getBytes(StandardCharsets.UTF_8));
+    return output.toByteArray();
+  }
 
-    private byte[] buildMultipartBody(File file, String boundary, Integer classId, String materialType) throws IOException {
-        String crlf = "\r\n";
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-
-        writeTextPart(output, boundary, "classId", String.valueOf(classId));
-        writeTextPart(output, boundary, "materialType", materialType);
-
-        String contentType = Files.probeContentType(file.toPath());
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
-
-        output.write(("--" + boundary + crlf).getBytes(StandardCharsets.UTF_8));
-        output.write(("Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"" + crlf)
-                .getBytes(StandardCharsets.UTF_8));
-        output.write(("Content-Type: " + contentType + crlf + crlf).getBytes(StandardCharsets.UTF_8));
-        output.write(Files.readAllBytes(file.toPath()));
-        output.write(crlf.getBytes(StandardCharsets.UTF_8));
-
-        output.write(("--" + boundary + "--" + crlf).getBytes(StandardCharsets.UTF_8));
-        return output.toByteArray();
-    }
-
-  private void writeTextPart(ByteArrayOutputStream output, String boundary, String name, String value) throws IOException {
+  private void writeTextPart(ByteArrayOutputStream output,
+                             String boundary,
+                             String name,
+                             String value) throws IOException {
     String crlf = "\r\n";
     output.write(("--" + boundary + crlf).getBytes(StandardCharsets.UTF_8));
-    output.write(("Content-Disposition: form-data; name=\"" + name + "\"" + crlf + crlf).getBytes(StandardCharsets.UTF_8));
+    output
+        .write(("Content-Disposition: form-data; name=\""
+        + name
+        + "\""
+        + crlf
+        + crlf)
+        .getBytes(StandardCharsets
+        .UTF_8));
     output.write(value.getBytes(StandardCharsets.UTF_8));
     output.write(crlf.getBytes(StandardCharsets.UTF_8));
   }
 
-  private void handleDownloadMaterial(Integer fileId, String filename, Button downloadButton, Button deleteButton, Label rowStatusLabel) {
+  private void handleDownloadMaterial(Integer fileId,
+                                      String filename,
+                                      Button downloadButton,
+                                      Button deleteButton,
+                                      Label rowStatusLabel) {
     if (fileId == null) {
       return;
     }
 
     FileChooser chooser = new FileChooser();
     chooser.setTitle(LocaleManager.getBundle().getString("class.dialog.saveMaterial"));
-    chooser.setInitialFileName(filename == null || filename.isBlank() ? LocaleManager.getBundle().getString("class.unknown") : filename);
+    chooser
+            .setInitialFileName(filename == null || filename
+                    .isBlank() ? LocaleManager
+                                 .getBundle()
+                                 .getString("class.unknown") : filename);
 
-        File destination = chooser.showSaveDialog(classNameLabel.getScene().getWindow());
-        if (destination == null) {
-            return;
+    File destination = chooser.showSaveDialog(classNameLabel.getScene().getWindow());
+    if (destination == null) {
+      return;
+    }
+
+    setRowActionState(downloadButton, deleteButton, rowStatusLabel, true,
+        LocaleManager
+        .getBundle()
+        .getString("class.status.downloading"));
+    runAsync(() -> {
+      try {
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(apiUri("/api/materials/" + fileId + "/download"))
+            .header(AUTHORIZATION, BEARER + token)
+            .GET()
+            .build();
+
+        HttpResponse<byte[]> response = httpClient
+            .send(request,
+            HttpResponse
+            .BodyHandlers
+            .ofByteArray());
+
+        if (response.statusCode() == 200) {
+          Files.write(destination.toPath(), response.body());
+          Platform.runLater(() -> {
+            setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
+            showAlert(Alert
+                .AlertType
+                .INFORMATION,
+                LocaleManager
+                .getBundle()
+                .getString("class.success.downloadComplete"),
+                MessageFormat
+                .format(LocaleManager
+                .getBundle()
+                .getString("class.success.downloadSaved"),
+                destination
+                .getAbsolutePath()));
+          });
+        } else {
+          Platform.runLater(() -> {
+            setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
+            showAlert(Alert
+                .AlertType
+                .ERROR,
+                LocaleManager
+                .getBundle()
+                .getString("class.error.downloadFailed"),
+                MessageFormat
+                .format(LocaleManager
+                .getBundle()
+                .getString(ERROR_SERVER_RESPONSE),
+                response
+                .statusCode()));
+          });
         }
-
-        setRowActionState(downloadButton, deleteButton, rowStatusLabel, true,
-                LocaleManager.getBundle().getString("class.status.downloading"));
-        runAsync(() -> {
-            try {
-                HttpRequest request = HttpRequest.newBuilder()
-                  .uri(apiUri("/api/materials/" + fileId + "/download"))
-                        .header(AUTHORIZATION, BEARER + token)
-                        .GET()
-                        .build();
-
-                HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
-
-                if (response.statusCode() == 200) {
-                    Files.write(destination.toPath(), response.body());
-                    Platform.runLater(() -> {
-                        setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
-                        showAlert(Alert.AlertType.INFORMATION, LocaleManager.getBundle().getString("class.success.downloadComplete"),
-                                MessageFormat.format(LocaleManager.getBundle().getString("class.success.downloadSaved"), destination.getAbsolutePath()));
-                    });
-                } else {
-                    Platform.runLater(() -> {
-                      setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
-                      showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle().getString("class.error.downloadFailed"),
-                                MessageFormat
-                                        .format(LocaleManager
-                                                .getBundle()
-                                                .getString(ERROR_SERVER_RESPONSE),
-                                                response
-                                                        .statusCode()));
-                    });
-            }
-          } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-          }
-            catch (Exception e) {
-            Platform.runLater(() -> {
-              setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
-              showAlert(Alert.AlertType.ERROR,
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      } catch (Exception e) {
+        Platform.runLater(() -> {
+          setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
+          showAlert(Alert.AlertType.ERROR,
                           LocaleManager.getBundle()
                                   .getString("class.error.downloadFailed"),
                           e
                                   .getMessage());
-            });
-          }
         });
+      }
+    });
   }
 
   private void handleDeleteMaterial(Integer fileId,
@@ -926,8 +1124,7 @@ public class ClassController {
         });
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         Platform.runLater(() -> {
           setRowActionState(downloadButton, deleteButton, rowStatusLabel, false, "");
           showAlert(Alert.AlertType.ERROR, LocaleManager
@@ -1060,7 +1257,7 @@ public class ClassController {
     runAsync(() -> {
       try {
         HttpRequest request = HttpRequest.newBuilder()
-          .uri(apiUri("/api/courses/" + classId))
+            .uri(apiUri("/api/courses/" + classId))
             .header(AUTHORIZATION, BEARER + token)
             .DELETE()
             .build();
@@ -1084,8 +1281,7 @@ public class ClassController {
         }
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         Platform.runLater(() -> showAlert(Alert
                         .AlertType.ERROR, LocaleManager.getBundle()
                         .getString(ERROR_TITLE),
@@ -1121,7 +1317,7 @@ public class ClassController {
         unenrollData.addProperty("classId", classId);
 
         HttpRequest request = HttpRequest.newBuilder()
-          .uri(apiUri("/api/participants/unenroll"))
+            .uri(apiUri("/api/participants/unenroll"))
             .header(AUTHORIZATION, BEARER + token)
             .header("Content-Type", "application/json")
             .method("DELETE", HttpRequest.BodyPublishers.ofString(unenrollData.toString()))
@@ -1145,8 +1341,7 @@ public class ClassController {
         }
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, LocaleManager.getBundle()
                         .getString(ERROR_TITLE),
             MessageFormat.format(LocaleManager.getBundle().getString(
