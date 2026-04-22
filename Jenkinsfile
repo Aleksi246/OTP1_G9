@@ -20,6 +20,24 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Aleksi246/OTP1_G9.git'
             }
         }
+        stage('Inject secrets') {
+            steps {
+                withCredentials([
+                    file(credentialsId: 'otp_env_file', variable: 'ENV_FILE'),
+                    file(credentialsId: 'otp_db_pro', variable: 'DB_FILE')
+                ]) {
+                    bat '''
+                        if not exist src\\main\\resources mkdir src\\main\\resources
+                        if not exist src\\test\\resources mkdir src\\test\\resources
+
+                        copy "%ENV_FILE%" ".env"
+
+                        copy "%DB_FILE%" "src\\main\\resources\\db.properties"
+                        copy "%DB_FILE%" "src\\test\\resources\\db.properties"
+                    '''
+                }
+            }
+        }
 
         stage('Build') {
             steps {
