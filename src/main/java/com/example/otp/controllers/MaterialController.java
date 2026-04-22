@@ -21,11 +21,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class MaterialController {
-    private MaterialDao materialDao = new MaterialDao();
-    private UserDao userDao = new UserDao();
-    private CourseDao courseDao = new CourseDao();
-    private ParticipantDao participantDao = new ParticipantDao();
-    private static final Path UPLOAD_DIR = Paths.get("uploads").toAbsolutePath();
+  private MaterialDao materialDao = new MaterialDao();
+  private UserDao userDao = new UserDao();
+  private CourseDao courseDao = new CourseDao();
+  private ParticipantDao participantDao = new ParticipantDao();
+  private static final Path UPLOAD_DIR = Paths.get("uploads").toAbsolutePath();
 
     private static final String ERROR = "Error: ";
 
