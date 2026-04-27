@@ -24,7 +24,7 @@ services:
   app:
     build:
       context: .
-    image: classroom-sharing-system:latest
+    image: aleksi246/otp:latest
     container_name: otp
     depends_on:
       db:
