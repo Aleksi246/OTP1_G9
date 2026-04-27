@@ -1,6 +1,6 @@
 package com.example.app;
 
-public class SessionManager {
+public final class SessionManager {
   private static String currentUsername;
   private static String currentEmail;
   private static String currentToken;

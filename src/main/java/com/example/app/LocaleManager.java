@@ -9,7 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class LocaleManager {
+public final class LocaleManager {
     private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
     private static final String DEFAULT_LANGUAGE = DEFAULT_LOCALE.getLanguage();
 

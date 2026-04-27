@@ -152,7 +152,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(1)
-    void fetchUserId_validEmail_returnsUserId() throws Exception {
+    void fetchUserIdValidEmailReturnsUserId() throws Exception {
         SessionManager.setSession("cc_teacher", "cc_teacher@test.com", teacherToken, "teacher");
         Method method = ClassController.class.getDeclaredMethod("fetchUserId");
         method.setAccessible(true);
@@ -165,7 +165,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(2)
-    void fetchUserId_nullEmail_returnsNull() throws Exception {
+    void fetchUserIdNullEmailReturnsNull() throws Exception {
         SessionManager.setSession("cc_teacher", null, teacherToken, "teacher");
         Method method = ClassController.class.getDeclaredMethod("fetchUserId");
         method.setAccessible(true);
@@ -177,7 +177,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(3)
-    void fetchUserId_blankEmail_returnsNull() throws Exception {
+    void fetchUserIdBlankEmailReturnsNull() throws Exception {
         SessionManager.setSession("cc_teacher", "  ", teacherToken, "teacher");
         Method method = ClassController.class.getDeclaredMethod("fetchUserId");
         method.setAccessible(true);
@@ -191,7 +191,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(4)
-    void isUserEnrolled_enrolledUser_returnsTrue() throws Exception {
+    void isUserEnrolledEnrolledUserReturnsTrue() throws Exception {
         Method method = ClassController.class.getDeclaredMethod("isUserEnrolled");
         method.setAccessible(true);
 
@@ -205,7 +205,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(5)
-    void isUserEnrolled_notEnrolledUser_returnsFalse() throws Exception {
+    void isUserEnrolledNotEnrolledUserReturnsFalse() throws Exception {
         Method method = ClassController.class.getDeclaredMethod("isUserEnrolled");
         method.setAccessible(true);
 
@@ -219,7 +219,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(6)
-    void isUserEnrolled_nullUserId_returnsFalse() throws Exception {
+    void isUserEnrolledNullUserIdReturnsFalse() throws Exception {
         Method method = ClassController.class.getDeclaredMethod("isUserEnrolled");
         method.setAccessible(true);
 
@@ -235,7 +235,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(7)
-    void fetchMaterialReviews_noReviews_returnsEmptyResult() throws Exception {
+    void fetchMaterialReviewsNoReviewsReturnsEmptyResult() throws Exception {
         Method method = ClassController.class.getDeclaredMethod("fetchMaterialReviews", Integer.class);
         method.setAccessible(true);
 
@@ -254,7 +254,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(8)
-    void fetchMaterialReviews_withReviews_returnsLines() throws Exception {
+    void fetchMaterialReviewsWithReviewsReturnsLines() throws Exception {
         // First create a review
         ReviewDao reviewDao = new ReviewDao();
         Review review = new Review();
@@ -277,7 +277,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(9)
-    void fetchMaterialReviews_nonExistentMaterial_returnsEmpty() throws Exception {
+    void fetchMaterialReviewsNonExistentMaterialReturnsEmpty() throws Exception {
         Method method = ClassController.class.getDeclaredMethod("fetchMaterialReviews", Integer.class);
         method.setAccessible(true);
 
@@ -293,7 +293,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(10)
-    void submitMaterialReview_validReview_returnsSuccess() throws Exception {
+    void submitMaterialReviewValidReviewReturnsSuccess() throws Exception {
         Method method = ClassController.class.getDeclaredMethod("submitMaterialReview",
                 Integer.class, Integer.class, String.class);
         method.setAccessible(true);
@@ -308,7 +308,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(11)
-    void submitMaterialReview_nullFileId_returnsError() throws Exception {
+    void submitMaterialReviewNullFileIdReturnsError() throws Exception {
         Method method = ClassController.class.getDeclaredMethod("submitMaterialReview",
                 Integer.class, Integer.class, String.class);
         method.setAccessible(true);
@@ -327,7 +327,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(12)
-    void buildMultipartBody_producesValidOutput() throws Exception {
+    void buildMultipartBodyProducesValidOutput() throws Exception {
         Method method = ClassController.class.getDeclaredMethod("buildMultipartBody",
                 File.class, String.class, Integer.class, String.class);
         method.setAccessible(true);
@@ -353,7 +353,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(13)
-    void buildMultipartBody_emptyFile() throws Exception {
+    void buildMultipartBodyEmptyFile() throws Exception {
         Method method = ClassController.class.getDeclaredMethod("buildMultipartBody",
                 File.class, String.class, Integer.class, String.class);
         method.setAccessible(true);
@@ -372,7 +372,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(14)
-    void writeTextPart_producesCorrectOutput() throws Exception {
+    void writeTextPartProducesCorrectOutput() throws Exception {
         Method method = ClassController.class.getDeclaredMethod("writeTextPart",
                 ByteArrayOutputStream.class, String.class, String.class, String.class);
         method.setAccessible(true);
@@ -388,7 +388,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(15)
-    void writeTextPart_specialChars() throws Exception {
+    void writeTextPartSpecialChars() throws Exception {
         Method method = ClassController.class.getDeclaredMethod("writeTextPart",
                 ByteArrayOutputStream.class, String.class, String.class, String.class);
         method.setAccessible(true);
@@ -402,7 +402,7 @@ class ClassControllerHttpTest {
 
     @Test
     @Order(16)
-    void writeTextPart_multipleParts() throws Exception {
+    void writeTextPartMultipleParts() throws Exception {
         Method method = ClassController.class.getDeclaredMethod("writeTextPart",
                 ByteArrayOutputStream.class, String.class, String.class, String.class);
         method.setAccessible(true);

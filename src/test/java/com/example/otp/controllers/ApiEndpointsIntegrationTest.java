@@ -176,7 +176,7 @@ public class ApiEndpointsIntegrationTest {
     }
 
     @Test
-    void authEndpoints_registerAndLogin() throws Exception {
+    void authEndpointsRegisterAndLogin() throws Exception {
         HttpResponse<String> register = sendJson("POST", "/api/auth/register", null, """
                 {
                   "username": "new_student",
@@ -215,7 +215,7 @@ public class ApiEndpointsIntegrationTest {
     }
 
     @Test
-    void authEndpoints_changePassword_successAndInvalidCurrentPassword() throws Exception {
+    void authEndpointsChangePasswordSuccessAndInvalidCurrentPassword() throws Exception {
         String teacherToken = tokenFor("teacher_seed");
 
         HttpResponse<String> invalidCurrent = sendJson("PUT", "/api/auth/change-password", bearer(teacherToken), """
@@ -253,7 +253,7 @@ public class ApiEndpointsIntegrationTest {
     }
 
     @Test
-    void userEndpoints_getAllAndGetById_requireToken() throws Exception {
+    void userEndpointsGetAllAndGetByIdRequireToken() throws Exception {
         HttpResponse<String> noToken = sendJson("GET", "/api/users", null, null);
         assertEquals(401, noToken.statusCode());
 
@@ -266,7 +266,7 @@ public class ApiEndpointsIntegrationTest {
     }
 
     @Test
-    void courseEndpoints_allRoutesCovered() throws Exception {
+    void courseEndpointsAllRoutesCovered() throws Exception {
         String teacherToken = tokenFor("teacher_seed");
         String teacher2Token = tokenFor("teacher2_seed");
 
@@ -303,7 +303,7 @@ public class ApiEndpointsIntegrationTest {
     }
 
     @Test
-    void materialEndpoints_allRoutesCovered() throws Exception {
+    void materialEndpointsAllRoutesCovered() throws Exception {
         String teacherToken = tokenFor("teacher_seed");
       String studentToken = tokenFor("student_seed");
       String student2Token = tokenFor("student2_seed");
@@ -341,7 +341,7 @@ public class ApiEndpointsIntegrationTest {
     }
 
     @Test
-    void reviewEndpoints_allRoutesCoveredWithOwnership() throws Exception {
+    void reviewEndpointsAllRoutesCoveredWithOwnership() throws Exception {
         String studentToken = tokenFor("student_seed");
         String student2Token = tokenFor("student2_seed");
 
@@ -393,7 +393,7 @@ public class ApiEndpointsIntegrationTest {
     }
 
     @Test
-    void participantEndpoints_allRoutesCovered() throws Exception {
+    void participantEndpointsAllRoutesCovered() throws Exception {
         String teacherToken = tokenFor("teacher_seed");
         String teacher2Token = tokenFor("teacher2_seed");
         String studentToken = tokenFor("student_seed");

@@ -93,7 +93,7 @@ class ReviewAuthFallbackTest {
     // Test: getAuthenticatedUser falls back to Authorization header parsing
     @Test
     @Order(1)
-    void createReview_viaBearerHeader_fallback_returns201() throws Exception {
+    void createReviewViaBearerHeaderFallbackReturns201() throws Exception {
         var resp = sendJson("POST", "/api/reviews", "Bearer " + studentToken, """
                 {"review":"Fallback auth test","rating":4,"fileId":%d}""".formatted(materialId));
         assertEquals(201, resp.statusCode());
@@ -106,7 +106,7 @@ class ReviewAuthFallbackTest {
     // Test: getAuthenticatedUser with no Authorization header returns null → 401
     @Test
     @Order(2)
-    void createReview_noAuthHeader_returns401() throws Exception {
+    void createReviewNoAuthHeaderReturns401() throws Exception {
         var resp = sendJson("POST", "/api/reviews", null, """
                 {"review":"No auth","rating":3,"fileId":%d}""".formatted(materialId));
         assertEquals(401, resp.statusCode());
@@ -115,7 +115,7 @@ class ReviewAuthFallbackTest {
     // Test: getAuthenticatedUser with invalid Bearer token
     @Test
     @Order(3)
-    void createReview_invalidBearerToken_returns401() throws Exception {
+    void createReviewInvalidBearerTokenReturns401() throws Exception {
         var resp = sendJson("POST", "/api/reviews", "Bearer invalid.token.here", """
                 {"review":"Invalid token","rating":3,"fileId":%d}""".formatted(materialId));
         assertEquals(401, resp.statusCode());
@@ -124,7 +124,7 @@ class ReviewAuthFallbackTest {
     // Test: getAuthenticatedUser with malformed Authorization header (no "Bearer " prefix)
     @Test
     @Order(4)
-    void createReview_malformedAuthHeader_returns401() throws Exception {
+    void createReviewMalformedAuthHeaderReturns401() throws Exception {
         var resp = sendJson("POST", "/api/reviews", "Basic dXNlcjpwYXNz", """
                 {"review":"Basic auth","rating":3,"fileId":%d}""".formatted(materialId));
         assertEquals(401, resp.statusCode());
@@ -133,7 +133,7 @@ class ReviewAuthFallbackTest {
     // Test: getAuthenticatedUser with token for non-existent user
     @Test
     @Order(5)
-    void createReview_tokenForNonExistentUser_returns401() throws Exception {
+    void createReviewTokenForNonExistentUserReturns401() throws Exception {
         String badToken = JWTUtil.generateToken("nonexistent@test.com");
         var resp = sendJson("POST", "/api/reviews", "Bearer " + badToken, """
                 {"review":"Ghost user","rating":3,"fileId":%d}""".formatted(materialId));
@@ -143,7 +143,7 @@ class ReviewAuthFallbackTest {
     // Test: updateReview via fallback auth
     @Test
     @Order(6)
-    void updateReview_viaBearerFallback_returns200() throws Exception {
+    void updateReviewViaBearerFallbackReturns200() throws Exception {
         var resp = sendJson("PUT", "/api/reviews/" + reviewId, "Bearer " + studentToken, """
                 {"review":"Updated via fallback","rating":5}""");
         assertEquals(200, resp.statusCode());
@@ -152,7 +152,7 @@ class ReviewAuthFallbackTest {
     // Test: deleteReview via fallback auth
     @Test
     @Order(7)
-    void deleteReview_viaBearerFallback_returns200() throws Exception {
+    void deleteReviewViaBearerFallbackReturns200() throws Exception {
         var resp = sendJson("DELETE", "/api/reviews/" + reviewId, "Bearer " + studentToken, null);
         assertEquals(200, resp.statusCode());
     }

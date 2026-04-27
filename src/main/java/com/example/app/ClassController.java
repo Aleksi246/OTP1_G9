@@ -1363,16 +1363,3 @@ public class ClassController {
   private record ReviewsFetchResult(String message, List<String> reviewLines) { }
 }
 
-class ClassContextHolder {
-  private ClassContextHolder() {}
-
-  private static Integer classId;
-
-  public static void setClassId(Integer id) {
-    classId = id;
-  }
-
-  public static Integer getClassId() {
-    return classId;
-  }
-}

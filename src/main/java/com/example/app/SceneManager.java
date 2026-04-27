@@ -11,7 +11,7 @@ import javafx.geometry.NodeOrientation;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class SceneManager {
+public final class SceneManager {
   private static Stage primaryStage;
   private static List<String> navigationHistory = new ArrayList<>();
   private static int currentIndex = -1;

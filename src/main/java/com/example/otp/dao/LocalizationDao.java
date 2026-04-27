@@ -12,7 +12,7 @@ import java.util.logging.Level;
 
 public class LocalizationDao {
     private static final Logger logger = Logger.getLogger(LocalizationDao.class.getName());
-    
+
     /**
      * Fetches a single translation string for a given key and language
      * @param key the translation key (e.g., "login.title")
@@ -38,7 +38,11 @@ public class LocalizationDao {
                 }
             }
         } catch (SQLException e) {
-            logger.log(Level.WARNING, "Error fetching translation for key: " + key + ", language: " + language, e);
+            if (logger.isLoggable(Level.WARNING)) {
+                logger.log(Level.WARNING, e, () ->
+                        "Error fetching translation for key: " + key + ", language: " + language
+                );
+            }
         }
         
         // Return null if translation not found (allows FXML fallback)
@@ -70,7 +74,9 @@ public class LocalizationDao {
                 }
             }
         } catch (SQLException e) {
-            logger.log(Level.WARNING, "Error fetching all translations for language: " + language, e);
+            if (logger.isLoggable(Level.WARNING)) {
+                logger.log(Level.WARNING, e, () -> "Error fetching all translations for language: " + language);
+            }
         }
         
         return translations;

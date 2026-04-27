@@ -21,19 +21,19 @@ class LocaleManagerTest {
     // =========================================================================
 
     @Test
-    void getLocale_defaultIsEnglish() {
+    void getLocaleDefaultIsEnglish() {
         LocaleManager.setLocale(Locale.ENGLISH);
         assertEquals(Locale.ENGLISH, LocaleManager.getLocale());
     }
 
     @Test
-    void setLocale_changesCurrentLocale() {
+    void setLocaleChangesCurrentLocale() {
         LocaleManager.setLocale(Locale.FRENCH);
         assertEquals(Locale.FRENCH, LocaleManager.getLocale());
     }
 
     @Test
-    void setLocale_nullResetsToEnglish() {
+    void setLocaleNullResetsToEnglish() {
         LocaleManager.setLocale(Locale.FRENCH);
         LocaleManager.setLocale(null);
         assertEquals(Locale.ENGLISH, LocaleManager.getLocale());
@@ -44,18 +44,18 @@ class LocaleManagerTest {
     // =========================================================================
 
     @Test
-    void getString_returnsKeyWhenTranslationMissing() {
+    void getStringReturnsKeyWhenTranslationMissing() {
         String result = LocaleManager.getString("nonexistent.key.xyz");
         assertEquals("nonexistent.key.xyz", result, "Should fall back to returning the key itself");
     }
 
     @Test
-    void getString_returnsNullForNullKey() {
+    void getStringReturnsNullForNullKey() {
         assertNull(LocaleManager.getString((String) null));
     }
 
     @Test
-    void getString_withParams_formatsWhenTranslationExists() {
+    void getStringWithParamsFormatsWhenTranslationExists() {
         // When key is not in translations, getString returns the key itself
         // MessageFormat on a plain string with no placeholders returns it as-is
         String result = LocaleManager.getString("some.key", "param1");
@@ -63,13 +63,13 @@ class LocaleManagerTest {
     }
 
     @Test
-    void getString_withParams_noParamsReturnsTranslation() {
+    void getStringWithParamsNoParamsReturnsTranslation() {
         String result = LocaleManager.getString("some.key");
         assertEquals("some.key", result);
     }
 
     @Test
-    void getString_withEmptyParams_returnsTranslation() {
+    void getStringWithEmptyParamsReturnsTranslation() {
         String result = LocaleManager.getString("some.key", new Object[]{});
         assertEquals("some.key", result);
     }
@@ -79,32 +79,32 @@ class LocaleManagerTest {
     // =========================================================================
 
     @Test
-    void getBundle_returnsNonNull() {
+    void getBundleReturnsNonNull() {
         ResourceBundle bundle = LocaleManager.getBundle();
         assertNotNull(bundle);
     }
 
     @Test
-    void getBundle_handleGetObject_returnsKeyForMissingTranslation() {
+    void getBundleHandleGetObjectReturnsKeyForMissingTranslation() {
         ResourceBundle bundle = LocaleManager.getBundle();
         String result = bundle.getString("missing.key.abc");
         assertEquals("missing.key.abc", result);
     }
 
     @Test
-    void getBundle_containsKey_trueForNonNull() {
+    void getBundleContainsKeyTrueForNonNull() {
         ResourceBundle bundle = LocaleManager.getBundle();
         assertTrue(bundle.containsKey("any.key"));
     }
 
     @Test
-    void getBundle_containsKey_falseForNull() {
+    void getBundleContainsKeyFalseForNull() {
         ResourceBundle bundle = LocaleManager.getBundle();
         assertFalse(bundle.containsKey(null));
     }
 
     @Test
-    void getBundle_getKeys_returnsEnumeration() {
+    void getBundleGetKeysReturnsEnumeration() {
         ResourceBundle bundle = LocaleManager.getBundle();
         assertNotNull(bundle.getKeys());
     }
@@ -114,19 +114,19 @@ class LocaleManagerTest {
     // =========================================================================
 
     @Test
-    void isRightToLeft_falseForEnglish() {
+    void isRightToLeftFalseForEnglish() {
         LocaleManager.setLocale(Locale.ENGLISH);
         assertFalse(LocaleManager.isRightToLeft());
     }
 
     @Test
-    void isRightToLeft_trueForPersian() {
+    void isRightToLeftTrueForPersian() {
         LocaleManager.setLocale(Locale.of("fa"));
         assertTrue(LocaleManager.isRightToLeft());
     }
 
     @Test
-    void isRightToLeft_falseForFrench() {
+    void isRightToLeftFalseForFrench() {
         LocaleManager.setLocale(Locale.FRENCH);
         assertFalse(LocaleManager.isRightToLeft());
     }
@@ -136,7 +136,7 @@ class LocaleManagerTest {
     // =========================================================================
 
     @Test
-    void refresh_clearsAndReloadsCache() {
+    void refreshClearsAndReloadsCache() {
         // Should not throw
         assertDoesNotThrow(() -> LocaleManager.refresh());
     }
@@ -146,7 +146,7 @@ class LocaleManagerTest {
     // =========================================================================
 
     @Test
-    void setLocale_toPersian_andBack() {
+    void setLocaleToPersianAndBack() {
         LocaleManager.setLocale(Locale.of("fa"));
         assertEquals("fa", LocaleManager.getLocale().getLanguage());
 
@@ -155,7 +155,7 @@ class LocaleManagerTest {
     }
 
     @Test
-    void setLocale_toRussian() {
+    void setLocaleToRussian() {
         LocaleManager.setLocale(Locale.of("ru"));
         assertEquals("ru", LocaleManager.getLocale().getLanguage());
         assertFalse(LocaleManager.isRightToLeft());

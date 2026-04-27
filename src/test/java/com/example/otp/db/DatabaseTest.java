@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DatabaseTest {
 
     @Test
-    void getConnection_returnsValidConnection() throws Exception {
+    void getConnectionReturnsValidConnection() throws Exception {
         try (Connection conn = Database.getConnection()) {
             assertNotNull(conn);
             assertFalse(conn.isClosed());
@@ -17,7 +17,7 @@ class DatabaseTest {
     }
 
     @Test
-    void getConnection_multipleCallsReturnDifferentConnections() throws Exception {
+    void getConnectionMultipleCallsReturnDifferentConnections() throws Exception {
         try (Connection conn1 = Database.getConnection();
              Connection conn2 = Database.getConnection()) {
             assertNotNull(conn1);
@@ -27,7 +27,7 @@ class DatabaseTest {
     }
 
     @Test
-    void getConnection_canExecuteQuery() throws Exception {
+    void getConnectionCanExecuteQuery() throws Exception {
         try (Connection conn = Database.getConnection();
              var stmt = conn.createStatement();
              var rs = stmt.executeQuery("SELECT 1")) {

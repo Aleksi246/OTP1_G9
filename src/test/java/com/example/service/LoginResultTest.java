@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class LoginResultTest {
 
     @Test
-    void success_containsAllFields() {
+    void successContainsAllFields() {
         LoginResult result = LoginResult.success("tok123", "alice", "alice@test.com", "teacher");
 
         assertTrue(result.isSuccess());
@@ -20,7 +20,7 @@ class LoginResultTest {
     }
 
     @Test
-    void error_withoutArgs() {
+    void errorWithoutArgs() {
         LoginResult result = LoginResult.error("login.error.failed");
 
         assertFalse(result.isSuccess());
@@ -34,7 +34,7 @@ class LoginResultTest {
     }
 
     @Test
-    void error_withArgs() {
+    void errorWithArgs() {
         LoginResult result = LoginResult.error("login.error.failed", 401);
 
         assertFalse(result.isSuccess());
@@ -44,7 +44,7 @@ class LoginResultTest {
     }
 
     @Test
-    void error_multipleArgs() {
+    void errorMultipleArgs() {
         LoginResult result = LoginResult.error("some.error", "arg1", 42, true);
 
         assertEquals(3, result.getErrorArgs().length);
@@ -54,7 +54,7 @@ class LoginResultTest {
     }
 
     @Test
-    void success_withNullUserType() {
+    void successWithNullUserType() {
         LoginResult result = LoginResult.success("tok", "user", "e@e.com", null);
         assertTrue(result.isSuccess());
         assertNull(result.getUserType());

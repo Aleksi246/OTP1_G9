@@ -25,39 +25,39 @@ class JWTHelperTest {
     // =========================================================================
 
     @Test
-    void getEmailFromToken_returnsSubject() {
+    void getEmailFromTokenReturnsSubject() {
         String token = fakeToken("{\"sub\":\"alice@example.com\"}");
         assertEquals("alice@example.com", JWTHelper.getEmailFromToken(token));
     }
 
     @Test
-    void getEmailFromToken_returnsNullWhenNoSub() {
+    void getEmailFromTokenReturnsNullWhenNoSub() {
         String token = fakeToken("{\"name\":\"alice\"}");
         assertNull(JWTHelper.getEmailFromToken(token));
     }
 
     @Test
-    void getEmailFromToken_returnsNullForMalformedToken() {
+    void getEmailFromTokenReturnsNullForMalformedToken() {
         assertNull(JWTHelper.getEmailFromToken("not.a.valid.token"));
     }
 
     @Test
-    void getEmailFromToken_returnsNullForSinglePartToken() {
+    void getEmailFromTokenReturnsNullForSinglePartToken() {
         assertNull(JWTHelper.getEmailFromToken("onlyonepart"));
     }
 
     @Test
-    void getEmailFromToken_returnsNullForEmptyString() {
+    void getEmailFromTokenReturnsNullForEmptyString() {
         assertNull(JWTHelper.getEmailFromToken(""));
     }
 
     @Test
-    void getEmailFromToken_returnsNullForNull() {
+    void getEmailFromTokenReturnsNullForNull() {
         assertNull(JWTHelper.getEmailFromToken(null));
     }
 
     @Test
-    void getEmailFromToken_returnsNullForBadBase64() {
+    void getEmailFromTokenReturnsNullForBadBase64() {
         assertNull(JWTHelper.getEmailFromToken("header.!!!invalid!!!.sig"));
     }
 
@@ -66,30 +66,30 @@ class JWTHelperTest {
     // =========================================================================
 
     @Test
-    void getUserTypeFromToken_returnsUserType() {
+    void getUserTypeFromTokenReturnsUserType() {
         String token = fakeToken("{\"sub\":\"a@b.com\",\"userType\":\"teacher\"}");
         assertEquals("teacher", JWTHelper.getUserTypeFromToken(token));
     }
 
     @Test
-    void getUserTypeFromToken_defaultsToStudentWhenMissing() {
+    void getUserTypeFromTokenDefaultsToStudentWhenMissing() {
         String token = fakeToken("{\"sub\":\"a@b.com\"}");
         assertEquals("student", JWTHelper.getUserTypeFromToken(token));
     }
 
     @Test
-    void getUserTypeFromToken_defaultsToStudentWhenEmpty() {
+    void getUserTypeFromTokenDefaultsToStudentWhenEmpty() {
         String token = fakeToken("{\"sub\":\"a@b.com\",\"userType\":\"\"}");
         assertEquals("student", JWTHelper.getUserTypeFromToken(token));
     }
 
     @Test
-    void getUserTypeFromToken_defaultsToStudentForBadToken() {
+    void getUserTypeFromTokenDefaultsToStudentForBadToken() {
         assertEquals("student", JWTHelper.getUserTypeFromToken("garbage"));
     }
 
     @Test
-    void getUserTypeFromToken_defaultsToStudentForNull() {
+    void getUserTypeFromTokenDefaultsToStudentForNull() {
         assertEquals("student", JWTHelper.getUserTypeFromToken(null));
     }
 
@@ -98,7 +98,7 @@ class JWTHelperTest {
     // =========================================================================
 
     @Test
-    void constructor_throwsUnsupportedOperationException() {
+    void constructorThrowsUnsupportedOperationException() {
         assertThrows(UnsupportedOperationException.class, () -> {
             var ctor = JWTHelper.class.getDeclaredConstructor();
             ctor.setAccessible(true);

@@ -45,130 +45,130 @@ class ClassControllerLogicTest {
     // ---- normalizeMaterialType ----
 
     @Test
-    void normalizeMaterialType_lectureNotes() throws Exception {
+    void normalizeMaterialTypeLectureNotes() throws Exception {
         assertEquals("lecture notes", normalizeMaterialType.invoke(controller, "Lecture Notes"));
     }
 
     @Test
-    void normalizeMaterialType_lectureNotesVariant() throws Exception {
+    void normalizeMaterialTypeLectureNotesVariant() throws Exception {
         assertEquals("lecture notes", normalizeMaterialType.invoke(controller, "lecture_notes"));
     }
 
     @Test
-    void normalizeMaterialType_lectureNotesHyphen() throws Exception {
+    void normalizeMaterialTypeLectureNotesHyphen() throws Exception {
         assertEquals("lecture notes", normalizeMaterialType.invoke(controller, "Lecture-Notes"));
     }
 
     @Test
-    void normalizeMaterialType_assignment() throws Exception {
+    void normalizeMaterialTypeAssignment() throws Exception {
         assertEquals("assignment", normalizeMaterialType.invoke(controller, "Assignment"));
     }
 
     @Test
-    void normalizeMaterialType_assignmentUpper() throws Exception {
+    void normalizeMaterialTypeAssignmentUpper() throws Exception {
         assertEquals("assignment", normalizeMaterialType.invoke(controller, "ASSIGNMENT"));
     }
 
     @Test
-    void normalizeMaterialType_slides() throws Exception {
+    void normalizeMaterialTypeSlides() throws Exception {
         assertEquals("slides", normalizeMaterialType.invoke(controller, "Slides"));
     }
 
     @Test
-    void normalizeMaterialType_slidesLower() throws Exception {
+    void normalizeMaterialTypeSlidesLower() throws Exception {
         assertEquals("slides", normalizeMaterialType.invoke(controller, "slides"));
     }
 
     @Test
-    void normalizeMaterialType_reference() throws Exception {
+    void normalizeMaterialTypeReference() throws Exception {
         assertEquals("reference", normalizeMaterialType.invoke(controller, "Reference"));
     }
 
     @Test
-    void normalizeMaterialType_referenceMixed() throws Exception {
+    void normalizeMaterialTypeReferenceMixed() throws Exception {
         assertEquals("reference", normalizeMaterialType.invoke(controller, "Reference Material"));
     }
 
     @Test
-    void normalizeMaterialType_other() throws Exception {
+    void normalizeMaterialTypeOther() throws Exception {
         assertEquals("other", normalizeMaterialType.invoke(controller, "RandomType"));
     }
 
     @Test
-    void normalizeMaterialType_null() throws Exception {
+    void normalizeMaterialTypeNull() throws Exception {
         assertEquals("other", normalizeMaterialType.invoke(controller, (String) null));
     }
 
     @Test
-    void normalizeMaterialType_blank() throws Exception {
+    void normalizeMaterialTypeBlank() throws Exception {
         assertEquals("other", normalizeMaterialType.invoke(controller, "   "));
     }
 
     @Test
-    void normalizeMaterialType_empty() throws Exception {
+    void normalizeMaterialTypeEmpty() throws Exception {
         assertEquals("other", normalizeMaterialType.invoke(controller, ""));
     }
 
     // ---- toApiMaterialType ----
 
     @Test
-    void toApiMaterialType_lectureNotes() throws Exception {
+    void toApiMaterialTypeLectureNotes() throws Exception {
         assertEquals("Lecture Notes", toApiMaterialType.invoke(controller, "lecture_notes"));
     }
 
     @Test
-    void toApiMaterialType_assignment() throws Exception {
+    void toApiMaterialTypeAssignment() throws Exception {
         assertEquals("Assignment", toApiMaterialType.invoke(controller, "Assignment"));
     }
 
     @Test
-    void toApiMaterialType_slides() throws Exception {
+    void toApiMaterialTypeSlides() throws Exception {
         assertEquals("Slides", toApiMaterialType.invoke(controller, "slides"));
     }
 
     @Test
-    void toApiMaterialType_reference() throws Exception {
+    void toApiMaterialTypeReference() throws Exception {
         assertEquals("Reference", toApiMaterialType.invoke(controller, "Reference"));
     }
 
     @Test
-    void toApiMaterialType_other() throws Exception {
+    void toApiMaterialTypeOther() throws Exception {
         assertEquals("Other", toApiMaterialType.invoke(controller, "Unknown"));
     }
 
     @Test
-    void toApiMaterialType_null() throws Exception {
+    void toApiMaterialTypeNull() throws Exception {
         assertEquals("Other", toApiMaterialType.invoke(controller, (String) null));
     }
 
     // ---- localizeMaterialType ----
 
     @Test
-    void localizeMaterialType_lectureNotes_returnsNonNull() throws Exception {
+    void localizeMaterialTypeLectureNotesReturnsNonNull() throws Exception {
         Object result = localizeMaterialType.invoke(controller, "Lecture Notes");
         assertNotNull(result);
     }
 
     @Test
-    void localizeMaterialType_assignment_returnsNonNull() throws Exception {
+    void localizeMaterialTypeAssignmentReturnsNonNull() throws Exception {
         Object result = localizeMaterialType.invoke(controller, "Assignment");
         assertNotNull(result);
     }
 
     @Test
-    void localizeMaterialType_slides_returnsNonNull() throws Exception {
+    void localizeMaterialTypeSlidesReturnsNonNull() throws Exception {
         Object result = localizeMaterialType.invoke(controller, "slides");
         assertNotNull(result);
     }
 
     @Test
-    void localizeMaterialType_reference_returnsNonNull() throws Exception {
+    void localizeMaterialTypeReferenceReturnsNonNull() throws Exception {
         Object result = localizeMaterialType.invoke(controller, "Reference");
         assertNotNull(result);
     }
 
     @Test
-    void localizeMaterialType_other_returnsNonNull() throws Exception {
+    void localizeMaterialTypeOtherReturnsNonNull() throws Exception {
         Object result = localizeMaterialType.invoke(controller, "xyz");
         assertNotNull(result);
     }
@@ -176,74 +176,74 @@ class ClassControllerLogicTest {
     // ---- extractApiMessage ----
 
     @Test
-    void extractApiMessage_validJson_returnsMessage() throws Exception {
+    void extractApiMessageValidJsonReturnsMessage() throws Exception {
         String json = "{\"message\":\"Course not found\"}";
         assertEquals("Course not found", extractApiMessage.invoke(controller, json, "fallback"));
     }
 
     @Test
-    void extractApiMessage_noMessageField_returnsFallback() throws Exception {
+    void extractApiMessageNoMessageFieldReturnsFallback() throws Exception {
         String json = "{\"error\":\"something\"}";
         assertEquals("fallback", extractApiMessage.invoke(controller, json, "fallback"));
     }
 
     @Test
-    void extractApiMessage_nullMessageField_returnsFallback() throws Exception {
+    void extractApiMessageNullMessageFieldReturnsFallback() throws Exception {
         String json = "{\"message\":null}";
         assertEquals("fallback", extractApiMessage.invoke(controller, json, "fallback"));
     }
 
     @Test
-    void extractApiMessage_invalidJson_returnsFallback() throws Exception {
+    void extractApiMessageInvalidJsonReturnsFallback() throws Exception {
         assertEquals("fallback", extractApiMessage.invoke(controller, "not json", "fallback"));
     }
 
     @Test
-    void extractApiMessage_emptyJson_returnsFallback() throws Exception {
+    void extractApiMessageEmptyJsonReturnsFallback() throws Exception {
         assertEquals("fallback", extractApiMessage.invoke(controller, "{}", "fallback"));
     }
 
     @Test
-    void extractApiMessage_jsonArray_returnsFallback() throws Exception {
+    void extractApiMessageJsonArrayReturnsFallback() throws Exception {
         assertEquals("fallback", extractApiMessage.invoke(controller, "[1,2,3]", "fallback"));
     }
 
     @Test
-    void extractApiMessage_emptyString_returnsFallback() throws Exception {
+    void extractApiMessageEmptyStringReturnsFallback() throws Exception {
         assertEquals("fallback", extractApiMessage.invoke(controller, "", "fallback"));
     }
 
     // ---- getStringOrDefault ----
 
     @Test
-    void getStringOrDefault_fieldPresent_returnsValue() throws Exception {
+    void getStringOrDefaultFieldPresentReturnsValue() throws Exception {
         JsonObject obj = new JsonObject();
         obj.addProperty("name", "Test");
         assertEquals("Test", getStringOrDefault.invoke(controller, obj, "name", "default"));
     }
 
     @Test
-    void getStringOrDefault_fieldMissing_returnsFallback() throws Exception {
+    void getStringOrDefaultFieldMissingReturnsFallback() throws Exception {
         JsonObject obj = new JsonObject();
         assertEquals("default", getStringOrDefault.invoke(controller, obj, "name", "default"));
     }
 
     @Test
-    void getStringOrDefault_fieldNull_returnsFallback() throws Exception {
+    void getStringOrDefaultFieldNullReturnsFallback() throws Exception {
         JsonObject obj = new JsonObject();
         obj.add("name", JsonNull.INSTANCE);
         assertEquals("default", getStringOrDefault.invoke(controller, obj, "name", "default"));
     }
 
     @Test
-    void getStringOrDefault_fieldEmpty_returnsEmpty() throws Exception {
+    void getStringOrDefaultFieldEmptyReturnsEmpty() throws Exception {
         JsonObject obj = new JsonObject();
         obj.addProperty("name", "");
         assertEquals("", getStringOrDefault.invoke(controller, obj, "name", "default"));
     }
 
     @Test
-    void getStringOrDefault_differentFieldTypes() throws Exception {
+    void getStringOrDefaultDifferentFieldTypes() throws Exception {
         JsonObject obj = new JsonObject();
         obj.addProperty("count", 42);
         // getAsString works on number properties in Gson

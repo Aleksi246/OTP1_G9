@@ -15,37 +15,37 @@ class LocalizationDaoTest {
 
     @Test
     @Order(1)
-    void getString_nullKey_returnsNull() {
+    void getStringNullKeyReturnsNull() {
         assertNull(LocalizationDao.getString(null, "en"));
     }
 
     @Test
     @Order(2)
-    void getString_nullLanguage_returnsNull() {
+    void getStringNullLanguageReturnsNull() {
         assertNull(LocalizationDao.getString("login.title", null));
     }
 
     @Test
     @Order(3)
-    void getString_bothNull_returnsNull() {
+    void getStringBothNullReturnsNull() {
         assertNull(LocalizationDao.getString(null, null));
     }
 
     @Test
     @Order(4)
-    void getString_nonExistentKey_returnsNull() {
+    void getStringNonExistentKeyReturnsNull() {
         assertNull(LocalizationDao.getString("this.key.does.not.exist.xyz", "en"));
     }
 
     @Test
     @Order(5)
-    void getString_nonExistentLanguage_returnsNull() {
+    void getStringNonExistentLanguageReturnsNull() {
         assertNull(LocalizationDao.getString("login.title", "zz"));
     }
 
     @Test
     @Order(6)
-    void getString_validEnglishKey_returnsValue() {
+    void getStringValidEnglishKeyReturnsValue() {
         // "login.title" should exist in the test DB for English
         String result = LocalizationDao.getString("login.title", "en");
         // If the key exists, it should be non-null and non-empty
@@ -57,7 +57,7 @@ class LocalizationDaoTest {
 
     @Test
     @Order(7)
-    void getAllTranslations_nullLanguage_returnsEmptyMap() {
+    void getAllTranslationsNullLanguageReturnsEmptyMap() {
         Map<String, String> result = LocalizationDao.getAllTranslations(null);
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -65,7 +65,7 @@ class LocalizationDaoTest {
 
     @Test
     @Order(8)
-    void getAllTranslations_nonExistentLanguage_returnsEmptyMap() {
+    void getAllTranslationsNonExistentLanguageReturnsEmptyMap() {
         Map<String, String> result = LocalizationDao.getAllTranslations("zz");
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -73,7 +73,7 @@ class LocalizationDaoTest {
 
     @Test
     @Order(9)
-    void getAllTranslations_english_returnsNonEmptyMap() {
+    void getAllTranslationsEnglishReturnsNonEmptyMap() {
         Map<String, String> result = LocalizationDao.getAllTranslations("en");
         assertNotNull(result);
         // There should be English translations in the test DB
@@ -88,7 +88,7 @@ class LocalizationDaoTest {
 
     @Test
     @Order(10)
-    void getAllTranslations_persian_returnsNonEmptyMap() {
+    void getAllTranslationsPersianReturnsNonEmptyMap() {
         Map<String, String> result = LocalizationDao.getAllTranslations("fa");
         assertNotNull(result);
         // Persian translations may exist in the test DB
@@ -96,7 +96,7 @@ class LocalizationDaoTest {
 
     @Test
     @Order(11)
-    void getString_consistentWithGetAllTranslations() {
+    void getStringConsistentWithGetAllTranslations() {
         // If getAllTranslations returns a key, getString should return the same value
         Map<String, String> allEn = LocalizationDao.getAllTranslations("en");
         if (!allEn.isEmpty()) {
@@ -108,19 +108,19 @@ class LocalizationDaoTest {
 
     @Test
     @Order(12)
-    void getString_emptyKey_returnsNull() {
+    void getStringEmptyKeyReturnsNull() {
         assertNull(LocalizationDao.getString("", "en"));
     }
 
     @Test
     @Order(13)
-    void getString_emptyLanguage_returnsNull() {
+    void getStringEmptyLanguageReturnsNull() {
         assertNull(LocalizationDao.getString("login.title", ""));
     }
 
     @Test
     @Order(14)
-    void getAllTranslations_emptyLanguage_returnsEmptyMap() {
+    void getAllTranslationsEmptyLanguageReturnsEmptyMap() {
         Map<String, String> result = LocalizationDao.getAllTranslations("");
         assertNotNull(result);
         assertTrue(result.isEmpty());

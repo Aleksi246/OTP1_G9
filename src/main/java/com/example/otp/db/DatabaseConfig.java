@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class DatabaseConfig {
+public final class DatabaseConfig {
   private static final Properties props = new Properties();
 
   private DatabaseConfig() {

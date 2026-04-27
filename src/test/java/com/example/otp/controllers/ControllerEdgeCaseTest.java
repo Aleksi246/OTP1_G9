@@ -145,28 +145,28 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(1)
-    void register_invalidJson_returns500() throws Exception {
+    void registerInvalidJsonReturns500() throws Exception {
         var resp = sendJson("POST", "/api/auth/register", null, "not json");
         assertEquals(500, resp.statusCode());
     }
 
     @Test
     @Order(2)
-    void register_emptyBody_returns500() throws Exception {
+    void registerEmptyBodyReturns500() throws Exception {
         var resp = sendJson("POST", "/api/auth/register", null, "{}");
         assertEquals(400, resp.statusCode());
     }
 
     @Test
     @Order(3)
-    void login_invalidJson_returns500() throws Exception {
+    void loginInvalidJsonReturns500() throws Exception {
         var resp = sendJson("POST", "/api/auth/login", null, "not json");
         assertEquals(500, resp.statusCode());
     }
 
     @Test
     @Order(4)
-    void login_emptyEmail_andEmptyUsername_returns400() throws Exception {
+    void loginEmptyEmailAndEmptyUsernameReturns400() throws Exception {
         var resp = sendJson("POST", "/api/auth/login", null, """
                 {"email":"","username":"","password":"pass"}""");
         assertEquals(400, resp.statusCode());
@@ -174,7 +174,7 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(5)
-    void login_emptyPassword_returns400() throws Exception {
+    void loginEmptyPasswordReturns400() throws Exception {
         var resp = sendJson("POST", "/api/auth/login", null, """
                 {"email":"edge_teacher@test.com","password":""}""");
         assertEquals(400, resp.statusCode());
@@ -182,14 +182,14 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(6)
-    void getUserById_invalidId_returns500() throws Exception {
+    void getUserByIdInvalidIdReturns500() throws Exception {
         var resp = sendJson("GET", "/api/users/abc", bearer(teacherToken), null);
         assertEquals(500, resp.statusCode());
     }
 
     @Test
     @Order(7)
-    void changePassword_noEmailAttribute_returns401() throws Exception {
+    void changePasswordNoEmailAttributeReturns401() throws Exception {
         // Use a token for a non-existent user
         String fakeToken = JWTUtil.generateToken("nonexistent@test.com");
         var resp = sendJson("PUT", "/api/auth/change-password", bearer(fakeToken), """
@@ -199,7 +199,7 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(8)
-    void changePassword_emptyFields_returns400() throws Exception {
+    void changePasswordEmptyFieldsReturns400() throws Exception {
         var resp = sendJson("PUT", "/api/auth/change-password", bearer(teacherToken), """
                 {"currentPassword":"","newPassword":""}""");
         assertEquals(400, resp.statusCode());
@@ -209,7 +209,7 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(10)
-    void createCourse_noAuth_returns401() throws Exception {
+    void createCourseNoAuthReturns401() throws Exception {
         var resp = sendJson("POST", "/api/courses", null, """
                 {"className":"test"}""");
         assertEquals(401, resp.statusCode());
@@ -217,7 +217,7 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(11)
-    void createCourse_emptyClassName_returns400() throws Exception {
+    void createCourseEmptyClassNameReturns400() throws Exception {
         var resp = sendJson("POST", "/api/courses", bearer(teacherToken), """
                 {"className":"   ","topic":"t"}""");
         assertEquals(400, resp.statusCode());
@@ -225,14 +225,14 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(12)
-    void getCourseById_invalidId_returns500() throws Exception {
+    void getCourseByIdInvalidIdReturns500() throws Exception {
         var resp = sendJson("GET", "/api/courses/abc", bearer(teacherToken), null);
         assertEquals(500, resp.statusCode());
     }
 
     @Test
     @Order(13)
-    void updateCourse_noAuth_returns401() throws Exception {
+    void updateCourseNoAuthReturns401() throws Exception {
         var resp = sendJson("PUT", "/api/courses/" + classId, null, """
                 {"topic":"new"}""");
         assertEquals(401, resp.statusCode());
@@ -240,7 +240,7 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(14)
-    void deleteCourse_nonCreator_returns403() throws Exception {
+    void deleteCourseNonCreatorReturns403() throws Exception {
         var resp = sendJson("DELETE", "/api/courses/" + classId, bearer(studentToken), null);
         assertEquals(403, resp.statusCode());
     }
@@ -249,28 +249,28 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(20)
-    void getMaterialsByCourse_invalidId_returns500() throws Exception {
+    void getMaterialsByCourseInvalidIdReturns500() throws Exception {
         var resp = sendJson("GET", "/api/materials/course/abc", null, null);
         assertEquals(500, resp.statusCode());
     }
 
     @Test
     @Order(21)
-    void getMaterialById_notFound_returns404() throws Exception {
+    void getMaterialByIdNotFoundReturns404() throws Exception {
         var resp = sendJson("GET", "/api/materials/999999", bearer(teacherToken), null);
         assertEquals(404, resp.statusCode());
     }
 
     @Test
     @Order(22)
-    void downloadMaterial_materialNotFound_returns404() throws Exception {
+    void downloadMaterialMaterialNotFoundReturns404() throws Exception {
         var resp = sendJson("GET", "/api/materials/999999/download", bearer(teacherToken), null);
         assertEquals(404, resp.statusCode());
     }
 
     @Test
     @Order(23)
-    void downloadMaterial_fileNotOnDisk_returns404() throws Exception {
+    void downloadMaterialFileNotOnDiskReturns404() throws Exception {
         // Create material with non-existent file path
         MaterialDao dao = new MaterialDao();
         Material m = new Material();
@@ -292,28 +292,28 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(24)
-    void updateMaterial_emptyBody_succeeds() throws Exception {
+    void updateMaterialEmptyBodySucceeds() throws Exception {
         var resp = sendJson("PUT", "/api/materials/" + materialId, bearer(teacherToken), "");
         assertEquals(200, resp.statusCode());
     }
 
     @Test
     @Order(25)
-    void updateMaterial_invalidJsonBody_succeeds() throws Exception {
+    void updateMaterialInvalidJsonBodySucceeds() throws Exception {
         var resp = sendJson("PUT", "/api/materials/" + materialId, bearer(teacherToken), "not json");
         assertEquals(200, resp.statusCode());
     }
 
     @Test
     @Order(26)
-    void deleteMaterial_notCreator_returns403() throws Exception {
+    void deleteMaterialNotCreatorReturns403() throws Exception {
         var resp = sendJson("DELETE", "/api/materials/" + materialId, bearer(studentToken), null);
         assertEquals(403, resp.statusCode());
     }
 
     @Test
     @Order(27)
-    void uploadMaterial_missingFile_returns400() throws Exception {
+    void uploadMaterialMissingFileReturns400() throws Exception {
         // Send multipart without a file
         String boundary = "----TestBoundary" + System.currentTimeMillis();
         String body = "--" + boundary + "\r\n"
@@ -337,7 +337,7 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(28)
-    void uploadMaterial_nonExistentClass_returns400() throws Exception {
+    void uploadMaterialNonExistentClassReturns400() throws Exception {
         String boundary = "----TestBoundary" + System.currentTimeMillis();
         String body = "--" + boundary + "\r\n"
                 + "Content-Disposition: form-data; name=\"file\"; filename=\"test.txt\"\r\n"
@@ -364,7 +364,7 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(29)
-    void uploadMaterial_notCreator_returns403() throws Exception {
+    void uploadMaterialNotCreatorReturns403() throws Exception {
         String boundary = "----TestBoundary" + System.currentTimeMillis();
         String body = "--" + boundary + "\r\n"
                 + "Content-Disposition: form-data; name=\"file\"; filename=\"test.txt\"\r\n"
@@ -393,7 +393,7 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(30)
-    void createReview_noAuth_returns401() throws Exception {
+    void createReviewNoAuthReturns401() throws Exception {
         var resp = sendJson("POST", "/api/reviews", null, """
                 {"review":"test","rating":3,"fileId":%d}""".formatted(materialId));
         assertEquals(401, resp.statusCode());
@@ -401,21 +401,21 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(31)
-    void getReviewsByMaterial_invalidId_returns500() throws Exception {
+    void getReviewsByMaterialInvalidIdReturns500() throws Exception {
         var resp = sendJson("GET", "/api/reviews/material/abc", null, null);
         assertEquals(500, resp.statusCode());
     }
 
     @Test
     @Order(32)
-    void getReviewById_invalidId_returns500() throws Exception {
+    void getReviewByIdInvalidIdReturns500() throws Exception {
         var resp = sendJson("GET", "/api/reviews/abc", bearer(teacherToken), null);
         assertEquals(500, resp.statusCode());
     }
 
     @Test
     @Order(33)
-    void updateReview_notFound_returns404() throws Exception {
+    void updateReviewNotFoundReturns404() throws Exception {
         var resp = sendJson("PUT", "/api/reviews/999999", bearer(studentToken), """
                 {"review":"updated","rating":3}""");
         assertEquals(404, resp.statusCode());
@@ -423,7 +423,7 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(34)
-    void deleteReview_notFound_returns404() throws Exception {
+    void deleteReviewNotFoundReturns404() throws Exception {
         var resp = sendJson("DELETE", "/api/reviews/999999", bearer(studentToken), null);
         assertEquals(404, resp.statusCode());
     }
@@ -432,35 +432,35 @@ class ControllerEdgeCaseTest {
 
     @Test
     @Order(40)
-    void enrollUser_invalidJson_returns500() throws Exception {
+    void enrollUserInvalidJsonReturns500() throws Exception {
         var resp = sendJson("POST", "/api/participants/enroll", null, "not json");
         assertEquals(500, resp.statusCode());
     }
 
     @Test
     @Order(41)
-    void getParticipantsByClass_invalidId_returns500() throws Exception {
+    void getParticipantsByClassInvalidIdReturns500() throws Exception {
         var resp = sendJson("GET", "/api/participants/class/abc", bearer(teacherToken), null);
         assertEquals(500, resp.statusCode());
     }
 
     @Test
     @Order(42)
-    void getClassesByUser_invalidId_returns500() throws Exception {
+    void getClassesByUserInvalidIdReturns500() throws Exception {
         var resp = sendJson("GET", "/api/participants/user/abc", bearer(teacherToken), null);
         assertEquals(500, resp.statusCode());
     }
 
     @Test
     @Order(43)
-    void unenroll_invalidJson_returns500() throws Exception {
+    void unenrollInvalidJsonReturns500() throws Exception {
         var resp = sendJson("DELETE", "/api/participants/unenroll", bearer(teacherToken), "not json");
         assertEquals(500, resp.statusCode());
     }
 
     @Test
     @Order(44)
-    void unenroll_nonExistentClass_returns400() throws Exception {
+    void unenrollNonExistentClassReturns400() throws Exception {
         var resp = sendJson("DELETE", "/api/participants/unenroll", bearer(studentToken), """
                 {"userId":%d,"classId":999999}""".formatted(studentId));
         assertEquals(400, resp.statusCode());

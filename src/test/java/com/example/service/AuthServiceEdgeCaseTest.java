@@ -35,7 +35,7 @@ class AuthServiceEdgeCaseTest {
     }
 
     @Test
-    void login_withEmailInput_usesEmailFieldInJson() throws Exception {
+    void loginWithEmailInputUsesEmailFieldInJson() throws Exception {
         String body = "{\"token\":\"tok\",\"email\":\"user@test.com\",\"username\":\"user\"}";
         when(response.statusCode()).thenReturn(200);
         when(response.body()).thenReturn(body);
@@ -49,7 +49,7 @@ class AuthServiceEdgeCaseTest {
     }
 
     @Test
-    void login_withUsernameInput_usesUsernameFieldInJson() throws Exception {
+    void loginWithUsernameInputUsesUsernameFieldInJson() throws Exception {
         String body = "{\"token\":\"tok\",\"email\":\"u@t.com\",\"username\":\"myuser\"}";
         when(response.statusCode()).thenReturn(200);
         when(response.body()).thenReturn(body);
@@ -63,7 +63,7 @@ class AuthServiceEdgeCaseTest {
     }
 
     @Test
-    void login_status500_returnsError() throws Exception {
+    void loginStatus500ReturnsError() throws Exception {
         when(response.statusCode()).thenReturn(500);
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
                 .thenReturn(response);
@@ -76,7 +76,7 @@ class AuthServiceEdgeCaseTest {
     }
 
     @Test
-    void login_status403_returnsError() throws Exception {
+    void loginStatus403ReturnsError() throws Exception {
         when(response.statusCode()).thenReturn(403);
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
                 .thenReturn(response);
@@ -89,7 +89,7 @@ class AuthServiceEdgeCaseTest {
     }
 
     @Test
-    void login_emptyResponseBody_tokenMissing() throws Exception {
+    void loginEmptyResponseBodyTokenMissing() throws Exception {
         when(response.statusCode()).thenReturn(200);
         when(response.body()).thenReturn("{}");
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
@@ -102,7 +102,7 @@ class AuthServiceEdgeCaseTest {
     }
 
     @Test
-    void login_blankEmailInResponse_fallsBackToTokenEmail() throws Exception {
+    void loginBlankEmailInResponseFallsBackToTokenEmail() throws Exception {
         String body = "{\"token\":\"tok\",\"email\":\"\",\"username\":\"myuser\"}";
         when(response.statusCode()).thenReturn(200);
         when(response.body()).thenReturn(body);
@@ -116,7 +116,7 @@ class AuthServiceEdgeCaseTest {
     }
 
     @Test
-    void login_blankUsernameInResponse_fallsBackToInput() throws Exception {
+    void loginBlankUsernameInResponseFallsBackToInput() throws Exception {
         String body = "{\"token\":\"tok\",\"email\":\"e@e.com\",\"username\":\"\"}";
         when(response.statusCode()).thenReturn(200);
         when(response.body()).thenReturn(body);
@@ -130,7 +130,7 @@ class AuthServiceEdgeCaseTest {
     }
 
     @Test
-    void login_specialCharsInPassword_escapedProperly() throws Exception {
+    void loginSpecialCharsInPasswordEscapedProperly() throws Exception {
         String body = "{\"token\":\"tok\",\"email\":\"e@e.com\",\"username\":\"u\"}";
         when(response.statusCode()).thenReturn(200);
         when(response.body()).thenReturn(body);

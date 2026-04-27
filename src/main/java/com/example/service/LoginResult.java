@@ -1,6 +1,6 @@
 package com.example.service;
 
-public class LoginResult {
+public final class LoginResult {
 
     private final boolean success;
     private final String token;

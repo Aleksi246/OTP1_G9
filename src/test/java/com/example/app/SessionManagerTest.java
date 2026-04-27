@@ -13,7 +13,7 @@ class SessionManagerTest {
     }
 
     @Test
-    void setSession_storesAllFields() {
+    void setSessionStoresAllFields() {
         SessionManager.setSession("alice", "alice@test.com", "tok123", "teacher");
 
         assertEquals("alice", SessionManager.getUsername());
@@ -23,13 +23,13 @@ class SessionManagerTest {
     }
 
     @Test
-    void setUserId_andGetUserId() {
+    void setUserIdAndGetUserId() {
         SessionManager.setUserId(42);
         assertEquals(42, SessionManager.getUserId());
     }
 
     @Test
-    void clearSession_removesAllFields() {
+    void clearSessionRemovesAllFields() {
         SessionManager.setSession("bob", "bob@test.com", "tok456", "student");
         SessionManager.setUserId(7);
         SessionManager.clearSession();
@@ -42,19 +42,19 @@ class SessionManagerTest {
     }
 
     @Test
-    void isLoggedIn_trueWhenTokenPresent() {
+    void isLoggedInTrueWhenTokenPresent() {
         SessionManager.setSession("u", "e", "validtoken", "s");
         assertTrue(SessionManager.isLoggedIn());
     }
 
     @Test
-    void isLoggedIn_falseWhenTokenNull() {
+    void isLoggedInFalseWhenTokenNull() {
         SessionManager.clearSession();
         assertFalse(SessionManager.isLoggedIn());
     }
 
     @Test
-    void isLoggedIn_falseWhenTokenEmpty() {
+    void isLoggedInFalseWhenTokenEmpty() {
         SessionManager.setSession("u", "e", "", "s");
         assertFalse(SessionManager.isLoggedIn());
     }
@@ -69,7 +69,7 @@ class SessionManagerTest {
     }
 
     @Test
-    void setSession_overwritesPreviousValues() {
+    void setSessionOverwritesPreviousValues() {
         SessionManager.setSession("first", "first@test.com", "tok1", "student");
         SessionManager.setSession("second", "second@test.com", "tok2", "teacher");
 
@@ -80,14 +80,14 @@ class SessionManagerTest {
     }
 
     @Test
-    void setUserId_overwritesPreviousValue() {
+    void setUserIdOverwritesPreviousValue() {
         SessionManager.setUserId(1);
         SessionManager.setUserId(2);
         assertEquals(2, SessionManager.getUserId());
     }
 
     @Test
-    void setUserId_acceptsNull() {
+    void setUserIdAcceptsNull() {
         SessionManager.setUserId(5);
         SessionManager.setUserId(null);
         assertNull(SessionManager.getUserId());

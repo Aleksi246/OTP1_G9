@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.util.Base64;
 
-public class JWTHelper {
+public final class JWTHelper {
 
     private JWTHelper() {
           throw new UnsupportedOperationException("Utility class");

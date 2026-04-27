@@ -88,7 +88,7 @@ class HomeControllerLogicTest {
 
     @Test
     @Order(1)
-    void fetchUserId_validEmail_returnsId() throws Exception {
+    void fetchUserIdValidEmailReturnsId() throws Exception {
         HomeController hc = new HomeController();
         Method m = HomeController.class.getDeclaredMethod("fetchUserId", String.class, String.class);
         m.setAccessible(true);
@@ -102,7 +102,7 @@ class HomeControllerLogicTest {
 
     @Test
     @Order(2)
-    void fetchUserId_nullEmail_returnsNull() throws Exception {
+    void fetchUserIdNullEmailReturnsNull() throws Exception {
         HomeController hc = new HomeController();
         Method m = HomeController.class.getDeclaredMethod("fetchUserId", String.class, String.class);
         m.setAccessible(true);
@@ -114,7 +114,7 @@ class HomeControllerLogicTest {
 
     @Test
     @Order(3)
-    void fetchUserClasses_returnsListNotNull() throws Exception {
+    void fetchUserClassesReturnsListNotNull() throws Exception {
         HomeController hc = new HomeController();
         Method m = HomeController.class.getDeclaredMethod("fetchUserClasses", Integer.class, String.class);
         m.setAccessible(true);

@@ -152,7 +152,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: register duplicate username ----
     @Test
     @Order(1)
-    void register_duplicateUsername_returns409() throws Exception {
+    void registerDuplicateUsernameReturns409() throws Exception {
         var resp = sendJson("POST", "/api/auth/register", null, """
                 {"username":"branch_teacher","email":"new@test.com","password":"pass123"}""");
         assertEquals(409, resp.statusCode());
@@ -162,7 +162,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: register duplicate email ----
     @Test
     @Order(2)
-    void register_duplicateEmail_returns409() throws Exception {
+    void registerDuplicateEmailReturns409() throws Exception {
         var resp = sendJson("POST", "/api/auth/register", null, """
                 {"username":"new_user","email":"branch_teacher@test.com","password":"pass123"}""");
         assertEquals(409, resp.statusCode());
@@ -172,7 +172,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: login with wrong password ----
     @Test
     @Order(3)
-    void login_wrongPassword_returns401() throws Exception {
+    void loginWrongPasswordReturns401() throws Exception {
         var resp = sendJson("POST", "/api/auth/login", null, """
                 {"email":"branch_teacher@test.com","password":"wrongpass"}""");
         assertEquals(401, resp.statusCode());
@@ -182,7 +182,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: login by username ----
     @Test
     @Order(4)
-    void login_byUsername_returns200() throws Exception {
+    void loginByUsernameReturns200() throws Exception {
         var resp = sendJson("POST", "/api/auth/login", null, """
                 {"username":"branch_teacher","password":"pass123"}""");
         assertEquals(200, resp.statusCode());
@@ -192,7 +192,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: login by username that looks like email (contains @) ----
     @Test
     @Order(5)
-    void login_usernameWithAtSign_fallbackToEmailLookup() throws Exception {
+    void loginUsernameWithAtSignFallbackToEmailLookup() throws Exception {
         var resp = sendJson("POST", "/api/auth/login", null, """
                 {"username":"branch_teacher@test.com","password":"pass123"}""");
         assertEquals(200, resp.statusCode());
@@ -201,7 +201,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: getUserByEmail - found ----
     @Test
     @Order(6)
-    void getUserByEmail_found_returns200() throws Exception {
+    void getUserByEmailFoundReturns200() throws Exception {
         var resp = sendJson("GET", "/api/users/by-email/" + teacherEmail, bearer(teacherToken), null);
         assertEquals(200, resp.statusCode());
         assertTrue(resp.body().contains("branch_teacher"));
@@ -210,7 +210,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: getUserByEmail - not found ----
     @Test
     @Order(7)
-    void getUserByEmail_notFound_returns404() throws Exception {
+    void getUserByEmailNotFoundReturns404() throws Exception {
         var resp = sendJson("GET", "/api/users/by-email/nonexistent@x.com", bearer(teacherToken), null);
         assertEquals(404, resp.statusCode());
     }
@@ -218,7 +218,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: getUserById - not found ----
     @Test
     @Order(8)
-    void getUserById_notFound_returns404() throws Exception {
+    void getUserByIdNotFoundReturns404() throws Exception {
         var resp = sendJson("GET", "/api/users/999999", bearer(teacherToken), null);
         assertEquals(404, resp.statusCode());
     }
@@ -226,7 +226,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: changePassword - wrong current password ----
     @Test
     @Order(9)
-    void changePassword_wrongCurrentPassword_returns401() throws Exception {
+    void changePasswordWrongCurrentPasswordReturns401() throws Exception {
         var resp = sendJson("PUT", "/api/auth/change-password", bearer(teacherToken), """
                 {"currentPassword":"wrong","newPassword":"newpass123"}""");
         assertEquals(401, resp.statusCode());
@@ -236,7 +236,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: changePassword - missing fields ----
     @Test
     @Order(10)
-    void changePassword_missingFields_returns400() throws Exception {
+    void changePasswordMissingFieldsReturns400() throws Exception {
         var resp = sendJson("PUT", "/api/auth/change-password", bearer(teacherToken), """
                 {"currentPassword":"","newPassword":""}""");
         assertEquals(400, resp.statusCode());
@@ -245,7 +245,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: changePassword - success ----
     @Test
     @Order(11)
-    void changePassword_success_returns200() throws Exception {
+    void changePasswordSuccessReturns200() throws Exception {
         var resp = sendJson("PUT", "/api/auth/change-password", bearer(studentToken), """
                 {"currentPassword":"pass123","newPassword":"newpass456"}""");
         assertEquals(200, resp.statusCode());
@@ -261,7 +261,7 @@ class ControllerBranchCoverageTest {
     // ---- CourseController: getAllCourses ----
     @Test
     @Order(15)
-    void getAllCourses_returns200() throws Exception {
+    void getAllCoursesReturns200() throws Exception {
         var resp = sendJson("GET", "/api/courses", bearer(teacherToken), null);
         assertEquals(200, resp.statusCode());
         assertTrue(resp.body().contains("Branch Test Class"));
@@ -270,7 +270,7 @@ class ControllerBranchCoverageTest {
     // ---- CourseController: getCourseById found ----
     @Test
     @Order(16)
-    void getCourseById_found_returns200() throws Exception {
+    void getCourseByIdFoundReturns200() throws Exception {
         var resp = sendJson("GET", "/api/courses/" + classId, bearer(teacherToken), null);
         assertEquals(200, resp.statusCode());
     }
@@ -278,7 +278,7 @@ class ControllerBranchCoverageTest {
     // ---- CourseController: getCourseById not found ----
     @Test
     @Order(17)
-    void getCourseById_notFound_returns404() throws Exception {
+    void getCourseByIdNotFoundReturns404() throws Exception {
         var resp = sendJson("GET", "/api/courses/999999", bearer(teacherToken), null);
         assertEquals(404, resp.statusCode());
     }
@@ -286,7 +286,7 @@ class ControllerBranchCoverageTest {
     // ---- CourseController: updateCourse by creator - success ----
     @Test
     @Order(18)
-    void updateCourse_byCreator_success() throws Exception {
+    void updateCourseByCreatorSuccess() throws Exception {
         var resp = sendJson("PUT", "/api/courses/" + classId, bearer(teacherToken), """
                 {"className":"Updated Branch Class","topic":"Updated Topic"}""");
         assertEquals(200, resp.statusCode());
@@ -296,7 +296,7 @@ class ControllerBranchCoverageTest {
     // ---- CourseController: updateCourse - course not found ----
     @Test
     @Order(19)
-    void updateCourse_courseNotFound_returns404() throws Exception {
+    void updateCourseCourseNotFoundReturns404() throws Exception {
         var resp = sendJson("PUT", "/api/courses/999999", bearer(teacherToken), """
                 {"className":"x"}""");
         assertEquals(404, resp.statusCode());
@@ -305,7 +305,7 @@ class ControllerBranchCoverageTest {
     // ---- CourseController: updateCourse - non-creator ----
     @Test
     @Order(20)
-    void updateCourse_nonCreator_returns403() throws Exception {
+    void updateCourseNonCreatorReturns403() throws Exception {
         var resp = sendJson("PUT", "/api/courses/" + classId, bearer(studentToken), """
                 {"className":"Stolen!"}""");
         assertEquals(403, resp.statusCode());
@@ -314,7 +314,7 @@ class ControllerBranchCoverageTest {
     // ---- CourseController: deleteCourse by non-creator ----
     @Test
     @Order(21)
-    void deleteCourse_nonCreator_returns403() throws Exception {
+    void deleteCourseNonCreatorReturns403() throws Exception {
         var resp = sendJson("DELETE", "/api/courses/" + classId, bearer(studentToken), null);
         assertEquals(403, resp.statusCode());
     }
@@ -322,7 +322,7 @@ class ControllerBranchCoverageTest {
     // ---- CourseController: deleteCourse not found ----
     @Test
     @Order(22)
-    void deleteCourse_notFound_returns404() throws Exception {
+    void deleteCourseNotFoundReturns404() throws Exception {
         var resp = sendJson("DELETE", "/api/courses/999999", bearer(teacherToken), null);
         assertEquals(404, resp.statusCode());
     }
@@ -330,7 +330,7 @@ class ControllerBranchCoverageTest {
     // ---- MaterialController: getMaterialById found ----
     @Test
     @Order(30)
-    void getMaterialById_found_returns200() throws Exception {
+    void getMaterialByIdFoundReturns200() throws Exception {
         var resp = sendJson("GET", "/api/materials/" + materialId, bearer(teacherToken), null);
         assertEquals(200, resp.statusCode());
         assertTrue(resp.body().contains("branch_test.txt"));
@@ -339,7 +339,7 @@ class ControllerBranchCoverageTest {
     // ---- MaterialController: downloadMaterial by enrolled user ----
     @Test
     @Order(31)
-    void downloadMaterial_enrolledUser_returnsFile() throws Exception {
+    void downloadMaterialEnrolledUserReturnsFile() throws Exception {
         var resp = sendJson("GET", "/api/materials/" + materialId + "/download", bearer(studentToken), null);
         assertEquals(200, resp.statusCode());
     }
@@ -347,7 +347,7 @@ class ControllerBranchCoverageTest {
     // ---- MaterialController: downloadMaterial by unenrolled user ----
     @Test
     @Order(32)
-    void downloadMaterial_unenrolledUser_returns403() throws Exception {
+    void downloadMaterialUnenrolledUserReturns403() throws Exception {
         // Create a new user not enrolled in the class
         UserDao userDao = new UserDao();
         User outsider = createUser(userDao, "outsider_" + System.currentTimeMillis(), "outsider@branch.com", "pass");
@@ -362,7 +362,7 @@ class ControllerBranchCoverageTest {
     // ---- MaterialController: updateMaterial with JSON body ----
     @Test
     @Order(33)
-    void updateMaterial_withJsonBody_updatesFields() throws Exception {
+    void updateMaterialWithJsonBodyUpdatesFields() throws Exception {
         var resp = sendJson("PUT", "/api/materials/" + materialId, bearer(teacherToken), """
                 {"originalFilename":"renamed.txt","materialType":"Reference"}""");
         assertEquals(200, resp.statusCode());
@@ -372,7 +372,7 @@ class ControllerBranchCoverageTest {
     // ---- MaterialController: updateMaterial by non-creator ----
     @Test
     @Order(34)
-    void updateMaterial_nonCreator_returns403() throws Exception {
+    void updateMaterialNonCreatorReturns403() throws Exception {
         var resp = sendJson("PUT", "/api/materials/" + materialId, bearer(studentToken), """
                 {"originalFilename":"stolen.txt"}""");
         assertEquals(403, resp.statusCode());
@@ -381,7 +381,7 @@ class ControllerBranchCoverageTest {
     // ---- MaterialController: updateMaterial not found ----
     @Test
     @Order(35)
-    void updateMaterial_notFound_returns404() throws Exception {
+    void updateMaterialNotFoundReturns404() throws Exception {
         var resp = sendJson("PUT", "/api/materials/999999", bearer(teacherToken), """
                 {"originalFilename":"x.txt"}""");
         assertEquals(404, resp.statusCode());
@@ -390,7 +390,7 @@ class ControllerBranchCoverageTest {
     // ---- MaterialController: deleteMaterial not found ----
     @Test
     @Order(36)
-    void deleteMaterial_notFound_returns404() throws Exception {
+    void deleteMaterialNotFoundReturns404() throws Exception {
         var resp = sendJson("DELETE", "/api/materials/999999", bearer(teacherToken), null);
         assertEquals(404, resp.statusCode());
     }
@@ -398,7 +398,7 @@ class ControllerBranchCoverageTest {
     // ---- ReviewController: getReviewsByMaterial ----
     @Test
     @Order(40)
-    void getReviewsByMaterial_returns200() throws Exception {
+    void getReviewsByMaterialReturns200() throws Exception {
         var resp = sendJson("GET", "/api/reviews/material/" + materialId, null, null);
         assertEquals(200, resp.statusCode());
     }
@@ -406,7 +406,7 @@ class ControllerBranchCoverageTest {
     // ---- ReviewController: getReviewById found ----
     @Test
     @Order(41)
-    void getReviewById_found_returns200() throws Exception {
+    void getReviewByIdFoundReturns200() throws Exception {
         var resp = sendJson("GET", "/api/reviews/" + reviewId, null, null);
         assertEquals(200, resp.statusCode());
     }
@@ -414,7 +414,7 @@ class ControllerBranchCoverageTest {
     // ---- ReviewController: getReviewById not found ----
     @Test
     @Order(42)
-    void getReviewById_notFound_returns404() throws Exception {
+    void getReviewByIdNotFoundReturns404() throws Exception {
         var resp = sendJson("GET", "/api/reviews/999999", null, null);
         assertEquals(404, resp.statusCode());
     }
@@ -422,7 +422,7 @@ class ControllerBranchCoverageTest {
     // ---- ReviewController: createReview with auth header (not attribute) ----
     @Test
     @Order(43)
-    void createReview_withBearerToken_returns201() throws Exception {
+    void createReviewWithBearerTokenReturns201() throws Exception {
         // This tests the getAuthenticatedUser fallback when email attribute isn't set
         var resp = sendJson("POST", "/api/reviews", bearer(studentToken), """
                 {"review":"Coverage test review","rating":3,"fileId":%d}""".formatted(materialId));
@@ -432,7 +432,7 @@ class ControllerBranchCoverageTest {
     // ---- ReviewController: createReview missing review text ----
     @Test
     @Order(44)
-    void createReview_missingReviewText_returns400() throws Exception {
+    void createReviewMissingReviewTextReturns400() throws Exception {
         var resp = sendJson("POST", "/api/reviews", bearer(studentToken), """
                 {"rating":3,"fileId":%d}""".formatted(materialId));
         assertEquals(400, resp.statusCode());
@@ -441,7 +441,7 @@ class ControllerBranchCoverageTest {
     // ---- ReviewController: updateReview - not owner ----
     @Test
     @Order(45)
-    void updateReview_notOwner_returns403() throws Exception {
+    void updateReviewNotOwnerReturns403() throws Exception {
         var resp = sendJson("PUT", "/api/reviews/" + reviewId, bearer(teacherToken), """
                 {"review":"hijacked","rating":1}""");
         assertEquals(403, resp.statusCode());
@@ -450,7 +450,7 @@ class ControllerBranchCoverageTest {
     // ---- ReviewController: updateReview - success ----
     @Test
     @Order(46)
-    void updateReview_byOwner_returns200() throws Exception {
+    void updateReviewByOwnerReturns200() throws Exception {
         var resp = sendJson("PUT", "/api/reviews/" + reviewId, bearer(studentToken), """
                 {"review":"Updated review","rating":5}""");
         assertEquals(200, resp.statusCode());
@@ -459,7 +459,7 @@ class ControllerBranchCoverageTest {
     // ---- ReviewController: deleteReview - not owner ----
     @Test
     @Order(47)
-    void deleteReview_notOwner_returns403() throws Exception {
+    void deleteReviewNotOwnerReturns403() throws Exception {
         var resp = sendJson("DELETE", "/api/reviews/" + reviewId, bearer(teacherToken), null);
         assertEquals(403, resp.statusCode());
     }
@@ -467,7 +467,7 @@ class ControllerBranchCoverageTest {
     // ---- ReviewController: createReview with invalid token ----
     @Test
     @Order(48)
-    void createReview_invalidToken_returns401() throws Exception {
+    void createReviewInvalidTokenReturns401() throws Exception {
         var resp = sendJson("POST", "/api/reviews", "Bearer invalidtoken123", """
                 {"review":"test","rating":3,"fileId":%d}""".formatted(materialId));
         // The ReviewController.getAuthenticatedUser should return null
@@ -477,7 +477,7 @@ class ControllerBranchCoverageTest {
     // ---- ReviewController: createReview with no auth header ----
     @Test
     @Order(49)
-    void createReview_noAuth_returns401() throws Exception {
+    void createReviewNoAuthReturns401() throws Exception {
         var resp = sendJson("POST", "/api/reviews", null, """
                 {"review":"test","rating":3,"fileId":%d}""".formatted(materialId));
         assertEquals(401, resp.statusCode());
@@ -486,7 +486,7 @@ class ControllerBranchCoverageTest {
     // ---- ParticipantController: enrollUser - user not found ----
     @Test
     @Order(50)
-    void enrollUser_userNotFound_returns400() throws Exception {
+    void enrollUserUserNotFoundReturns400() throws Exception {
         var resp = sendJson("POST", "/api/participants/enroll", null, """
                 {"userId":999999,"classId":%d}""".formatted(classId));
         assertEquals(400, resp.statusCode());
@@ -496,7 +496,7 @@ class ControllerBranchCoverageTest {
     // ---- ParticipantController: enrollUser - class not found ----
     @Test
     @Order(51)
-    void enrollUser_classNotFound_returns400() throws Exception {
+    void enrollUserClassNotFoundReturns400() throws Exception {
         var resp = sendJson("POST", "/api/participants/enroll", null, """
                 {"userId":%d,"classId":999999}""".formatted(teacherId));
         assertEquals(400, resp.statusCode());
@@ -506,7 +506,7 @@ class ControllerBranchCoverageTest {
     // ---- ParticipantController: unenroll non-self non-creator ----
     @Test
     @Order(52)
-    void unenroll_nonSelfNonCreator_returns403() throws Exception {
+    void unenrollNonSelfNonCreatorReturns403() throws Exception {
         // Create a third user enrolled in the class
         UserDao userDao = new UserDao();
         User third = createUser(userDao, "third_" + System.currentTimeMillis(), "third@branch.com", "pass");
@@ -525,7 +525,7 @@ class ControllerBranchCoverageTest {
     // ---- ParticipantController: unenroll enrollment not found ----
     @Test
     @Order(53)
-    void unenroll_enrollmentNotFound_returns404() throws Exception {
+    void unenrollEnrollmentNotFoundReturns404() throws Exception {
         // Self-unenroll from a class you're not actually enrolled in
         UserDao userDao = new UserDao();
         User user = createUser(userDao, "unenroll_" + System.currentTimeMillis(), "unenroll@branch.com", "pass");
@@ -541,7 +541,7 @@ class ControllerBranchCoverageTest {
     // ---- MaterialController: downloadMaterial not found ----
     @Test
     @Order(54)
-    void downloadMaterial_materialNotFound_returns404() throws Exception {
+    void downloadMaterialMaterialNotFoundReturns404() throws Exception {
         var resp = sendJson("GET", "/api/materials/999999/download", bearer(teacherToken), null);
         assertEquals(404, resp.statusCode());
     }
@@ -549,7 +549,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: login with email field (primary path) ----
     @Test
     @Order(55)
-    void login_byEmail_returns200() throws Exception {
+    void loginByEmailReturns200() throws Exception {
         var resp = sendJson("POST", "/api/auth/login", null, """
                 {"email":"branch_teacher@test.com","password":"pass123"}""");
         assertEquals(200, resp.statusCode());
@@ -559,7 +559,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: login with empty string email and empty username ----
     @Test
     @Order(56)
-    void login_blankEmailAndUsername_returns400() throws Exception {
+    void loginBlankEmailAndUsernameReturns400() throws Exception {
         var resp = sendJson("POST", "/api/auth/login", null, """
                 {"email":"","username":"","password":"pass123"}""");
         assertEquals(400, resp.statusCode());
@@ -568,7 +568,7 @@ class ControllerBranchCoverageTest {
     // ---- UserController: login blank password ----
     @Test
     @Order(57)
-    void login_blankPassword_returns400() throws Exception {
+    void loginBlankPasswordReturns400() throws Exception {
         var resp = sendJson("POST", "/api/auth/login", null, """
                 {"email":"branch_teacher@test.com","password":""}""");
         assertEquals(400, resp.statusCode());
@@ -577,7 +577,7 @@ class ControllerBranchCoverageTest {
     // ---- MaterialController: getMaterialsByCourse ----
     @Test
     @Order(60)
-    void getMaterialsByCourse_returns200() throws Exception {
+    void getMaterialsByCourseReturns200() throws Exception {
         var resp = sendJson("GET", "/api/materials/course/" + classId, bearer(teacherToken), null);
         assertEquals(200, resp.statusCode());
     }
