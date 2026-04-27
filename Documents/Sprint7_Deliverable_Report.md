@@ -82,10 +82,10 @@ Reference: target/site/jacoco/jacoco.csv
 
 | Team Member Name | Assigned Tasks | Time Spent (hrs) | In-class Tasks |
 |---|---|---:|---|
-| Elias Eide | Test execution, UAT support, documentation | 20 | Submitted |
-| Aleksi Lappalainen | CI/CD and SonarQube verification, reporting | 20 | Submitted |
-| Arttu Salo | Functional testing, bug tracking, quality checks | 20 | Submitted |
-| Eero Koivukoski | Heuristic review support and issue tracking | 5 | Not Submitted |
+| Elias Eide | Test execution, UAT support, documentation | 10 | Submitted |
+| Aleksi Lappalainen | CI/CD and SonarQube verification, reporting | 10 | Submitted |
+| Arttu Salo | Functional testing, bug tracking, quality checks | 10 | Submitted |
+| Eero Koivukoski | Heuristic review support and issue tracking | 6 | Submitted |
 
 ## 6. Appendix
 
