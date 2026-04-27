@@ -85,7 +85,7 @@ Reference: target/site/jacoco/jacoco.csv
 | Elias Eide | Test execution, UAT support, documentation | 10 | Submitted |
 | Aleksi Lappalainen | CI/CD and SonarQube verification, reporting | 10 | Submitted |
 | Arttu Salo | Functional testing, bug tracking, quality checks | 10 | Submitted |
-| Eero Koivukoski | Heuristic review support and issue tracking | 6 | Submitted |
+| Eero Koivukoski | Heuristic review support and issue tracking | 10 | Submitted |
 
 ## 6. Appendix
 
