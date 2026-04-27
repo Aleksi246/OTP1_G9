@@ -24,6 +24,9 @@
 
 ## Code refactoring and Quality improvements
 - The codebase was refactored using tools such as SonarQube, Checkstyle, and PMD to improve code quality and maintainability.
+- 2 critical issues in bestpractices were fixed
+- 7 critical design issues were fixed
+- 256 naming convention issues in codestyle fixed
 
 ### Reason:
 - To enforce consistent coding standards, reduce code smells, and improve long-term maintainability.
