@@ -96,5 +96,3 @@ Reference: target/site/jacoco/jacoco.csv
 - Documents/TechnicalChanges27_4_2026.md
 - Documents/STATISTICAL_CODE_REVIEW.MD
 - Documents/diagrams/Heuristic Summary OTP2-1.png
-- Jenkinsfile
-- docker-compose.yml
