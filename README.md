@@ -1,290 +1,286 @@
-# Classroom Sharing System
+# Classroom Resource Sharing Platform (OTP1_G9)
 
-## Project Description
+## 1. Project Title & Overview
+Classroom Resource Sharing Platform is a Java-based learning system for managing courses, materials, and peer feedback in one workflow.
+The project solves fragmented file sharing and review processes in course environments by centralizing class enrollment, uploads, downloads, and ratings.
+Target users are students and instructors who need role-based access to classroom resources.
+The system combines a JavaFX desktop UI, Javalin REST backend, and MariaDB persistence.
+Security includes JWT-based authorization and BCrypt password hashing.
+The implementation also supports multilingual UI behavior including RTL handling for Persian.
+Project duration was 8 sprints, each 2 weeks (total 16 weeks).
 
-The Classroom Sharing System is a comprehensive application designed to facilitate resource sharing and collaboration within educational institutions. This system enables students and instructors to share course materials, collaborate on projects, and manage classroom resources efficiently. The application features user authentication, role-based access control, material management, and review capabilities to promote a collaborative learning environment.
+## 2. Product Vision
+### Vision Statement
+Build a secure, testable, and multilingual classroom platform where course resources can be shared and reviewed efficiently.
 
-**The application supports multiple languages** including English, French, Russian, and Persian (Farsi) with full RTL (Right-to-Left) support for Persian.
+### Main Goals
+- Centralize course resource management.
+- Enforce role-based behavior for creators and participants.
+- Provide measurable software quality through automated testing and analysis.
+- Support localization at both UI and database levels.
 
-## Technology Stack
+### Key Features
+- User registration, login, and password change.
+- Course creation, enrollment, update, and deletion.
+- File upload/download with authorization checks.
+- Material reviews and ratings.
+- Multilingual UI (English, French, Russian, Persian) with RTL support.
+- Dockerized execution and CI pipeline automation.
 
-### Backend
-- **Language:** Java 21
-- **Framework:** Spring Boot
-- **Build Tool:** Maven 3.6+
-- **Database:** MariaDB 10.4+
-- **Testing:** JUnit 5, Mockito
-- **Code Coverage:** JaCoCo
-- **CI/CD:** Jenkins
+### Definition of Success
+The project is considered complete when core user stories are implemented, automated tests pass, sprint deliverables are documented, quality metrics are available, and the system can be run reproducibly via local Maven and Docker workflows.
 
-### Frontend
-- **Framework:** JavaFX 21.0.6
-- **Language:** Java 21
-- **UI Components:** FXML with CSS styling
+## 3. Project Plan & Sprint Structure
+### Development Methodology
+The team followed Agile/Scrum with sprint planning, sprint review, and backlog updates.
 
-### DevOps & Deployment
-- **Containerization:** Docker
-- **Container Registry:** Docker Hub
-- **Version Control:** Git/GitHub
+### Sprint Length
+Each sprint lasted 2 weeks.
 
-## Architecture Design
+### 8-Sprint Timeline (Goals)
+- Sprint 1: Project kickoff, vision, and initial planning.
+- Sprint 2: Requirements, database foundation, initial UI/testing setup.
+- Sprint 3: Core feature completion, CI and coverage automation.
+- Sprint 4: Product finalization and Docker packaging.
+- Sprint 5: UI localization and internationalization.
+- Sprint 6: Database localization and quality/refactoring work.
+- Sprint 7: QA execution, acceptance testing, and issue tracking.
+- Sprint 8: Documentation consolidation and final delivery packaging.
+
+## 4. Sprint 1 - Project Planning & Vision
+### Summary
+Sprint 1 established project direction, initial scope, and startup coordination.
+
+### Included Work
+- Project plan summary and project vision definition.
+- Initial backlog direction and next-sprint preparation.
+- Early risk/scope recognition (team communication and planning improvements identified).
+
+### Planning/Review Links
+- Sprint planning report: [Sprint 1 Planning](Documents/sprint_reports/sprint1_planning_report.md)
+- Sprint review report: [Sprint 1 Review](Documents/sprint_reports/sprint1_review_report.md)
+
+## 5. Sprint 2 - Requirements & Database
+### Functional Requirements Summary
+Sprint 2 focused on requirements implementation foundations: schema design, initial UI work, unit tests, and code coverage setup.
 
 ### Use Case Diagram
-The system supports the following primary use cases:
+- [Use Case Diagram](Documents/diagrams/img_1.png)
 
-![Use Case Diagram](Documents/diagrams/img_1.png)
+### ER Diagram
+- [ER Diagram](Documents/diagrams/ER.png)
 
-The use case diagram depicts the key interactions between actors (Students, Instructors, Administrators) and the system, including:
-- User authentication and profile management
-- Material upload and sharing
-- Course enrollment and management
-- Review and feedback mechanisms
-- Resource discovery and access control
+### Database Technology
+- MariaDB with relational schema and constraints.
 
-### Entity-Relationship Diagram
-The database architecture is modeled through an ER diagram that defines the relationships between core entities:
+### Database Implementation Overview
+- Core tables and relationships created and validated.
+- CRUD behavior tested during sprint.
 
-![ER Diagram](Documents/diagrams/erdiagram.png)
+### Unit Testing Strategy and Tools
+- JUnit 5 + Mockito with Maven Surefire.
+- JaCoCo introduced for coverage tracking.
 
-The ER diagram illustrates the logical structure of the database, including:
-- **Users:** Student and instructor accounts with authentication credentials
-- **Courses:** Course definitions with metadata and enrollment information
-- **Materials:** Shareable resources attached to courses
-- **Reviews:** Feedback and ratings on materials and contributions
-- **Participants:** Enrollment records linking users to courses
+### Planning/Review Links
+- Sprint planning report: [Sprint 2 Planning](Documents/sprint_reports/sprint2_planning_report.md)
+- Sprint review report: [Sprint 2 Review](Documents/sprint_reports/sprint2_review_report.md)
 
-## Project Documentation & Sprint Reports
+## 6. Sprint 3 - UI Implementation & CI
+### UI Framework and Design Approach
+- JavaFX + FXML + CSS for desktop UI.
+- Incremental integration of UI and backend features.
 
-For detailed information about project progress, sprint planning, and architectural decisions, visit the [Sprint Reports Folder](Documents/sprint_reports/):
+### Screens Implemented
+- Login and registration flow.
+- Home/class management views.
+- Material and review dialogs.
 
-- [Sprint 1 Review](Documents/sprint_reports/sprint1_review_report.md)
-- [Sprint 2 Planning](Documents/sprint_reports/sprint2_planning_report.md)
-- [Sprint 2 Review](Documents/sprint_reports/sprint2_review_report.md)
-- [Sprint 3 Planning](Documents/sprint_reports/sprint3_planning_report.md)
-- [Sprint 3 Review](Documents/sprint_reports/sprint3_review_report.md)
-- [Sprint 4 Planning](Documents/sprint_reports/sprint4_planning_report.md)
-- [Sprint 5 Planning](Documents/sprint_reports/sprint5_planning_report.md)
-- [Sprint 5 Review](Documents/sprint_reports/sprint5_review_report.md)
-- [Sprint 6 Planning](Documents/sprint_reports/sprint6_planning_report.md)
+### Code Coverage Goals and Tools
+- Expanded unit and integration testing.
+- JaCoCo pipeline publication through Jenkins.
 
-## Getting Started
+### Jenkins Pipeline
+- Build stage.
+- Test stage.
+- Coverage report stage.
 
+### Planning/Review Links
+- Sprint planning report: [Sprint 3 Planning](Documents/sprint_reports/sprint3_planning_report.md)
+- Sprint review report: [Sprint 3 Review](Documents/sprint_reports/sprint3_review_report.md)
+
+## 7. Sprint 4 - Docker Containerization
+### Purpose of Docker in the Project
+Docker was used to standardize runtime setup, simplify environment bootstrapping, and prepare reproducible delivery.
+
+### Services Containerized
+- Application service.
+- MariaDB database service.
+
+### Dockerfile and Compose Overview
+- [Dockerfile](Dockerfile)
+- [Docker Compose](docker-compose.yml)
+
+### Container Usage in Development/Testing
+- Local development and smoke validation run through compose stack.
+- Database bootstrap is wired with [init.sql](init.sql).
+
+### Planning/Review Links
+- Sprint planning report: [Sprint 4 Planning](Documents/sprint_reports/sprint4_planning_report.md)
+- Sprint review report: [Sprint 4 Review](Documents/sprint_reports/sprint4_review_report.md)
+
+## 8. Sprint 5 - UI Localization & Kubernetes
+### Supported UI Languages
+- English (`en`)
+- French (`fr`)
+- Russian (`ru`)
+- Persian (`fa`, RTL)
+
+### Localization Approach
+- UI text externalized and dynamically selected by locale.
+- Runtime language switching with RTL handling for Persian.
+
+### Kubernetes Usage
+Kubernetes manifests are not included in this repository.
+- Deployment strategy: not applied in this project repository.
+- Services/scaling: not applied in this project repository.
+
+### Planning/Review Links
+- Sprint planning report: [Sprint 5 Planning](Documents/sprint_reports/sprint5_planning_report.md)
+- Sprint review report: [Sprint 5 Review](Documents/sprint_reports/sprint5_review_report.md)
+
+## 9. Sprint 6 - Database Localization
+### Language/Region-Specific Data Handling
+- Localization moved to database layer using key-value translation entries.
+- UTF-8 capable schema for multilingual strings.
+
+### Migration or Schema Changes
+- Added `localization_strings` table and uniqueness rule on `(translation_key, language)`.
+- Seeded multilingual content through [init.sql](init.sql).
+
+### Validation Approach
+- Static key checks against seed data.
+- Compile/test validation after localization updates.
+- Runtime fallback to English for missing localized keys.
+
+### Planning/Review Links
+- Sprint planning report: [Sprint 6 Planning](Documents/sprint_reports/sprint6_planning_report.md)
+- Sprint review report: [Sprint 6 Review](Documents/sprint_reports/sprint6_review_report.md)
+- Detailed implementation report: [Database Localization Report](Documents/DATABASE_LOCALIZATION_REPORT.md)
+
+## 10. Sprint 7 - Quality Assurance
+### SonarQube Usage and Metrics
+- SonarQube/SonarScanner used for static quality and security checks.
+- Supporting metrics and findings documented in:
+  - [Statistical Code Review](Documents/STATISTICAL_CODE_REVIEW.MD)
+  - [Technical Changes](Documents/TechnicalChanges27_4_2026.md)
+
+### Code Quality Goals
+- Reduce critical findings, improve naming/standards consistency, and lower technical debt through refactoring.
+
+### JMeter Test Scenarios
+JMeter artifacts are not included in this repository.
+
+### Functional and Non-Functional Testing
+- Functional, UAT, and acceptance coverage documented in:
+  - [Sprint 7 Deliverable Report](Documents/Sprint7_Deliverable_Report.md)
+  - [Acceptance Test Plan](Documents/Acceptance_Test_Plan.md)
+  - [Test Plan](Documents/TEST_PLAN_SIMPLE.md)
+  - [Test Cases](Documents/TEST_CASES.md)
+
+### Planning/Review Links
+- Sprint planning report: [Sprint 7 Planning](Documents/sprint_reports/sprint7_planning_report.md)
+- Sprint review report: [Sprint 7 Deliverable Report](Documents/Sprint7_Deliverable_Report.md)
+
+## 11. Sprint 8 - Documentation & Finalization
+### Technical Documentation
+- Sprint reports and technical notes consolidated in [Documents](Documents/).
+- DB initialization behavior and safety modes documented in [DB Init Guide](Documents/DB_INIT_GUIDE.md).
+- Code quality and localization details are documented in [Statistical Code Review](Documents/STATISTICAL_CODE_REVIEW.MD), [Technical Changes](Documents/TechnicalChanges27_4_2026.md), and [Database Localization Report](Documents/DATABASE_LOCALIZATION_REPORT.md).
+
+### User Documentation
+- End-user testing flows and acceptance scenarios documented in:
+  - [Acceptance Test Plan](Documents/Acceptance_Test_Plan.md)
+  - [Test Cases](Documents/TEST_CASES.md)
+  - [Test Plan](Documents/TEST_PLAN_SIMPLE.md)
+
+### API Documentation
+- API call examples are provided in [HTTP Test Suite](http_test.http).
+
+### Final System Architecture Diagram
+- [Class/Architecture Diagram](Documents/diagrams/LuokkakaavioGroup9-1-1.png)
+
+### Planning/Review Links
+- Sprint planning report: [Sprint 8 Planning](Documents/sprint_reports/sprint8_planning_report.md)
+- Sprint review report: [Sprint 8 Review](Documents/sprint_reports/sprint8_review_report.md)
+
+## 12. How to Run the Project
 ### Prerequisites
-- Java 21 or higher
+- Java 21
 - Maven 3.6+
-- MariaDB 10.4+
-- Docker (optional, for containerized deployment)
+- Docker + Docker Compose (for containerized run)
+- MariaDB (if running without Docker)
 
-### Installation & Setup
+### Environment Setup
+1. Configure database credentials using environment variables or properties as described in [DB Init Guide](Documents/DB_INIT_GUIDE.md).
+2. Ensure initialization SQL file is available: [init.sql](init.sql).
+3. If you are running without Docker, provide a MariaDB instance and matching `DB_URL`, `DB_USER`, and `DB_PASS` values for the application.
 
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd OTP1_G9
-   ```
-
-2. **Configure database connection:**
-   - Update database credentials in the application properties file if needed
-   - Initialize the database using the provided `init.sql` script:
-     ```bash
-     mysql -u <username> -p < init.sql
-     ```
-
-### Running the Application
-
-#### Option 1: Using Maven (Recommended)
+### Run with Maven
 ```bash
-# Clean build and run with JavaFX
 mvn clean javafx:run
-
-# Run without running tests (faster development)
-mvn -DskipTests javafx:run
-
-# Run tests and generate code coverage report
-mvn clean test jacoco:report
 ```
 
-#### Option 2: Using Docker Compose (macOS & Windows)
+### Run with Docker Compose
 ```bash
-# Start the database + app, and build the local image if needed
 docker compose up --build
 ```
 
-The Compose file now builds the app locally and connects it to the database service automatically, so you do not need separate `docker build` or `docker run` commands.
-
-Before first run, make sure your host X server is ready:
-
-- **macOS:** install/open **XQuartz**, then run `xhost + 127.0.0.1`
-- **Windows:** start **VcXsrv** or **Xming** and allow local connections
-
-
-Useful commands:
+### Optional Stop Command
 ```bash
-# Follow logs
-docker compose logs -f
-
-# Stop containers
 docker compose down
 ```
 
-## Language Selection & Localization
+### How to Access the Application
+- Desktop application: starts through JavaFX when launched with Maven or inside the app container.
+- Backend/API base URL: `http://localhost:7700`
+- API request examples: [HTTP Test Suite](http_test.http)
 
-The application supports **4 languages** that can be switched seamlessly within the application:
+## 13. Testing Instructions
+### Run Unit/Integration Tests
+```bash
+mvn test
+```
 
-| Language | Code | Default | RTL Support |
-|----------|------|---------|-------------|
-| English | `en` | ✓ | ✗ |
-| Français (French) | `fr` | | ✗ |
-| Русский (Russian) | `ru` | | ✗ |
-| فارسی (Persian/Farsi) | `fa` | | ✓ |
+### Generate Coverage Report
+```bash
+mvn test jacoco:report
+```
+Coverage report entry point:
+- [JaCoCo HTML Index](target/site/jacoco/index.html)
 
-### Localization Implementation
+### Performance Testing Instructions
+- Performance criteria and scenarios are documented in [Test Plan](Documents/TEST_PLAN_SIMPLE.md).
+- Dedicated JMeter files are not included in this repository.
 
-- Localization and translation work was assisted with GitHub Copilot during development.
-- UI text is externalized to the database table `localization_strings` (see `init.sql`).
-- `LocaleManager` loads translations through `LocalizationDao` and serves them via a `ResourceBundle` adapter:
-  - `src/main/java/com/example/app/LocaleManager.java`
-  - `src/main/java/com/example/otp/dao/LocalizationDao.java`
-- Translation rows are keyed by `(translation_key, language)` and seeded for `en`, `fa`, `fr`, and `ru`.
-- Non-default languages use English fallback for missing keys in `LocaleManager`.
+## 14. Repository Structure
+Main directories and files:
+- [src/main](src/main) - Application source: UI, controllers, DAO, models, and services
+- [src/test](src/test) - Unit and integration tests
+- [Documents](Documents) - Sprint reports, test plans, technical reports, diagrams
+- [Documents/diagrams](Documents/diagrams) - Use case, ER, architecture, flow visuals
+- [uploads](uploads) - Uploaded material storage during runtime/tests
+- [docker-compose.yml](docker-compose.yml) - Multi-service container orchestration
+- [Dockerfile](Dockerfile) - Application image definition
+- [Jenkinsfile](Jenkinsfile) - CI pipeline stages
+- [init.sql](init.sql) - Database schema and seed data
 
-### Database Localization Strategy (ERD + Data Model)
+## 15. Authors
+### Team Members and Roles
+- Elias Eide - Development, Testing, Documentation
+- Aleksi Lappalainen - CI/CD, DevOps, Quality Reporting
+- Arttu Salo - Development, Testing, Quality Checks
+- Eero Koivukoski - QA Support, Issue Tracking, Documentation Support
 
-- Localization method: **key-value translation table** (`localization_strings`) with one row per key/language.
-- Schema (from `init.sql`):
-  - `translation_key VARCHAR(100) NOT NULL`
-  - `value VARCHAR(500) NOT NULL`
-  - `language VARCHAR(10) NOT NULL`
-  - `UNIQUE (translation_key, language)`
-- Character encoding: `utf8mb4` with `utf8mb4_unicode_ci` collation for multilingual text storage.
-- ERD impact: `localization_strings` is a shared lookup table used by UI localization code (no FK to domain tables).
-
-### Localization Validation Checklist
-
-1. Seed localization data:
-   ```sql
-   USE otptestdb;
-   SOURCE /path/to/init.sql;
-   ```
-2. Switch language from the top bar (`en`, `fa`, `fr`, `ru`).
-3. Verify key screens (Login, Home, Class, Review dialogs) render translated labels/messages.
-4. Verify fallback behavior by temporarily removing a non-English key: app should fall back to English.
-5. Confirm UTF-8 retrieval in DB:
-   ```sql
-   SELECT translation_key, value, language
-   FROM localization_strings
-   WHERE language IN ('fa','fr','ru')
-   LIMIT 20;
-   ```
-
-### Selecting a Language at Runtime
-
-1. **Launch the Application:**
-   - Run the application using Maven or Docker
-   - The application starts in English by default
-
-2. **Change Language:**
-   - After logging in, locate the **language selector dropdown** in the top navigation bar
-   - Click the dropdown to view all available languages
-   - Select your preferred language from the list:
-     - **English** (English)
-     - **Français** (French)
-     - **Русский** (Russian)
-     - **فارسی** (Persian/Farsi with RTL support)
-   - The entire application UI will instantly update to display content in the selected language
-
-3. **Language Features:**
-   - **English** - Full translations for all UI elements, messages, and dialogs
-   - **French** - Complete French localization with proper accents and formatting
-   - **Russian** - Complete Russian localization with Cyrillic text support
-   - **Persian (Farsi)** - Complete localization with Right-to-Left (RTL) text direction and bidirectional text support
-
-### Adding New Languages
-
-To add a new language to the application:
-
-1. **Insert translation rows:**
-   Add new rows to `localization_strings` for the new language code.
-   Use the same `translation_key` set as English.
-
-2. **Update TopBarController.java:**
-   Modify the initialize method to include the new locale:
-   ```java
-   languageChoiceBox.getItems().setAll(
-       Locale.ENGLISH, 
-       Locale.FRENCH, 
-       new Locale("fa"), 
-       new Locale("ru"),
-       new Locale("de")  // Add your new locale here
-   );
-   ```
-
-3. **Add display name:**
-   Update the `StringConverter` in the same file:
-   ```java
-   case "de" -> "Deutsch";
-   ```
-
-4. **Handle RTL (if needed):**
-   If your language reads right-to-left, update `LocaleManager.isRightToLeft()`:
-   ```java
-   public static boolean isRightToLeft() {
-       return currentLocale != null && ("fa".equals(currentLocale.getLanguage()) || "ar".equals(currentLocale.getLanguage()));
-   }
-   ```
-
-5. **Rebuild and test:**
-   ```bash
-   mvn clean javafx:run
-   ```
-
-## Build & Deployment Status
-
-- **CI/CD Pipeline:** Jenkins integration active
-- **Code Quality:** Continuous testing with JUnit 5 and code coverage tracking
-- **Published JaCoCo Coverage Report:** https://users.metropolia.fi/~aleklap/Aleksi246%20OTP1_G9%20main%20target-site_jacoco/
-
-## Additional Resources
-
-- **Published JaCoCo Report:** https://users.metropolia.fi/~aleklap/Aleksi246%20OTP1_G9%20main%20target-site_jacoco/
-- **Database Initialization Guide:** See [DB_INIT_GUIDE.md](DB_INIT_GUIDE.md)
-- **Database Localization Report:** See [DATABASE_LOCALIZATION_REPORT.md](DATABASE_LOCALIZATION_REPORT.md)
-- **Project Management:** Trello Board - https://trello.com/b/JAtHGqiA/sprint5
-
-## Troubleshooting
-
-### Common Issues
-
-**Issue: Application won't start with JavaFX**
-- Ensure Java 21 is installed: `java -version`
-- Check that your platform is correctly set in pom.xml (mac-aarch64 for Apple Silicon, mac for Intel)
-- Try cleaning Maven cache: `mvn clean`
-
-**Issue: Database connection fails**
-- Verify MariaDB is running
-- Check database credentials in application properties
-- Ensure the init.sql script has been executed
-
-**Issue: Language not changing**
-- Make sure you're logged in before accessing the language selector
-- Ensure `init.sql` has been executed and includes rows in `localization_strings` for the selected language
-- Restart the app after reseeding translations, or trigger `LocaleManager.refresh()` in development
-
-## Requirements
-
-- **Minimum Java Version:** Java 21
-- **Build System:** Maven 3.6 or later
-- **Database:** MariaDB 10.4 or later
-- **Operating Systems:** Windows, macOS (Intel & Apple Silicon), Linux
-- **Display Resolution:** Minimum 1280x720 recommended
-
-## Contributing
-
-When contributing to this project:
-
-1. Follow the existing code style and conventions
-2. Add/update tests for new features
-3. Ensure code coverage remains above current level (check with `mvn jacoco:report`)
-4. Update documentation for significant changes
-5. Create descriptive commit messages
-6. Reference sprint reports when applicable
+### Course
+- AD / Spring 2026
+- Project: OTP2 / Team OTP1_G9
